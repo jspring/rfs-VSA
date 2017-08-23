@@ -1,0 +1,19 @@
+#!/bin/bash
+
+NOWTIME=`date +%s`
+LATESTFILE=`ls -t /var/www/html/VSA/data/datafeed* | head -1` 2>/home/jspring/run_vsa.err
+LATESTFILETIME=`stat -c %X $LATESTFILE` 2>>/home/jspring/run_vsa.err
+TIMESINCELASTDATA=`echo $(($NOWTIME-$LATESTFILETIME))`
+
+if [[ $TIMESINCELASTDATA -gt 7200 ]]
+then
+	echo Latest data is $TIMESINCELASTDATA seconds old. That is longer than 7200 seconds, so we are exiting....
+	exit 0
+fi
+
+killall xml_parser 2>>/home/jspring/run_vsa.err
+killall db_slv 2>>/home/jspring/run_vsa.err
+/home/path/db/db_clean.sh 2>>/home/jspring/run_vsa.err
+/home/path/db/lnx/db_slv 2>>/home/jspring/run_vsa.err &
+
+/home/rfs-VSA/src/lnx/xml_parser $LATESTFILE 2>>/home/jspring/run_vsa.err
