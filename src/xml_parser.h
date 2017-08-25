@@ -1,111 +1,103 @@
 #include <db_include.h>
+#include "urms.h"
 
 typedef struct {
 	int vsa;
 } db_vsa_ctl_t;
 
-#define DB_JEFFERSON_1_TYPE		500
-#define DB_JEFFERSON_2_TYPE		501
-#define DB_EL_CAMINO_REAL_1_TYPE	502
-#define DB_EL_CAMINO_REAL_2_TYPE	503
-#define DB_PLAZA_1_TYPE			504
-#define DB_PLAZA_2_TYPE			505
-#define DB_EMERALD_1_TYPE		506
-#define DB_EMERALD_2_TYPE		507
-#define DB_VISTA_VILLAGE_1_TYPE		508
-#define DB_VISTA_VILLAGE_2_TYPE		509
-#define DB_ESCONDIDO_1_TYPE		510
-#define DB_ESCONDIDO_2_TYPE		511
-#define DB_MAR_VISTA_1_TYPE		512
-#define DB_MAR_VISTA_2_TYPE		513
-#define DB_SYCAMORE_1_TYPE		514
-#define DB_SYCAMORE_2_TYPE		515
-#define DB_SANTA_FE_1_TYPE		516
-#define DB_SANTA_FE_2_TYPE		517
-#define DB_LAS_POSAS_1_TYPE		518
-#define DB_LAS_POSAS_2_TYPE		519
-#define DB_SAN_MARCOS_1_TYPE		520
-#define DB_SAN_MARCOS_2_TYPE		521
-#define DB_TWIN_OAKS_1_TYPE		522
-#define DB_TWIN_OAKS_2_TYPE		523
-#define	DB_BARHAM_1_TYPE		524
-#define	DB_BARHAM_2_TYPE		525
-#define DB_NORDAHL_1_TYPE		526
-#define DB_NORDAHL_2_TYPE		527
+#define NUM_LOOPNAMES		12
 
-#define DB_LDS_BASE_VAR		DB_JEFFERSON_1_TYPE
-#define DB_JEFFERSON_1_VAR	DB_JEFFERSON_1_TYPE
-#define DB_JEFFERSON_2_VAR	DB_JEFFERSON_2_TYPE
-#define DB_EL_CAMINO_REAL_1_VAR	DB_EL_CAMINO_REAL_1_TYPE
-#define DB_EL_CAMINO_REAL_2_VAR	DB_EL_CAMINO_REAL_2_TYPE
-#define DB_PLAZA_1_VAR		DB_PLAZA_1_TYPE
-#define DB_PLAZA_2_VAR		DB_PLAZA_2_TYPE
-#define DB_EMERALD_1_VAR	DB_EMERALD_1_TYPE
-#define DB_EMERALD_2_VAR	DB_EMERALD_2_TYPE
-#define DB_VISTA_VILLAGE_1_VAR	DB_VISTA_VILLAGE_1_TYPE
-#define DB_VISTA_VILLAGE_2_VAR	DB_VISTA_VILLAGE_2_TYPE
-#define DB_ESCONDIDO_1_VAR	DB_ESCONDIDO_1_TYPE
-#define DB_ESCONDIDO_2_VAR	DB_ESCONDIDO_2_TYPE
-#define DB_MAR_VISTA_1_VAR	DB_MAR_VISTA_1_TYPE
-#define DB_MAR_VISTA_2_VAR	DB_MAR_VISTA_2_TYPE
-#define DB_SYCAMORE_1_VAR	DB_SYCAMORE_1_TYPE
-#define DB_SYCAMORE_2_VAR	DB_SYCAMORE_2_TYPE
-#define DB_SANTA_FE_1_VAR	DB_SANTA_FE_1_TYPE
-#define DB_SANTA_FE_2_VAR	DB_SANTA_FE_2_TYPE
-#define DB_LAS_POSAS_1_VAR	DB_LAS_POSAS_1_TYPE
-#define DB_LAS_POSAS_2_VAR	DB_LAS_POSAS_2_TYPE
-#define DB_SAN_MARCOS_1_VAR	DB_SAN_MARCOS_1_TYPE
-#define DB_SAN_MARCOS_2_VAR	DB_SAN_MARCOS_2_TYPE
-#define DB_TWIN_OAKS_1_VAR	DB_TWIN_OAKS_1_TYPE
-#define DB_TWIN_OAKS_2_VAR	DB_TWIN_OAKS_2_TYPE
-#define	DB_BARHAM_1_VAR		DB_BARHAM_1_TYPE
-#define	DB_BARHAM_2_VAR		DB_BARHAM_2_TYPE
-#define DB_NORDAHL_1_VAR	DB_NORDAHL_1_TYPE
-#define DB_NORDAHL_2_VAR	DB_NORDAHL_2_TYPE
+#define DB_JEFFERSON_TYPE		3000
+#define DB_EL_CAMINO_REAL_TYPE		3200
+#define DB_PLAZA_TYPE			3400
+#define DB_EMERALD_TYPE			3600	
+#define DB_VISTA_VILLAGE_TYPE		3800
+#define DB_ESCONDIDO_TYPE		4000
+#define DB_MAR_VISTA_TYPE		4200
+#define DB_SYCAMORE_TYPE		4400
+#define DB_SANTA_FE_TYPE		4600
+#define DB_LAS_POSAS_TYPE		4800
+#define DB_SAN_MARCOS_TYPE		5000
+#define DB_TWIN_OAKS_TYPE		5200
+#define	DB_BARHAM_TYPE			5400
+#define DB_NORDAHL_TYPE			5600
+
+#define DB_LDS_BASE_VAR		DB_JEFFERSON_TYPE
+#define VAR_INC			200 // Constant difference between sequential DB vars
+#define DB_JEFFERSON_VAR	DB_JEFFERSON_TYPE
+#define DB_EL_CAMINO_REAL_VAR	DB_EL_CAMINO_REAL_TYPE
+#define DB_PLAZA_VAR		DB_PLAZA_TYPE
+#define DB_EMERALD_VAR		DB_EMERALD_TYPE
+#define DB_VISTA_VILLAGE_VAR	DB_VISTA_VILLAGE_TYPE
+#define DB_ESCONDIDO_VAR	DB_ESCONDIDO_TYPE
+#define DB_MAR_VISTA_VAR	DB_MAR_VISTA_TYPE
+#define DB_SYCAMORE_VAR		DB_SYCAMORE_TYPE
+#define DB_SANTA_FE_VAR		DB_SANTA_FE_TYPE
+#define DB_LAS_POSAS_VAR	DB_LAS_POSAS_TYPE
+#define DB_SAN_MARCOS_VAR	DB_SAN_MARCOS_TYPE
+#define DB_TWIN_OAKS_VAR	DB_TWIN_OAKS_TYPE
+#define	DB_BARHAM_VAR		DB_BARHAM_TYPE
+#define DB_NORDAHL_VAR		DB_NORDAHL_TYPE
 
 typedef struct {
-        char	*loopname;
+        char	loopname[5];
         unsigned char loopnameindex;
         char	rawspeed;
+        char	rawlooperrorstatus;
         char	rawvolume;
         float	rawoccupancy;
         short	rawoccupancycount;     
 } IS_PACKED loop_data_t;
 
-#define MAX_LOOPS_PER_DB_VAR	9 //Keeps size of db variable < 128 bytes
-
 db_id_t db_vds_list[] =  {
-	{DB_JEFFERSON_1_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_JEFFERSON_2_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_EL_CAMINO_REAL_1_VAR	, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_EL_CAMINO_REAL_2_VAR	, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_PLAZA_1_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_PLAZA_2_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_EMERALD_1_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_EMERALD_2_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_VISTA_VILLAGE_1_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_VISTA_VILLAGE_2_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_ESCONDIDO_1_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_ESCONDIDO_2_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_MAR_VISTA_1_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_MAR_VISTA_2_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_SYCAMORE_1_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_SYCAMORE_2_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_SANTA_FE_1_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_SANTA_FE_2_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_LAS_POSAS_1_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_LAS_POSAS_2_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_SAN_MARCOS_1_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_SAN_MARCOS_2_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_TWIN_OAKS_1_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_TWIN_OAKS_2_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_BARHAM_1_VAR	, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_BARHAM_2_VAR	, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_NORDAHL_1_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR},
-	{DB_NORDAHL_2_VAR, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR}
+	{DB_JEFFERSON_VAR, sizeof(db_urms_status_t)},
+	{DB_EL_CAMINO_REAL_VAR	, sizeof(db_urms_status_t)},
+	{DB_PLAZA_VAR, sizeof(db_urms_status_t)},
+	{DB_EMERALD_VAR, sizeof(db_urms_status_t)},
+	{DB_VISTA_VILLAGE_VAR, sizeof(db_urms_status_t)},
+	{DB_ESCONDIDO_VAR, sizeof(db_urms_status_t)},
+	{DB_MAR_VISTA_VAR, sizeof(db_urms_status_t)},
+	{DB_SYCAMORE_VAR, sizeof(db_urms_status_t)},
+	{DB_SANTA_FE_VAR, sizeof(db_urms_status_t)},
+	{DB_LAS_POSAS_VAR, sizeof(db_urms_status_t)},
+	{DB_SAN_MARCOS_VAR, sizeof(db_urms_status_t)},
+	{DB_TWIN_OAKS_VAR, sizeof(db_urms_status_t)},
+	{DB_BARHAM_VAR	, sizeof(db_urms_status_t)},
+	{DB_NORDAHL_VAR, sizeof(db_urms_status_t)},
+
+	{DB_JEFFERSON_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_EL_CAMINO_REAL_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_PLAZA_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_EMERALD_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_VISTA_VILLAGE_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_ESCONDIDO_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_MAR_VISTA_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_SYCAMORE_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_SANTA_FE_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_LAS_POSAS_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_SAN_MARCOS_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_TWIN_OAKS_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_BARHAM_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_NORDAHL_VAR + 1, sizeof(db_urms_status2_t)},
+
+	{DB_JEFFERSON_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_EL_CAMINO_REAL_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_PLAZA_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_EMERALD_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_VISTA_VILLAGE_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_ESCONDIDO_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_MAR_VISTA_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_SYCAMORE_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_SANTA_FE_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_LAS_POSAS_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_SAN_MARCOS_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_TWIN_OAKS_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_BARHAM_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_NORDAHL_VAR + 2, sizeof(db_urms_status3_t)}
+
 };
 
-#define NUM_LDS (sizeof(db_vds_list)/sizeof(db_id_t)/2)
+#define NUM_LDS (sizeof(db_vds_list)/sizeof(db_id_t)/3)
 
 const int LdsId_onramp_int[] =
 {
@@ -127,39 +119,85 @@ const int LdsId_onramp_int[] =
 
 const char *LdsId_onramp[] =
 {
-        "201",
-        "200",
-        "199",
-        "24",
-        "205",
-        "198",
-        "197",
-        "203",
-        "152",
-        "398",
-        "180",
-        "234",
-        "236",
-        "13006"
+	"201",
+	"200",
+	"199",
+	"24",
+	"205",
+	"198",
+	"197",
+	"203",
+	"152",
+	"398",
+	"180",
+	"234",
+	"236",
+	"13006",
 };
 
-#define NUM_LOOPNAMES		15
-#define NUM_LOOPNAMES_2		7
+const char *LdsId_onramp2[][2] =
+{
+	{"201", "Jefferson"},
+	{"200", "El_Camino"},
+	{"199", "Plaza"},
+	{"24",  "Emerald"},
+	{"205", "Vista_Village"},
+	{"198", "Sunset-Escondido"},
+	{"197", "Mar_Vista"},
+	{"203", "Sycamore"},
+	{"152", "Santa_Fe"},
+	{"398", "Las_Posas"},
+	{"180", "San_Marcos"},
+	{"234", "Twin_Oaks"},
+	{"236", "Barham"},
+	{"13006", "Nordahl"},
+};
+
 const char *loopname_list[] = //Comprehensive only for above LDS list!!
 {	
-	"MLE1",
-	"MLE2",
-	"MLE3",
-	"OFF1",
-	"OFF2",
-	"MLW1",
-	"MLW2",
-	"MLW3",
-	"D1",
-	"D2",
-	"P1",
-	"P2",
-	"P3",
-	"Q1",
-	"Q2"
+	"MLE1", //db_urms_status_t.struct mainline_stat mainline_stat[0].speed,lead_vol,lead_occ_msb,lead_occ_lsb,lead_stat;
+	"MLE2", //db_urms_status_t.struct mainline_stat mainline_stat[1].speed,lead_vol,lead_occ_msb,lead_occ_lsb,lead_stat;
+	"MLE3", //db_urms_status_t.struct mainline_stat mainline_stat[2].speed,lead_vol,lead_occ_msb,lead_occ_lsb,lead_stat;
+	"OFF1", //db_urms_status3_t.struct addl_det_stat additional_det[0]
+	"OFF2", //db_urms_status3_t.struct addl_det_stat additional_det[1]
+	"D1", //db_urms_status_t.struct metered_lane_stat metered_lane_stat[0].demand_vol,demand_stat
+	"D2", //db_urms_status_t.struct metered_lane_stat metered_lane_stat[1].demand_vol,demand_stat
+	"P1", //db_urms_status_t.struct metered_lane_stat metered_lane_stat[0].passage_vol,demand_stat
+	"P2", //db_urms_status_t.struct metered_lane_stat metered_lane_stat[1].passage_vol,passage_stat
+	"P3", //db_urms_status_t.struct metered_lane_stat metered_lane_stat[2].passage_vol,passage_stat
+	"Q1", //db_urms_status2_t.struct queue_stat queue_stat[0][0]
+	"Q2"  //db_urms_status2_t.struct queue_stat queue_stat[1][0]
 };
+
+
+
+
+
+/*
+** Variables used in resource.c
+
+Mainline
+num_main
+mainline lead_stat
+mainline lead volume
+lead_occ_msb lead_occ_lsb
+speed
+
+Onramp
+num_meter
+passage_stat
+passage_vol
+demand_stat
+demand_vol
+queue_stat.stat
+queue_stat.vol
+queue_stat.occ_msb occ_lsb
+queue_stat.vol
+
+Offramp
+num_addl_det
+additional_det.stat
+additional_det.volume
+additional_det.occ_msb occ_lsb
+
+*/

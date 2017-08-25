@@ -110,13 +110,6 @@ float flow_aggregation_mainline(db_urms_status_t *controller_data, struct confid
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;
 			}
-		}else if(controller_data->mainline_stat[i].trail_stat == 2){
-			if((float)controller_data->mainline_stat[i].trail_vol >= 0 && (float)controller_data->mainline_stat[i].trail_vol <= MAX_30_SEC_FLOW){
-			     flow_temp[j]=(float)controller_data->mainline_stat[i].trail_vol;  
-			     j++;
-			}else{
-		 confidence->num_good_vals--;
-			}
 		}else{
 			confidence->num_good_vals--;
 		}
@@ -294,17 +287,9 @@ float occupancy_aggregation_mainline(db_urms_status_t *controller_data, struct c
 	if( (controller_data->num_main > 0) && (controller_data->num_main <= MAX_MAINLINES) ) {
 	    for(i=0 ; i < controller_data->num_main; i++) {
 			lead_occ = 0.1 * ( ((controller_data->mainline_stat[i].lead_occ_msb << 8) & 0xFF00) + ((controller_data->mainline_stat[i].lead_occ_lsb) & 0xFF) );
-	    trail_occ = 0.1 * ( ((controller_data->mainline_stat[i].trail_occ_msb << 8) & 0xFF00) + ((controller_data->mainline_stat[i].trail_occ_lsb) & 0xFF) );
 		if(controller_data->mainline_stat[i].lead_stat == 2){
 			if(lead_occ>=0 && lead_occ <=100){
 			    occ_temp[j] = lead_occ;
-			    j++;
-			}else {
-				confidence->num_good_vals--;
-			}
-		}else if(controller_data->mainline_stat[i].trail_stat == 2){
-		    if(trail_occ>=0 && trail_occ <=100){
-			    occ_temp[j] = trail_occ;
 			    j++;
 			}else {
 				confidence->num_good_vals--;

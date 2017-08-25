@@ -45,24 +45,28 @@ int main(int argc, char *argv[]) {
         mxml_node_t *node;
         mxml_node_t *node2 = {0};
         mxml_node_t *node3;
-	loop_data_t lds[NUM_LDS][2][MAX_LOOPS_PER_DB_VAR] = {{{0}}};
+	loop_data_t lds[NUM_LDS][NUM_LOOPNAMES] = {{{0}}};
         int whitespacevalue;
 	char *textvalue; 
+	char *rawlooperrorstatus; 
 	int i;
 	int j;
-	int k;
-	int l;
 	int mainline_counter = 0;
 	int mainline_speed = 0;
 	int mainline_volume = 0;
 	int mle_flag;
 	float mainline_occupancy = 0;
 
+	db_urms_status_t controller_data[NUM_LDS];  //See warning at top of file
+	db_urms_status2_t controller_data2[NUM_LDS];  //See warning at top of file
+	db_urms_status3_t controller_data3[NUM_LDS];  //See warning at top of file
+
 	printf("sizeof loop_data_t %d sizeof datafilename %d\n", sizeof(loop_data_t), sizeof(datafilename));
+	printf("sizeof %d db_urms_status_t sizeof db_urms_status2_t %d sizeof(db_urms_status3_t %d NUM_LDS %d\n", sizeof(db_urms_status_t), sizeof(db_urms_status2_t ), sizeof(db_urms_status3_t), NUM_LDS);
 
         get_local_name(hostname, MAXHOSTNAMELEN);
 
-        if ( (pclt = db_list_init(argv[0], hostname, domain, xport, db_vds_list, NUM_LDS * 2, NULL, 0)) == NULL) {
+        if ( (pclt = db_list_init(argv[0], hostname, domain, xport, db_vds_list, NUM_LDS * 3, NULL, 0)) == NULL) {
                 printf("Database initialization error in %s.\n", argv[0]);
                 exit(EXIT_FAILURE);
         }
@@ -83,7 +87,6 @@ int main(int argc, char *argv[]) {
         fp = fopen(argv[1], "r");
         tree = mxmlLoadFile(NULL, fp, MXML_NO_CALLBACK);
 
-	k = 0;
         for (node = mxmlFindElement(tree, tree, "Controller", NULL, NULL,
                                     MXML_DESCEND);
              node != NULL;
@@ -93,13 +96,14 @@ int main(int argc, char *argv[]) {
             node2 = mxmlFindElement(node, node, "LdsId", NULL, NULL, MXML_DESCEND);
             textvalue = mxmlGetText(node2, &whitespacevalue);
 	    for(i = 0; i < NUM_LDS; i++) {
-		if( (strcmp(textvalue, LdsId_onramp[i]) ) == 0) {
+		if( (strcmp(textvalue, LdsId_onramp2[i][0]) ) == 0) {
 			memset(&datafilename[0], 0, 1000);
 			sprintf(datafilename, "%s%s", pathname, textvalue);
 			datafp = fopen(datafilename, "w");
 			mainline_counter = mainline_speed = mainline_occupancy = mainline_volume = 0;
 
 			fprintf(datafp, "LdsID %s: ", textvalue);
+			printf("%s: LdsID %s:\n", LdsId_onramp2[i][1], textvalue);
 		        for (node3 = mxmlFindElement(node, node, "LoopDiags", NULL, NULL,
                                     MXML_DESCEND);
              		node3 != NULL;
@@ -110,9 +114,7 @@ int main(int argc, char *argv[]) {
         			textvalue = mxmlGetText(node3, &whitespacevalue);
 				for(j = 0; j < NUM_LOOPNAMES; j++) {
 					if(strcmp(textvalue, loopname_list[j]) == 0) {
-						k = j/MAX_LOOPS_PER_DB_VAR;
-						l = j%(MAX_LOOPS_PER_DB_VAR);
-						lds[i][k][l].loopnameindex = j;
+						lds[i][j].loopnameindex = j;
 						if( (strcmp(textvalue, "MLE")) >= 0){ //Pick out eastbound mainline volume, occupancy, and speed
 							mle_flag = 1;
 							mainline_counter++;
@@ -124,45 +126,61 @@ int main(int argc, char *argv[]) {
 				}		
         			node3 = mxmlFindElement(node3, node, "RawSpeed", NULL, NULL, MXML_DESCEND);
         			textvalue = mxmlGetText(node3, &whitespacevalue);
-				lds[i][k][l].rawspeed = atoi(textvalue);
+				lds[i][j].rawspeed = atoi(textvalue);
 				if(mle_flag)
-					mainline_speed += lds[i][k][l].rawspeed;
+					mainline_speed += lds[i][j].rawspeed;
+	
+        			node3 = mxmlFindElement(node3, node, "RawLoopErrorStatus", NULL, NULL, MXML_DESCEND);
+        			textvalue = mxmlGetText(node3, &whitespacevalue);
+				lds[i][j].rawlooperrorstatus = 0;
+				lds[i][j].rawlooperrorstatus = (textvalue == NULL) ? 2 : 0;
+				rawlooperrorstatus = textvalue;
 	
         			node3 = mxmlFindElement(node3, node, "RawVolume", NULL, NULL, MXML_DESCEND);
         			textvalue = mxmlGetText(node3, &whitespacevalue);
-				lds[i][k][l].rawvolume = atoi(textvalue);
+				lds[i][j].rawvolume = atoi(textvalue);
 				if(mle_flag)
-					mainline_volume += lds[i][k][l].rawvolume;
+					mainline_volume += lds[i][j].rawvolume;
 	
         			node3 = mxmlFindElement(node3, node, "RawOccupancy", NULL, NULL, MXML_DESCEND);
         			textvalue = mxmlGetText(node3, &whitespacevalue);
-				lds[i][k][l].rawoccupancy = atof(textvalue);
+				lds[i][j].rawoccupancy = atof(textvalue);
 				if(mle_flag)
-					mainline_occupancy += lds[i][k][l].rawoccupancy;
+					mainline_occupancy += lds[i][j].rawoccupancy;
 	
         			node3 = mxmlFindElement(node3, node, "RawOccupancyCount", NULL, NULL, MXML_DESCEND);
         			textvalue = mxmlGetText(node3, &whitespacevalue);
-				lds[i][k][l].rawoccupancycount = atoi(textvalue);
+				lds[i][j].rawoccupancycount = atoi(textvalue);
 
-//				printf("LoopName %s loopindex %d RawSpeed %d RawVolume %d RawOccupancy %.2f RawOccupancyCount %d ",
-//					loopname_list[lds[i][k][l].loopnameindex],
-//					lds[i][k][l].loopnameindex,
-//					lds[i][k][l].rawspeed,
-//					lds[i][k][l].rawvolume,
-//					lds[i][k][l].rawoccupancy,
-//					lds[i][k][l].rawoccupancycount
-//				);
+				printf("LoopName %s loopindex %d RawloopErrorStatus %d rawLoopErrorStatus %s RawSpeed %d RawVolume %d RawOccupancy %.2f RawOccupancyCount %d\n",
+					loopname_list[lds[i][j].loopnameindex],
+					lds[i][j].loopnameindex,
+					lds[i][j].rawlooperrorstatus,
+					rawlooperrorstatus,
+					lds[i][j].rawspeed,
+					lds[i][j].rawvolume,
+					lds[i][j].rawoccupancy,
+					lds[i][j].rawoccupancycount
+				);
 
         		}
-//			printf("\n");
-			db_clt_write(pclt, DB_LDS_BASE_VAR + (2 * i) + k, sizeof(loop_data_t) * MAX_LOOPS_PER_DB_VAR, &lds[i][0][0]);
+			printf("\n");
+			per_controller_mapping(&lds[0][i], &controller_data[i], &controller_data2[i], &controller_data3[i]);
+			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC), sizeof(db_urms_status_t), &controller_data[i]);
+			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 1, sizeof(db_urms_status2_t), &controller_data2[i]);
+			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 2, sizeof(db_urms_status3_t), &controller_data3[i]);
+//			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC), 120, &controller_data[i]);
+//			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 1, 85, &controller_data2[i]);
+//			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 2, 102, &controller_data3[i]);
+
 		if(mle_flag) //Print only eastbound mainline values
-			if(mainline_counter > 0)
+			if(mainline_counter > 0) {
 				fprintf(datafp, "Speed %d Volume %d Occupancy %.2f",
 					(int)(mainline_speed/mainline_counter),
 					(int)(mainline_volume/mainline_counter),
 					mainline_occupancy/mainline_counter
 				);
+			}
 			else
 				fprintf(datafp, "Speed 0 Volume 0 Occupancy 0");
 		fclose(datafp);
@@ -173,6 +191,67 @@ int main(int argc, char *argv[]) {
 	}
 
 	longjmp(exit_env, SIGTERM);
+
+	return 0;
+}
+
+
+
+int per_controller_mapping(loop_data_t lds[], db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, db_urms_status3_t *controller_data3) {
+
+        controller_data->mainline_stat[0].speed = lds[0].rawspeed;
+        controller_data->mainline_stat[0].lead_vol = lds[0].rawvolume;
+        controller_data->mainline_stat[0].lead_stat = lds[0].rawlooperrorstatus;
+        controller_data->mainline_stat[0].lead_occ_msb = (((int)(lds[0].rawoccupancy * 10)) & 0xFF00) >> 8; 
+        controller_data->mainline_stat[0].lead_occ_lsb = (((int)(lds[0].rawoccupancy * 10)) & 0x00FF); 
+
+        controller_data->mainline_stat[1].speed = lds[1].rawspeed;
+        controller_data->mainline_stat[1].lead_vol = lds[1].rawvolume;
+        controller_data->mainline_stat[1].lead_stat = lds[1].rawlooperrorstatus;
+        controller_data->mainline_stat[1].lead_occ_msb = (((int)(lds[1].rawoccupancy * 10)) & 0xFF00) >> 8; 
+        controller_data->mainline_stat[1].lead_occ_lsb = (((int)(lds[1].rawoccupancy * 10)) & 0x00FF); 
+
+        controller_data->mainline_stat[2].speed = lds[2].rawspeed;
+        controller_data->mainline_stat[2].lead_vol = lds[2].rawvolume;
+        controller_data->mainline_stat[2].lead_stat = lds[2].rawlooperrorstatus;
+        controller_data->mainline_stat[2].lead_occ_msb = (((int)(lds[2].rawoccupancy * 10)) & 0xFF00) >> 8; 
+        controller_data->mainline_stat[2].lead_occ_lsb = (((int)(lds[2].rawoccupancy * 10)) & 0x00FF); 
+
+        controller_data3->additional_det[0].volume = lds[3].rawvolume;
+        controller_data3->additional_det[0].stat = lds[3].rawlooperrorstatus;
+        controller_data3->additional_det[0].occ_msb = (((int)(lds[3].rawoccupancy * 10)) & 0xFF00) >> 8; 
+        controller_data3->additional_det[0].occ_lsb = (((int)(lds[3].rawoccupancy * 10)) & 0x00FF); 
+
+        controller_data3->additional_det[1].volume = lds[4].rawvolume;
+        controller_data3->additional_det[1].stat = lds[4].rawlooperrorstatus;
+        controller_data3->additional_det[1].occ_msb = (((int)(lds[4].rawoccupancy * 10)) & 0xFF00) >> 8; 
+        controller_data3->additional_det[1].occ_lsb = (((int)(lds[4].rawoccupancy * 10)) & 0x00FF); 
+
+        controller_data->metered_lane_stat[0].demand_vol = lds[5].rawvolume;
+        controller_data->metered_lane_stat[0].demand_stat = lds[5].rawlooperrorstatus;
+
+        controller_data->metered_lane_stat[1].demand_vol = lds[6].rawvolume;
+        controller_data->metered_lane_stat[1].demand_stat = lds[6].rawlooperrorstatus;
+
+        controller_data->metered_lane_stat[0].passage_vol = lds[7].rawvolume;
+        controller_data->metered_lane_stat[0].passage_stat = lds[7].rawlooperrorstatus;
+
+        controller_data->metered_lane_stat[1].passage_vol = lds[8].rawvolume;
+        controller_data->metered_lane_stat[1].passage_stat = lds[8].rawlooperrorstatus;
+
+        controller_data->metered_lane_stat[2].passage_vol = lds[9].rawvolume;
+        controller_data->metered_lane_stat[2].passage_stat = lds[9].rawlooperrorstatus;
+
+        controller_data2->queue_stat[0][0].stat = lds[10].rawlooperrorstatus;
+        controller_data2->queue_stat[0][0].vol = lds[10].rawvolume;
+        controller_data2->queue_stat[0][0].occ_msb = (((int)(lds[10].rawoccupancy * 10)) & 0xFF00) >> 8; 
+        controller_data2->queue_stat[0][0].occ_lsb = (((int)(lds[10].rawoccupancy * 10)) & 0x00FF); 
+
+        controller_data2->queue_stat[1][0].stat = lds[11].rawlooperrorstatus;
+        controller_data2->queue_stat[1][0].vol = lds[11].rawvolume;
+        controller_data2->queue_stat[1][0].occ_msb = (((int)(lds[11].rawoccupancy * 10)) & 0xFF00) >> 8; 
+        controller_data2->queue_stat[1][0].occ_lsb = (((int)(lds[11].rawoccupancy * 10)) & 0x00FF); 
+
 
 	return 0;
 }
