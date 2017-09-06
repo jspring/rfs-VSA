@@ -10,8 +10,7 @@ PATH_CFLAGS += -I../mxml-release-2.10 -I$(ATSC_INC_DIR) -Wall
 PATH_LDFLAGS += -L./lnx -L../mxml-release-2.10
 PATH_OBJS += $(OBJDIR)/resource.o $(OBJDIR)/nrutil2.o
 
-#EXEC =  $(OBJDIR)/xml_parser $(OBJDIR)/sign_control $(OBJDIR)/clt_vars
-EXEC =  $(OBJDIR)/xml_parser $(OBJDIR)/sign_control $(OBJDIR)/opt_vsa
+EXEC =  $(OBJDIR)/xml_parser $(OBJDIR)/sign_control $(OBJDIR)/opt_vsa $(OBJDIR)/clt_vars
 
 all: 	$(OBJDIR) $(PATH_OBJS) $(EXEC)
 
