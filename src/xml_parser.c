@@ -37,7 +37,8 @@ int main(int argc, char *argv[]) {
 
 	FILE *fp;
 	FILE *datafp;
-	char datafilename[1000] = {0};
+	char *datainputfile = NULL;
+	char datafilename[1000];
 	const char *pathname = "/var/www/html/VSA/webdata/";
 
 
@@ -56,6 +57,8 @@ int main(int argc, char *argv[]) {
 	int mainline_volume = 0;
 	int mle_flag;
 	float mainline_occupancy = 0;
+	int create_db_vars = 0;
+	const char *usage = "-c (create db variables) -f <input data file (required)>";
 
 	db_urms_status_t controller_data[NUM_LDS];  //See warning at top of file
 	db_urms_status2_t controller_data2[NUM_LDS];  //See warning at top of file
@@ -63,13 +66,39 @@ int main(int argc, char *argv[]) {
 
 	printf("sizeof loop_data_t %d sizeof datafilename %d\n", sizeof(loop_data_t), sizeof(datafilename));
 	printf("sizeof %d db_urms_status_t sizeof db_urms_status2_t %d sizeof(db_urms_status3_t %d NUM_LDS %d\n", sizeof(db_urms_status_t), sizeof(db_urms_status2_t ), sizeof(db_urms_status3_t), NUM_LDS);
+        while ((option = getopt(argc, argv, "cf:")) != EOF) {
+                switch(option) {
+                        case 'c':
+                                create_db_vars = 1;
+                                break;
+                        case 'f':
+                                datainputfile = strdup(optarg);
+                                break;
+                        default:
+                                printf("\nUsage: %s %s\n", argv[0], usage);
+                                exit(EXIT_FAILURE);
+                                break;
+                }
+        }
 
+	if(datainputfile == NULL) {
+		printf("\nUsage: %s %s\n", argv[0], usage);
+		exit(EXIT_FAILURE);
+	}
         get_local_name(hostname, MAXHOSTNAMELEN);
 
-        if ( (pclt = db_list_init(argv[0], hostname, domain, xport, db_vds_list, NUM_LDS * 3, NULL, 0)) == NULL) {
-                printf("Database initialization error in %s.\n", argv[0]);
-                exit(EXIT_FAILURE);
-        }
+	if(create_db_vars) {
+		if ( (pclt = db_list_init(argv[0], hostname, domain, xport, db_vds_list, NUM_LDS * 3, NULL, 0)) == NULL) {
+			printf("Database initialization error in %s.\n", argv[0]);
+			exit(EXIT_FAILURE);
+		}
+	}
+	else {
+		if ( (pclt = db_list_init(argv[0], hostname, domain, xport, NULL, 0, NULL, 0)) == NULL) {
+			printf("Database initialization error in %s.\n", argv[0]);
+			exit(EXIT_FAILURE);
+		}
+	}
         /* Setup a timer for every 'interval' msec. */
         if ( ((ptimer = timer_init(interval, DB_CHANNEL(pclt) )) == NULL)) {
                 printf("Unable to initialize wrfiles timer\n");
@@ -84,7 +113,7 @@ int main(int argc, char *argv[]) {
         } else
                 sig_ign(sig_list, sig_hand);
 
-        fp = fopen(argv[1], "r");
+        fp = fopen(datainputfile, "r");
         tree = mxmlLoadFile(NULL, fp, MXML_NO_CALLBACK);
 
         for (node = mxmlFindElement(tree, tree, "Controller", NULL, NULL,
