@@ -1,8 +1,20 @@
 #!/bin/bash
 
+ps -elf | grep -v grep | grep db_slv
+if [[ $? != 0 ]]
+then
+	/home/path/db/lnx/db_slv &
+fi
+
+ps -elf | grep -v grep | grep clt_vars
+if [[ $? != 0 ]]
+then
+	/home/rfs-VSA/src/lnx/clt_vars &
+fi
+
 NOWTIME=`date +%s`
-LATESTFILE=`ls -t /var/www/html/VSA/data/datafeed* | head -1` 2>/home/jspring/run_vsa.err
-LATESTFILETIME=`stat -c %X $LATESTFILE` 2>>/home/jspring/run_vsa.err
+LATESTFILE=`ls -t /var/www/html/VSA/data/datafeed* | head -1` 2>/var/log/vsa/run_vsa.err
+LATESTFILETIME=`stat -c %X $LATESTFILE` 2>>/var/log/vsa/run_vsa.err
 TIMESINCELASTDATA=`echo $(($NOWTIME-$LATESTFILETIME))`
 
 if [[ $TIMESINCELASTDATA -gt 7200 ]]
@@ -11,9 +23,4 @@ then
 	exit 0
 fi
 
-killall xml_parser 2>>/home/jspring/run_vsa.err
-killall db_slv 2>>/home/jspring/run_vsa.err
-/home/path/db/db_clean.sh 2>>/home/jspring/run_vsa.err
-/home/path/db/lnx/db_slv 2>>/home/jspring/run_vsa.err &
-
-/home/rfs-VSA/src/lnx/xml_parser $LATESTFILE 2>>/home/jspring/run_vsa.err
+/home/rfs-VSA/src/lnx/xml_parser -f $LATESTFILE 2>>/var/log/vsa/run_vsa.err
