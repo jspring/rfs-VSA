@@ -106,7 +106,10 @@ int main(int argc, char *argv[]) {
         }
 
         if(( exitsig = setjmp(exit_env)) != 0) {
-                db_list_done(pclt, db_vds_list, NUM_LDS * 2, NULL, 0);
+		if(create_db_vars)
+			db_list_done(pclt, db_vds_list, NUM_LDS * 2, NULL, 0);
+		else
+			db_list_done(pclt, NULL, 0, NULL, 0);
 		if(fp != NULL)
 			fclose(fp);
                 exit(EXIT_SUCCESS);
