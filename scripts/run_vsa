@@ -25,5 +25,9 @@ fi
 
 /home/rfs-VSA/src/lnx/xml_parser -f $LATESTFILE 2>>/var/log/vsa/run_vsa.err
 
-cd /home/rfs-VSA/src
-./lnx/opt_vsa
+#ps -elf | grep -v grep | grep opt_vsa
+#if [[ $? != 0 ]]
+#then
+#	cd /home/rfs-VSA/src
+#	./lnx/opt_vsa &
+#fi
