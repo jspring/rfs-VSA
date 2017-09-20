@@ -1,5 +1,11 @@
 #!/bin/bash
 
+sudo killall opt_vsa
+sudo killall xml_parser
+sudo killall clt_vars
+sudo killall db_slv
+sudo /home/path/db/db_clean.sh
+
 ps -elf | grep -v grep | grep db_slv
 if [[ $? != 0 ]]
 then
@@ -12,10 +18,21 @@ then
 	/home/rfs-VSA/src/lnx/clt_vars &
 fi
 
-NOWTIME=`date +%s`
-LATESTFILE=`ls -t /var/www/html/VSA/data/datafeed* | head -1` 2>/var/log/vsa/run_vsa.err
-LATESTFILETIME=`stat -c %X $LATESTFILE` 2>>/var/log/vsa/run_vsa.err
-TIMESINCELASTDATA=`echo $(($NOWTIME-$LATESTFILETIME))`
+COUNTER=0
+TIMESINCELASTDATA=0
+while [[ ($TIMESINCELASTDATA -lt 5) && ($COUNTER -le 6) ]]
+do
+	NOWTIME=`date +%s`
+	date >>/var/log/vsa/run_vsa.err
+	LATESTFILE=`ls -t /var/www/html/VSA/data/datafeed* | head -1` 2>>/var/log/vsa/run_vsa.err
+	LATESTFILETIME=`stat -c %X $LATESTFILE` 2>>/var/log/vsa/run_vsa.err
+	TIMESINCELASTDATA=`echo $(($NOWTIME-$LATESTFILETIME))`
+	if [[ $TIMESINCELASTDATA -lt 5 ]]
+	then
+		COUNTER=$(($COUNTER+1))
+		sleep 5
+	fi
+done
 
 if [[ $TIMESINCELASTDATA -gt 7200 ]]
 then
