@@ -9,6 +9,7 @@
 #define MAX_30_SEC_FLOW		40 // JAS,8/26/2016 I saw 30 in the data (corresponding to 3600 VPH), so this number is larger than that, but XYL says that's local
 //#define MAX_30_SEC_FLOW	17 //JAS,8/26/2016 from XYL:Maximum 30-second flow rate per lane (sample time is 30 seconds, so this value corresponds to 2000 vehicles per hour)
 // git push test 09202017 chengju
+// git push test again 09202017 chengju
 // units
 // flow is vehicle per hour
 // speed is miles per hour
