@@ -22,19 +22,19 @@ AR		=	/usr/bin/ar
 ARFLAGS		=	crvs
 ARCHFLAGS	=	
 CC		=	gcc
-CFLAGS		=	$(OPTIM) $(ARCHFLAGS) -Wall   
-CP		=	/bin/cp
-DSO		=	$(CC)
-DSOFLAGS	=	 -Wl,-soname,libmxml.so.1,-rpath,$(libdir) -shared $(OPTIM)
-LDFLAGS		=	$(OPTIM) $(ARCHFLAGS)  -Wl,-rpath,$(libdir)
+CFLAGS		=	$(OPTIM) $(ARCHFLAGS) -Wall   -D_THREAD_SAFE -D_REENTRANT
+CP		=	/usr/bin/cp
+DSO		=	:
+DSOFLAGS	=	
+LDFLAGS		=	$(OPTIM) $(ARCHFLAGS) 
 INSTALL		=	/usr/bin/install -c
-LIBMXML		=	libmxml.so.1.5
-LIBS		=	 
-LN		=	/bin/ln -s
-MKDIR		=	/bin/mkdir
-OPTIM		=	-fPIC -Os -g
+LIBMXML		=	libmxml.a
+LIBS		=	 -lpthread
+LN		=	/usr/bin/ln -s
+MKDIR		=	/usr/bin/mkdir
+OPTIM		=	-Os -g
 RANLIB		=	ranlib
-RM		=	/bin/rm -f
+RM		=	/usr/bin/rm -f
 SHELL		=	/bin/sh
 
 
@@ -328,14 +328,6 @@ libmxml.1.dylib:	$(LIBOBJS)
 	$(RM) libmxml.dylib
 	$(LN) libmxml.1.dylib libmxml.dylib
 
-
-xml_parser.o: xml_parser.c
-	echo Compiling $<
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-xml_parser:	$(LIBMXML) xml_parser.o
-	echo Linking $@...
-	$(CC) -L. $(LDFLAGS) -o $@ xml_parser.o -lmxml $(LIBS)
 
 #
 # mxmldoc

@@ -6,5 +6,5 @@ includedir=${prefix}/include
 Name: Mini-XML
 Description: Lightweight XML support library
 Version: 2.10
-Libs: -L${exec_prefix}/lib -lmxml 
-Cflags: -I${prefix}/include 
+Libs: -L${exec_prefix}/lib -lmxml -lpthread
+Cflags: -I${prefix}/include -D_THREAD_SAFE -D_REENTRANT

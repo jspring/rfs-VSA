@@ -25,7 +25,7 @@ $libdir=${exec_prefix}/lib
 $mandir=${datarootdir}/man
 $srcdir=.
 
-$PICFLAG=1
+$PICFLAG=0
 
 # Product information
 %product mxml
