@@ -34,27 +34,19 @@ int main(int argc, char *argv[])
 	posix_timer_typ *ptimer;       /* Timing proxy */
 	char *domain = DEFAULT_SERVICE; // usually no need to change this 
 	int xport = COMM_OS_XPORT;	// set correct for OS in sys_os.h 
-	int verbose = 0;
 	char zero_array[200];
 	int i;
 
 	memset(zero_array, 0, sizeof(zero_array));
 
 	/* Read and interpret any user switches. */
-	while ((option = getopt(argc, argv, "i:v")) != EOF) {
+	while ((option = getopt(argc, argv, "i:")) != EOF) {
 		switch(option) {
 	        case 'i':
 			interval = atoi(optarg); 
 			break;
-	        case 'v':
-			verbose = 1; 
-			break;
 	        default:
-			printf("Usage: %s\n", argv[0]); 
-			printf("    -d <trip directory> \n");
-			printf("    -m <file time in minutes> \n");
-			printf("    -l <no. lines to save to file> \n");
-			printf("    -t <loop time in ms> \n");
+			printf("Usage: %s -i <loop time in ms>\n", argv[0]);
 			exit(EXIT_FAILURE);
 	        }
 	}
