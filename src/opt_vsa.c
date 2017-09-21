@@ -1,10 +1,6 @@
-/* opt_crm.c - SR99 data aggregation and control
+/* opt_vsa.c - SR78 data aggregation and control
 **
-** WARNING!! NUM_CONTROLLER_VARS includes db_urms_status_t, urms_datafile_t, db_urms_t, db_urms_status2_t,
-** db_urms_status3_t, and db_ramp_data_t.
-** For the present purposes (i.e. 4/20/2016) we're using only db_urms_status_t, which contains the data 
-** Cheng-Ju needs for data aggregation. We will eventually need all 28*6=168 database variables.
-**
+** NOTE: Variable Speed Advisories must be limited to an unsigned char in the range 0 <= VSA <= 100
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -81,6 +77,7 @@ int main(int argc, char *argv[])
 	db_urms_status_t controller_data[NUM_LDS];  //See warning at top of file
 	db_urms_status2_t controller_data2[NUM_LDS];  //See warning at top of file
 	db_urms_status3_t controller_data3[NUM_LDS];  //See warning at top of file
+	db_vsa_ctl_t db_vsa_ctl;
 
 	int option;
 	int exitsig;
@@ -626,7 +623,9 @@ int secCTidx [SecSize][4] =  {{7,  -1, -1, -1}, // controller in section 1
 		Set_Default_Meter(time,time2,timeSta); 		
 		
 		Set_Opt_Meter();
-
+		for(i=0; i<NUM_SIGNS; i++) 
+			db_vsa_ctl.vsa[i]= 0; //NOTE to Chengju: Assign variable speeds here
+		db_clt_write(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
 		TIMER_WAIT(ptimer);	
 	} 
 	
