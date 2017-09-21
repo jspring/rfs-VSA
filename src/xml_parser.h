@@ -1,12 +1,14 @@
 #include <db_include.h>
 #include "urms.h"
 
+#define NUM_SIGNS		7
 typedef struct {
-	int vsa;
+	unsigned char vsa[NUM_SIGNS];
 } db_vsa_ctl_t;
 
 #define NUM_LOOPNAMES		12
 
+#define DB_ALL_SIGNS_TYPE		2000
 #define DB_JEFFERSON_TYPE		3000
 #define DB_EL_CAMINO_REAL_TYPE		3200
 #define DB_PLAZA_TYPE			3400
@@ -22,6 +24,7 @@ typedef struct {
 #define	DB_BARHAM_TYPE			5400
 #define DB_NORDAHL_TYPE			5600
 
+#define DB_ALL_SIGNS_VAR		DB_ALL_SIGNS_TYPE
 #define DB_LDS_BASE_VAR		DB_JEFFERSON_TYPE
 #define VAR_INC			200 // Constant difference between sequential DB vars
 #define DB_JEFFERSON_VAR	DB_JEFFERSON_TYPE
