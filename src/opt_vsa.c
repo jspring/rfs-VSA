@@ -15,7 +15,7 @@
 #include "nrutil2.h"
 #include "resource.h"
 #include "look_up_table.h"
-#include "rm_algo.h"
+//#include "rm_algo.h"
 #include "xml_parser.h"
 
 char str[len_str];
@@ -55,15 +55,15 @@ const char *controller_strings[][3] = {
 	{"1108329", "24", "EMERALD DR"},
 	{"LDS 110433", "0", "MELROSE DR"},
 	{"1108650", "205", "VISTA VILLAGE DR"},
-	{"1108636", "198", "SUNSET/ESCONDIDO"},
-	{"1108634", "197", "MAR VISTA DR"},
-	{"1108646", "203", "SYCAMORE AVE"},
+	{"1108636", "198", "SUNSET/ESCONDIDO"},    // VSA 1
+	{"1108634", "197", "MAR VISTA DR"},       
+	{"1108646", "203", "SYCAMORE AVE"},        // VSA 2
 	{"1108550", "152", "RANCHO SANTA FE RD"},
-	{"1116450", "398", "Las Posas Rd"},
-	{"1108602", "180", "SAN MARCOS BLVD"},
-	{"1113559", "234", "TWIN OAKS VALLEY RD"},
-	{"1108703", "236", "BARHAM DR"},
-	{"1108707", "13006", "NORDAHL RD"}
+	{"1116450", "398", "Las Posas Rd"},        // VSA 3
+	{"1108602", "180", "SAN MARCOS BLVD"},     // VSA 4
+	{"1113559", "234", "TWIN OAKS VALLEY RD"}, // VSA 5
+	{"1108703", "236", "BARHAM DR"},           // VSA 6
+	{"1108707", "13006", "NORDAHL RD"}         // VSA 7
 };
 
 int main(int argc, char *argv[])
@@ -205,13 +205,8 @@ int main(int argc, char *argv[])
 ###################################################################################################################*/
 
 // Cheng-Ju's code here
-// 4 off-ramp is missing, total number of off-ramps is 9. After D3 fix those missing off-ramps, OffRampIndex table need to be updated. 
+// 09212017 Remove all unnecessary cruft from opt_CRM
 
-// This part aggregate data for each URMS2070 controller in the field   
-	//int OnRampIndex [NUM_LDS] =  { 0, -1, 2,  3, -1, 5,  6, -1, 8,  9, -1, 11, 12, -1, -1, -1, 16, 17, -1, 19, 20, -1, 22, 23, -1, 25, -1, -1}; 
-	//int OffRampIndex [NUM_LDS] = {-1, -1, 2, -1, -1, 5, -1, -1, 8, -1, 10, -1, -1, -1, -1, -1, 16, 17, -1, 19, 20, 21, -1, 23, -1, 25, -1, 27};  
-	//int OffRampIndex [NUM_LDS] = {-1, -1, 2, -1, -1, 5, -1, -1, 8, -1, 10, -1, -1, -1, -1, -1, 16, -1, -1, -1, -1, 21, -1, 23, -1, -1, -1, 27};  
-    
 	get_current_timestamp(&ts); // get current time step
 	print_timestamp(dbg_st_file_out, pts); // #1 print out current time step to file
  
@@ -294,87 +289,8 @@ int main(int argc, char *argv[])
 	fprintf(dbg_st_file_out,"\n");
 
     
-// This part aggregate data for each section
-// controller index for each mainline section
-int secCTidx [SecSize][4] =  {{7,  -1, -1, -1}, // controller in section 1 
-                             {8,  -1, -1, -1}, // controller in section 2 
-                             {9,  -1, -1, -1}, // controller in section 3
-                             {10, 11, -1, -1}, // controller in section 4
-                             {12, -1, -1, -1}, // controller in section 5    
-                             {13, 14, 15, 16}, // controller in section 6 
-                             {17, -1, -1, -1}, // controller in section 7 
-							 {18, 19, -1, -1}, // controller in section 8 
-                             {20, -1, -1, -1}, // controller in section 9   
-                             {21, 22, -1, -1}, // controller in section 10
-							 {23, -1, -1, -1}, // controller in section 11 
-							 {24, 25, 26, -1}}; // controller in section 12 
-
-		float temp_num_ct = 0.0; // number of controllers per section
-		float temp_vol = 0.0;
-		float temp_speed = 0.0;
-		float temp_occ = 0.0;
-		float temp_density = 0.0;
-		float temp_mean_speed = 0.0;
-//This part aggregate mainline data for each section
- 	for(i=0;i<SecSize;i++){
-		// this loop aggregates all controller data in each section
-	
-		for(j=0;j<4;j++){
-			if(secCTidx[i][j]>0){
-				temp_vol += controller_mainline_data[secCTidx[i][j]].agg_vol;
-				temp_speed += controller_mainline_data[secCTidx[i][j]].agg_speed; 
-			   	temp_occ += controller_mainline_data[secCTidx[i][j]].agg_occ;
-				temp_density += controller_mainline_data[secCTidx[i][j]].agg_density;
-				temp_mean_speed += controller_mainline_data[secCTidx[i][j]].agg_mean_speed;
-				temp_num_ct ++;
-			}
-		}
-		mainline_out[cycle_index][i].agg_vol = Mind(12000.0, Maxd(temp_vol/temp_num_ct,1));
-		mainline_out[cycle_index][i].agg_speed = Mind(150.0, Maxd(temp_speed/temp_num_ct,1));
-		mainline_out[cycle_index][i].agg_occ =  Mind(90.0, Maxd(temp_occ/temp_num_ct,1));
-        mainline_out[cycle_index][i].agg_density = Mind(200.0, Maxd(temp_density/temp_num_ct,1));
-
-		/*
-		fprintf(dbg_st_file_out,"S%d,cyc%d ", i,cycle_index); //controller index 
-		fprintf(dbg_st_file_out,"%f ", mainline_out[cycle_index][i].agg_vol); 
-		fprintf(dbg_st_file_out,"%f ", mainline_out[cycle_index][i].agg_speed); 
-		fprintf(dbg_st_file_out,"%f ", mainline_out[cycle_index][i].agg_occ); 
-		fprintf(dbg_st_file_out,"%f ", mainline_out[cycle_index][i].agg_density); 
-		fprintf(dbg_st_file_out,"%f ", mainline_out[cycle_index][i].agg_mean_speed);
-        */
-
-		// Initialize all temp variables
-		temp_num_ct = 0.0; 
-		temp_vol = 0.0;
-		temp_speed = 0.0;
-		temp_occ = 0.0;
-		temp_density = 0.0;
-		temp_mean_speed = 0.0;
-
-	} 
-
-//This part aggregate onramp data for each section
-	int onrampCTidx[NumOnRamp] = {8, 9, 11, 12, 16, 17, 19, 20, 22, 23, 25}; 
-	for(i=0;i<NumOnRamp;i++){
-		onramp_out[cycle_index][i].agg_vol = Mind(12000.0, Maxd(controller_onramp_data[onrampCTidx[i]].agg_vol,0));
-		onramp_out[cycle_index][i].agg_occ = Mind(90.0, Maxd(controller_onramp_data[onrampCTidx[i]].agg_occ,0 ));
-        onramp_queue_out[cycle_index][i].agg_vol = Mind(12000.0, Maxd( controller_onramp_queue_detector_data[onrampCTidx[i]].agg_vol ,0));
-		onramp_queue_out[cycle_index][i].agg_occ = Mind(90.0, Maxd(controller_onramp_queue_detector_data[onrampCTidx[i]].agg_occ,0 ));
-	}
-
-//This part aggregate onramp data for each section <--- match number of off-ramp by number of on-ramp 		 
-	//int offrampCTidx[NumOnRamp] = {8, -1, 10, -1, 16, 17, 19, 20, 21, 23, 25}; // 4 off-ramp is missing, total number of off-ramps is 9
-	int offrampCTidx[NumOnRamp] = {8, -1, 9, -1, 16, 17, 19, 20, 22, 23, 26}; // 4 off-ramp is missing, total number of off-ramps is 9
-	for(i=0;i<NumOnRamp;i++){ 
-		if (offrampCTidx[i] != -1.0){//<-- impute data here
-			offramp_out[cycle_index][i].agg_vol = Mind(12000.0, Maxd(controller_offramp_data[offrampCTidx[i]].agg_vol,0));
-			offramp_out[cycle_index][i].agg_occ = Mind(90.0, Maxd(controller_offramp_data[offrampCTidx[i]].agg_occ,0 ));
-		}else{
-			offramp_out[cycle_index][i].agg_vol = 0.0;
-			offramp_out[cycle_index][i].agg_occ = 0.0;
-		}
-	} 
-
+  
+ 
 /*
 // flow balance of mainline by using filtered data
       for(i=0;i<SecSize;i++){
@@ -389,7 +305,7 @@ int secCTidx [SecSize][4] =  {{7,  -1, -1, -1}, // controller in section 1
 		  }
 	  }
 */
-   
+/*   
 // replace bad flow data by upstream data
 //if flow < 100 do upstream downstrean interpolation flow data
     for(i=0;i<SecSize;i++){   
@@ -442,7 +358,7 @@ int secCTidx [SecSize][4] =  {{7,  -1, -1, -1}, // controller in section 1
 		}
 
     }
-
+*/
 // average the historical data from data buffer
 // moving average filter for mainline
    for(i=0; i<SecSize; i++){

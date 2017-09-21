@@ -8,9 +8,7 @@
 #define RANGE_ERROR -2.0 
 #define MAX_30_SEC_FLOW		40 // JAS,8/26/2016 I saw 30 in the data (corresponding to 3600 VPH), so this number is larger than that, but XYL says that's local
 //#define MAX_30_SEC_FLOW	17 //JAS,8/26/2016 from XYL:Maximum 30-second flow rate per lane (sample time is 30 seconds, so this value corresponds to 2000 vehicles per hour)
-// git push test 09202017 chengju
-// git push test again 09202017 chengju
-// git push test again 09202017 chengju
+
 // units
 // flow is vehicle per hour
 // speed is miles per hour
@@ -685,7 +683,7 @@ float occupancy_aggregation_onramp_queue(db_urms_status_t *controller_data, db_u
 	float occ_onramp_queue = 0.0;
    	return occ_onramp_queue;
 }
-
+/*
 float queue_onramp(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence){
 	float average_vehicle_length = 4.5; // average vehicle length 4.5 meters
 	float queue = 0;
@@ -729,7 +727,7 @@ float queue_onramp(db_urms_status_t *controller_data, db_urms_status2_t *control
 	//printf("queue_agg %4.2f num_meter %d\n", queue,controller_data->num_meter);
 	return mind(500.0, maxd(queue,0));
 }
-
+*/
 float density_aggregation_mainline(float flow, float hm_speed, float density_prev){
 	float density = 0.0;
 	
@@ -846,7 +844,7 @@ float butt_2_ML_density(float in_dat, int index){
    x_old_density[1][index]=x[1][index];
    return out_dat;
 }
-
+/*
 float interp_OR_HIS_FLOW(int OR_idx, float OR_flow_prev , const float OR_HIS_FLOW_DAT[NUM_5MIN_INTERVALS][NUM_ONRAMPS_PLUS_1], timestamp_t *ts){
 //float interp_OR_HIS_FLOW(int OR_idx, float *OR_HIS_FLOW_DAT){
 //	timestamp_t ts;
@@ -877,7 +875,8 @@ float interp_OR_HIS_FLOW(int OR_idx, float OR_flow_prev , const float OR_HIS_FLO
 	//}
 	return OR_flow;
 }
-
+*/
+/*
 float interp_OR_HIS_OCC(int OR_idx, float OR_occupancy_prev, const float OR_HIS_OCC_DAT[NUM_5MIN_INTERVALS][NUM_ONRAMPS_PLUS_1], timestamp_t *ts){
 //float interp_OR_HIS_FLOW(int OR_idx, float *OR_HIS_FLOW_DAT){
 //	timestamp_t ts;
@@ -907,9 +906,9 @@ float interp_OR_HIS_OCC(int OR_idx, float OR_occupancy_prev, const float OR_HIS_
 	//}
 	return OR_occ;
 }
+*/
 
-
-
+/*
 float interp_FR_HIS_FLOW(int FR_idx, float FR_flow_prev, const float FR_HIS_FLOW_DAT[NUM_5MIN_INTERVALS][NUM_OFFRAMPS_PLUS_1], timestamp_t *ts){
 //float interp_OR_HIS_FLOW(int OR_idx, float *OR_HIS_FLOW_DAT){
 //	timestamp_t ts;
@@ -940,8 +939,8 @@ float interp_FR_HIS_FLOW(int FR_idx, float FR_flow_prev, const float FR_HIS_FLOW
 
 	return FR_flow;
 }
-
-
+*/
+/*
 float interp_FR_HIS_OCC(int FR_idx, float FR_occupancy_prev, const float FR_HIS_OCC_DAT[NUM_5MIN_INTERVALS][NUM_OFFRAMPS_PLUS_1], timestamp_t *ts){
 //float interp_OR_HIS_FLOW(int OR_idx, float *OR_HIS_FLOW_DAT){
 //	timestamp_t ts;
@@ -971,7 +970,8 @@ float interp_FR_HIS_OCC(int FR_idx, float FR_occupancy_prev, const float FR_HIS_
 	//}
 	return FR_occ;
 }
-
+*/
+/*
 float ratio_ML_HIS_FLOW(float current_most_upstream_flow, const float MOST_UPSTREAM_MAINLINE_FLOW_DATA[NUM_5MIN_INTERVALS][2], timestamp_t *ts){
 	//float interp_OR_HIS_FLOW(int OR_idx, float *OR_HIS_FLOW_DAT){
 //	timestamp_t ts;
@@ -1000,7 +1000,7 @@ float ratio_ML_HIS_FLOW(float current_most_upstream_flow, const float MOST_UPSTR
 	//}
 	return ratio;
 }
-
+*/
 
 /*
 float interp_OR_HIS_FLOW(int OR_idx, float OR_flow_prev ,float OR_HIS_FLOW_DAT[NUM_5MIN_INTERVALS][NUM_ONRAMPS_PLUS_1], timestamp_t *ts){
