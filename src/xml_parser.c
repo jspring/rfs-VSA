@@ -24,6 +24,8 @@ static void sig_hand(int code)
                 longjmp(exit_env, code);
 }
 
+int per_controller_mapping(loop_data_t lds[], db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, db_urms_status3_t *controller_data3);
+
 int main(int argc, char *argv[]) {
 
         int option;
@@ -46,7 +48,7 @@ int main(int argc, char *argv[]) {
         mxml_node_t *node;
         mxml_node_t *node2 = {0};
         mxml_node_t *node3;
-	loop_data_t lds[NUM_LDS][NUM_LOOPNAMES] = {{{0}}};
+	loop_data_t lds[NUM_LDS][NUM_LOOPNAMES] = {0};
         int whitespacevalue;
 	char *textvalue; 
 	char *rawlooperrorstatus; 
@@ -64,8 +66,8 @@ int main(int argc, char *argv[]) {
 	db_urms_status2_t controller_data2[NUM_LDS];  //See warning at top of file
 	db_urms_status3_t controller_data3[NUM_LDS];  //See warning at top of file
 
-	printf("sizeof loop_data_t %d sizeof datafilename %d\n", sizeof(loop_data_t), sizeof(datafilename));
-	printf("sizeof %d db_urms_status_t sizeof db_urms_status2_t %d sizeof(db_urms_status3_t %d NUM_LDS %d\n", sizeof(db_urms_status_t), sizeof(db_urms_status2_t ), sizeof(db_urms_status3_t), NUM_LDS);
+	printf("sizeof loop_data_t %ld sizeof datafilename %ld\n", sizeof(loop_data_t), sizeof(datafilename));
+	printf("sizeof %ld db_urms_status_t sizeof db_urms_status2_t %ld sizeof(db_urms_status3_t %ld NUM_LDS %ld\n", sizeof(db_urms_status_t), sizeof(db_urms_status2_t ), sizeof(db_urms_status3_t), NUM_LDS);
         while ((option = getopt(argc, argv, "cf:")) != EOF) {
                 switch(option) {
                         case 'c':
@@ -126,7 +128,7 @@ int main(int argc, char *argv[]) {
                                     MXML_DESCEND))
         {
             node2 = mxmlFindElement(node, node, "LdsId", NULL, NULL, MXML_DESCEND);
-            textvalue = mxmlGetText(node2, &whitespacevalue);
+            textvalue = (char *)mxmlGetText(node2, &whitespacevalue);
 	    for(i = 0; i < NUM_LDS; i++) {
 		if( (strcmp(textvalue, LdsId_onramp2[i][0]) ) == 0) {
 			memset(&datafilename[0], 0, 1000);
@@ -143,7 +145,7 @@ int main(int argc, char *argv[]) {
                                     MXML_DESCEND))
         		{
         			node3 = mxmlFindElement(node3, node, "LoopName", NULL, NULL, MXML_DESCEND);
-        			textvalue = mxmlGetText(node3, &whitespacevalue);
+        			textvalue = (char *)mxmlGetText(node3, &whitespacevalue);
 				for(j = 0; j < NUM_LOOPNAMES; j++) {
 					if(strcmp(textvalue, loopname_list[j]) == 0) {
 						lds[i][j].loopnameindex = j;
@@ -157,31 +159,31 @@ int main(int argc, char *argv[]) {
 					}		
 				}		
         			node3 = mxmlFindElement(node3, node, "RawSpeed", NULL, NULL, MXML_DESCEND);
-        			textvalue = mxmlGetText(node3, &whitespacevalue);
+        			textvalue = (char *)mxmlGetText(node3, &whitespacevalue);
 				lds[i][j].rawspeed = atoi(textvalue);
 				if(mle_flag)
 					mainline_speed += lds[i][j].rawspeed;
 	
         			node3 = mxmlFindElement(node3, node, "RawLoopErrorStatus", NULL, NULL, MXML_DESCEND);
-        			textvalue = mxmlGetText(node3, &whitespacevalue);
+        			textvalue = (char *)mxmlGetText(node3, &whitespacevalue);
 				lds[i][j].rawlooperrorstatus = 0;
 				lds[i][j].rawlooperrorstatus = (textvalue == NULL) ? 2 : 0;
 				rawlooperrorstatus = textvalue;
 	
         			node3 = mxmlFindElement(node3, node, "RawVolume", NULL, NULL, MXML_DESCEND);
-        			textvalue = mxmlGetText(node3, &whitespacevalue);
+        			textvalue = (char *)mxmlGetText(node3, &whitespacevalue);
 				lds[i][j].rawvolume = atoi(textvalue);
 				if(mle_flag)
 					mainline_volume += lds[i][j].rawvolume;
 	
         			node3 = mxmlFindElement(node3, node, "RawOccupancy", NULL, NULL, MXML_DESCEND);
-        			textvalue = mxmlGetText(node3, &whitespacevalue);
+        			textvalue = (char *)mxmlGetText(node3, &whitespacevalue);
 				lds[i][j].rawoccupancy = atof(textvalue);
 				if(mle_flag)
 					mainline_occupancy += lds[i][j].rawoccupancy;
 	
         			node3 = mxmlFindElement(node3, node, "RawOccupancyCount", NULL, NULL, MXML_DESCEND);
-        			textvalue = mxmlGetText(node3, &whitespacevalue);
+        			textvalue = (char *)mxmlGetText(node3, &whitespacevalue);
 				lds[i][j].rawoccupancycount = atoi(textvalue);
 
 				printf("LoopName %s loopindex %d RawloopErrorStatus %d rawLoopErrorStatus %s RawSpeed %d RawVolume %d RawOccupancy %.2f RawOccupancyCount %d\n",
@@ -205,7 +207,7 @@ int main(int argc, char *argv[]) {
 //			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 1, 85, &controller_data2[i]);
 //			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 2, 102, &controller_data3[i]);
 
-		if(mle_flag) //Print only eastbound mainline values
+		if(mle_flag) { //Print only eastbound mainline values
 			if(mainline_counter > 0) {
 				fprintf(datafp, "Speed %d Volume %d Occupancy %.2f",
 					(int)(mainline_speed/mainline_counter),
@@ -213,8 +215,9 @@ int main(int argc, char *argv[]) {
 					mainline_occupancy/mainline_counter
 				);
 			}
-			else
+			else 
 				fprintf(datafp, "Speed 0 Volume 0 Occupancy 0");
+		}
 		fclose(datafp);
 		}
 
