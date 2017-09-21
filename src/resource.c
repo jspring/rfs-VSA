@@ -273,7 +273,6 @@ float occupancy_aggregation_mainline(db_urms_status_t *controller_data, struct c
 	int i;
 	int j = 0;
 	float lead_occ = 0.0;
-	float trail_occ = 0.0;
 	float occupancy = 0.0;
 	float mean_occ = 0.0;
 	float var_occ = 0.0;

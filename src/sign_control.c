@@ -39,7 +39,6 @@ int main(int argc, char *argv[])
 	char hostname[MAXHOSTNAMELEN+1];
 	posix_timer_typ *ptimer;       /* Timing proxy */
 	int interval = 30000;      /// Number of milliseconds between saves
-	int cycle_index = 0;
 	char *domain = DEFAULT_SERVICE; // usually no need to change this
 	int xport = COMM_OS_XPORT;      // set correct for OS in sys_os.h
 //      int verbose = 0;
