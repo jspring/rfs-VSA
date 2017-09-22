@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 {
 	timestamp_t ts;
 	timestamp_t *pts = &ts;
-	//float time = 0; , time2 = 0,timeSta = 0, tmp=0.0;
+	float time = 0; // , time2 = 0,timeSta = 0, tmp=0.0;
 	static int init_sw=1;
 	int i;
 	db_urms_status_t controller_data[NUM_LDS];  //See warning at top of file
