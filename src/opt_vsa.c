@@ -103,13 +103,13 @@ int main(int argc, char *argv[])
 	agg_data_t controller_onramp_data[NUM_ONRAMPS] = {{0}};                 // data aggregated controller by controller
 	agg_data_t controller_onramp_queue_detector_data[NUM_ONRAMPS] = {{0}};
 	agg_data_t controller_offramp_data[NUM_OFFRAMPS] = {{0}};               // data aggregated controller by controller
-	//float hm_speed_prev [NUM_LDS] = {1.0};               // this is the register of harmonic mean speed in previous time step
-	//float mean_speed_prev [NUM_LDS] = {1.0};             // this is the register of mean speed in previous time step
-    //float density_prev [NUM_LDS] = {0};             // this is the register of density in previous time step
-	//float OR_flow_prev [NUM_ONRAMPS] = {0};               // this is the register of on-ramp flow in previous time step
-	//float OR_occupancy_prev [NUM_ONRAMPS] = {0};               // this is the register of on-ramp occupancy in previous time step
-	//float FR_flow_prev [NUM_ONRAMPS] = {0};               // this is the register of on-ramp flow in previous time step
-	//float FR_occupancy_prev [NUM_ONRAMPS] = {0};               // this is the register of on-ramp occupancy in previous time step
+	float hm_speed_prev [NUM_LDS] = {1.0};               // this is the register of harmonic mean speed in previous time step
+	float mean_speed_prev [NUM_LDS] = {1.0};             // this is the register of mean speed in previous time step
+    float density_prev [NUM_LDS] = {0};             // this is the register of density in previous time step
+	float OR_flow_prev [NUM_ONRAMPS] = {0};               // this is the register of on-ramp flow in previous time step
+	float OR_occupancy_prev [NUM_ONRAMPS] = {0};               // this is the register of on-ramp occupancy in previous time step
+	float FR_flow_prev [NUM_ONRAMPS] = {0};               // this is the register of on-ramp flow in previous time step
+	float FR_occupancy_prev [NUM_ONRAMPS] = {0};               // this is the register of on-ramp occupancy in previous time step
 	float float_temp;
     //float ML_flow_ratio = 0.0; // current most upstream flow to historical most upstream flow
     //float current_most_upstream_flow = 0.0;
@@ -117,10 +117,10 @@ int main(int argc, char *argv[])
 	int num_controller_vars = NUM_LDS; //See warning at top of file
 	struct confidence confidence[num_controller_vars][3]; 
 
-    float temp_ary_vol[NUM_CYCLE_BUFFS] = {0};    // temporary array of cyclic buffer
-	float temp_ary_speed[NUM_CYCLE_BUFFS] = {0};
-	float temp_ary_occ[NUM_CYCLE_BUFFS] = {0};
-	float temp_ary_density[NUM_CYCLE_BUFFS] = {0};	
+    //float temp_ary_vol[NUM_CYCLE_BUFFS] = {0};    // temporary array of cyclic buffer
+	//float temp_ary_speed[NUM_CYCLE_BUFFS] = {0};
+	//float temp_ary_occ[NUM_CYCLE_BUFFS] = {0};
+	//float temp_ary_density[NUM_CYCLE_BUFFS] = {0};	
     //float temp_ary_OR_vol[NUM_CYCLE_BUFFS] = {0};
 	//float temp_ary_OR_occ[NUM_CYCLE_BUFFS] = {0};
 	//float temp_ary_OR_queue_detector_vol[NUM_CYCLE_BUFFS] = {0};
