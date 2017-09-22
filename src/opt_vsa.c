@@ -15,7 +15,7 @@
 #include "nrutil2.h"
 #include "resource.h"
 #include "look_up_table.h"
-//#include "rm_algo.h"
+#include "rm_algo.h"
 #include "xml_parser.h"
 
 char str[len_str];
@@ -359,6 +359,8 @@ int main(int argc, char *argv[])
 
     }
 */
+
+
 // average the historical data from data buffer
 // moving average filter for mainline
    for(i=0; i<SecSize; i++){
@@ -532,8 +534,7 @@ int main(int argc, char *argv[])
 	      	
 	return 0;
 }
-
-
+ 
 
 int Init_sim_data_io()
 {	
