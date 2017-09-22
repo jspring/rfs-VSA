@@ -427,10 +427,10 @@ int main(int argc, char *argv[])
 		print_timestamp(st_file_out, pts);//1
 		for(i=0;i<SecSize;i++)
 		{
-			    detection_s[i]->data[Np-1].flow=Mind(12000.0, Maxd(mainline_out_f[i].agg_vol, 200.0*(1.0+0.5*rand()/RAND_MAX)));
-			    detection_s[i]->data[Np-1].speed=Mind(100.0, Maxd(mainline_out_f[i].agg_speed, 5.0*(1.0+0.5*rand()/RAND_MAX)));
-			    detection_s[i]->data[Np-1].occupancy=Mind(100.0, Maxd((mainline_out_f[i].agg_occ), 5.0*(1.0+0.5*rand()/RAND_MAX)));
-			    detection_s[i]->data[Np-1].density=Mind(1200.0, Maxd(mainline_out_f[i].agg_density, 10.0*(1.0+0.5*rand()/RAND_MAX)));
+			    //detection_s[i]->data[Np-1].flow=Mind(12000.0, Maxd(mainline_out_f[i].agg_vol, 200.0*(1.0+0.5*rand()/RAND_MAX)));
+			    //detection_s[i]->data[Np-1].speed=Mind(100.0, Maxd(mainline_out_f[i].agg_speed, 5.0*(1.0+0.5*rand()/RAND_MAX)));
+			    //detection_s[i]->data[Np-1].occupancy=Mind(100.0, Maxd((mainline_out_f[i].agg_occ), 5.0*(1.0+0.5*rand()/RAND_MAX)));
+			    //detection_s[i]->data[Np-1].density=Mind(1200.0, Maxd(mainline_out_f[i].agg_density, 10.0*(1.0+0.5*rand()/RAND_MAX)));
 			    
                 //fprintf(st_file_out,"Sec %d ", i); 
 			    fprintf(st_file_out,"%.6f ", mainline_out_f[i].agg_vol); //2,6,10,14,18,22,26,30,34,38,42,46
@@ -445,10 +445,10 @@ int main(int argc, char *argv[])
 
 		for(i=0;i<NumOnRamp;i++)
 		{	
-				detection_onramp[i]->data[Np-1].flow=Mind(6000.0, Maxd(onramp_out_f[i].agg_vol, 100.0*(1.0+0.5*rand()/RAND_MAX)));
-				detection_onramp[i]->data[Np-1].occupancy=Mind(100.0, Maxd((onramp_out_f[i].agg_occ), 5.0*(1.0+0.5*rand()/RAND_MAX))); 
-				detection_offramp[i]->data[Np-1].flow=Mind(6000.0, Maxd(offramp_out_f[i].agg_vol, 100.0*(1.0+0.5*rand()/RAND_MAX)));
-				detection_offramp[i]->data[Np-1].occupancy=Mind(100.0, Maxd((offramp_out_f[i].agg_occ), 5.0*(1.0+0.5*rand()/RAND_MAX))); 	
+				//detection_onramp[i]->data[Np-1].flow=Mind(6000.0, Maxd(onramp_out_f[i].agg_vol, 100.0*(1.0+0.5*rand()/RAND_MAX)));
+				//detection_onramp[i]->data[Np-1].occupancy=Mind(100.0, Maxd((onramp_out_f[i].agg_occ), 5.0*(1.0+0.5*rand()/RAND_MAX))); 
+				//detection_offramp[i]->data[Np-1].flow=Mind(6000.0, Maxd(offramp_out_f[i].agg_vol, 100.0*(1.0+0.5*rand()/RAND_MAX)));
+				//detection_offramp[i]->data[Np-1].occupancy=Mind(100.0, Maxd((offramp_out_f[i].agg_occ), 5.0*(1.0+0.5*rand()/RAND_MAX))); 	
 				//fprintf(st_file_out,"OR %d ", i);//
 				fprintf(st_file_out,"%.6f ", onramp_out_f[i].agg_vol); //50,54,58,62,66,70,74,78,82,86,90  			
 				fprintf(st_file_out,"%.6f ", onramp_out_f[i].agg_occ); //51,55,59,63,67,71,75,79,83,87,91 
@@ -459,7 +459,7 @@ int main(int argc, char *argv[])
 				fprintf(st_file_out,"%.6f ", onramp_queue_out_f[i].agg_vol);
 				fprintf(st_file_out,"%.6f ", onramp_queue_out_f[i].agg_occ);
 				//fprintf(st_file_out,"\n");//
-				
+				/*
 				max_occ_2_dwn[i]=detection_s[i]->data[Np-1].occupancy;	
 				max_occ_all_dwn[i]=detection_s[i]->data[Np-1].occupancy;		
 				for (j=i+1;j<=i+2;j++)
@@ -500,19 +500,19 @@ int main(int argc, char *argv[])
 		}
 		
 		fprintf(st_file_out,"\n");
-		
+		*/
 		
 		
 		/*************************************************
 		   
-		      XYLu code start from here
+		      VSA control code start from here
 		
 		**************************************************/
 		
 		det_data_4_contr(time);	
 		get_meas(time);		
-		update_q_R();
-		
+		//update_q_R();
+		/*
 		fprintf(cal_opt_f,"%lf ", time);   // Output calculated Opt RM rt
 		for (i=0;i<NumOnRamp;i++)
 		{				
@@ -524,6 +524,8 @@ int main(int argc, char *argv[])
 		Set_Default_Meter(time,time2,timeSta); 		
 		
 		Set_Opt_Meter();
+        */
+
 		for(i=0; i<NUM_SIGNS; i++) 
 			db_vsa_ctl.vsa[i]= 0; //NOTE to Chengju: Assign variable speeds here
 		db_clt_write(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
@@ -562,7 +564,7 @@ int Init_sim_data_io()
    Subrutines of XYLu needs updating  from here;   09_15_16
    
 ****************************************************/
-
+/*
 int Init()  // A major function; Called by AAPI.cxx: the top function for intialization of the whole system
 {
 	int i; 
@@ -643,9 +645,9 @@ int Init()  // A major function; Called by AAPI.cxx: the top function for intial
 	
 	return 1;
 }
-
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 int moveData(detData* detection)
 {
 	int k;
@@ -664,13 +666,14 @@ int moveData(detData* detection)
 	}
 	return 1;
 }
+*/
 
-
+/*
 int update_queue(float time)  // This will not be used since we have onramp length available;
 {
 	int i,j;
 	float w;
-//	StructAkiEstadSection onramp_info;
+    //	StructAkiEstadSection onramp_info;
 
 	//for(i=0;i<SecSize;i++)
 	for(i=0;i<NumOnRamp;i++)
@@ -679,7 +682,7 @@ int update_queue(float time)  // This will not be used since we have onramp leng
 		for(j=0;j<max_onramp_ln;j++)
 		{
 			
-			/*if(OnRamp_Ln_Id[i][j]>0)
+			if(OnRamp_Ln_Id[i][j]>0)
 			{
 				onramp_info=AKIEstGetParcialStatisticsSection(OnRamp_Ln_Id[i][j],time,0);
 				if(onramp_info.report!=0)
@@ -687,15 +690,15 @@ int update_queue(float time)  // This will not be used since we have onramp leng
 				else
 					w=Maxd(w,onramp_info.LongQueueAvg);  // use the max queue of the lane as onramp queue
 			}
-			*/
+			
 		}
 		queue[i]=w;
 	}
 
 	return 1;
 }
-
-
+*/
+/*
 int det_data_4_contr(float time) // not used anymore
 {
 	int i,j;
@@ -731,7 +734,8 @@ int det_data_4_contr(float time) // not used anymore
 	
 	return 1;
 }
-
+*/
+/*
 int update_q_R()       // update flow for each cell
 {
 	int i;
@@ -745,9 +749,9 @@ int update_q_R()       // update flow for each cell
 	
 	return 1;
 }
+*/
 
-
-
+/*
 int get_meas(float T)
 {
 	int i;
@@ -773,9 +777,9 @@ int get_meas(float T)
 	
 	return 1;
 }
+*/
 
-
-
+/*
 int Set_Opt_Meter()
 {
 	int i;
@@ -830,13 +834,13 @@ int Set_Opt_Meter()
 
 	return 1;
 }
-
+*/
 /**************************************************
 
 	Should apply to downstream 11 onrampsonly
 
 ***************************************************/
-
+/*
 int Set_Default_Meter(float time,float time2,float timeSta) // this implemenmtation is correct 03_05_14; changed from 11 onarmps to 16 onramps 11_28_14
 {
 
@@ -925,13 +929,13 @@ int Set_Default_Meter(float time,float time2,float timeSta) // this implemenmtat
 		ISUPDATE2++;	
 	return 1;
 }
-
+*/
 
 
 /*******************************************
                OptSolver
 ********************************************/
-
+/*
 int set_coef(float c[MP][NP],float Qm)
 {
 	
@@ -1134,12 +1138,12 @@ int set_coef(float c[MP][NP],float Qm)
 	fprintf(pp,"\n");
 
 	//sprintf(str,"Q_o:");
-	/*fprintf(pp,"Q_o=:\n");
-	for(m=0;m<NumOnRamp;m++)
-	{
-		fprintf(pp,"%lf ",Q_o[m]);		
-	}
-	fprintf(pp,"\n") */
+	//fprintf(pp,"Q_o=:\n");
+	//for(m=0;m<NumOnRamp;m++)
+	//{
+	//	fprintf(pp,"%lf ",Q_o[m]);		
+	//}
+	//fprintf(pp,"\n") 
 	
 
 	sprintf(str,"Onramp Length:");
@@ -1230,11 +1234,11 @@ int set_coef(float c[MP][NP],float Qm)
 	
 
 
-/*sprintf(str,"M1 & M2:");
-	fprintf(pp,"%s\n",str);
-	fprintf(pp,"%i %i ",M1, M2); //b_l[m]);		
-	fprintf(pp,"\n");	
-*/
+    //sprintf(str,"M1 & M2:");
+	//fprintf(pp,"%s\n",str);
+	//fprintf(pp,"%i %i ",M1, M2); //b_l[m]);		
+	//fprintf(pp,"\n");	
+
 	sprintf(str,"c:");
 	fprintf(pp,"%s\n",str);
 	for(m=0;m<MP;m++)
@@ -1249,8 +1253,8 @@ int set_coef(float c[MP][NP],float Qm)
 	
 	return 0;
 }
-
-#undef NRANSI
+*/
+// #undef NRANSI
 
 /*******************************************
                OptSolver End
