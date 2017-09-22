@@ -53,7 +53,7 @@ const float T=30/3600.0;  // 30s RM control time interval in [hr]
 #define Gama 0.004
 #define QM 7200
 //static int ISUPDATE=3;         // for VSL update
-static int ISUPDATE2=1;
+//static int ISUPDATE2=1;
 #define Compliance_Level 0.3   // VSL compliance level: 1.0 is full level
 #define	exp_flt 0.85           // sensor measure exp filter gain
 
@@ -64,7 +64,7 @@ static int ISUPDATE2=1;
 //#define a_w 6.5			       // default: 6.5;   2.0 and 6.5 are the same in effect (1/7/14); not sure what is this? value=?
 #define len_str 1280           // for using sprintf_s
 #define Omega 20.11             // shockwave back-propagation speed 12.5 mph=20.1km/h
-static float a_w[NumOnRamp]={0.0};
+//static float a_w[NumOnRamp]={0.0};
 
 #define vsl_gain   15.0        // 20.0 fro I-80;    17=>10; 15.0
 #define vsl_p_gain 2.0         // 2.0
@@ -90,70 +90,70 @@ static float a_w[NumOnRamp]={0.0};
 //#define alpha_TTD_M alpha_TTD*5
 // for OptSolver End
 
-static int ControlOn;
-static int StateOn=0;
-static int StateOff=0;
+//static int ControlOn;
+//static int StateOn=0;
+//static int StateOff=0;
 //static int count=1;
 
-static float u[SecSize]={0};    // For all cells
+//static float u[SecSize]={0};    // For all cells
 float alpha[SecSize]={0};
 float beta_c[SecSize]={0};
-static float q[SecSize]={0.0};   // composite mainline flow
-static float v[SecSize]={0.0};   // composite speed for each cell
-static float o[SecSize]={0.0};   // composite occupancy for each cell
-static float qc[SecSize]={7200};      // mainline capacity; assigned in Init()
-static float queue[SecSize]={0.0};      // updated with update_queue();
+//static float q[SecSize]={0.0};   // composite mainline flow
+//static float v[SecSize]={0.0};   // composite speed for each cell
+//static float o[SecSize]={0.0};   // composite occupancy for each cell
+//static float qc[SecSize]={7200};      // mainline capacity; assigned in Init()
+//static float queue[SecSize]={0.0};      // updated with update_queue();
 //float s[SecSize]={0.0};          // off-ramp flow  // changed on 03/04/14
-static float s[NumOnRamp]={0.0};          // off-ramp flow
-static float R[NumOnRamp]={0.0};   // composite onramp flow;  changed on 01/03/13
-static float dmd[NumOnRamp]={0.0};          // onramp demand flow;     changed on 01/03/13
-static float Q_o[NumOnRamp]={0.0};  // Onramp capacity; total onramp max RM rate
-static float Q_min[NumOnRamp]={0.0};  // Total Onramp minimum RM rate
-static float ss[NumOnRamp][Np]={{0.0}};
-static float dd[NumOnRamp][Np]={{0.0}};     // onramp dmd
-static float pre_w[NumOnRamp]={0};
-static float max_occ_all_dwn[NumOnRamp]={0};
-static float max_occ_2_dwn[NumOnRamp]={0};
+//static float s[NumOnRamp]={0.0};          // off-ramp flow
+//static float R[NumOnRamp]={0.0};   // composite onramp flow;  changed on 01/03/13
+//static float dmd[NumOnRamp]={0.0};          // onramp demand flow;     changed on 01/03/13
+//static float Q_o[NumOnRamp]={0.0};  // Onramp capacity; total onramp max RM rate
+//static float Q_min[NumOnRamp]={0.0};  // Total Onramp minimum RM rate
+//static float ss[NumOnRamp][Np]={{0.0}};
+//static float dd[NumOnRamp][Np]={{0.0}};     // onramp dmd
+//static float pre_w[NumOnRamp]={0};
+//static float max_occ_all_dwn[NumOnRamp]={0};
+//static float max_occ_2_dwn[NumOnRamp]={0};
 
-static float q_main[SecSize]={0.0};     // mainline flow of all cells   
-static float u2[SecSize]={0};           // speed to feed into the model
+//static float q_main[SecSize]={0.0};     // mainline flow of all cells   
+//static float u2[SecSize]={0};           // speed to feed into the model
 
-static float pre_rho[SecSize]={0};
-static float opt_r[SecSize][Np]={{0.0}};
+//static float pre_rho[SecSize]={0};
+//static float opt_r[SecSize][Np]={{0.0}};
 //static float metering_rate_change_time=0.0;
-static float up_rho[Np]={0};
+//static float up_rho[Np]={0};
 
 
 unsigned int replication=0;
 //static int detectorNum=0,sectionNum=0,nodeNum=0,centroidNum=0;  // moved from data_save.h and readdetectordata.h; 05_29_13
 
-static float dyna_min_r[NumOnRamp]={0.0};
-static float dyna_max_r[NumOnRamp]={0.0};
-static float Ramp_rt[NumOnRamp]={0.0,0.0,0.0};
-static float RM_occ[NumOnRamp]={0.0,0.0,0.0};
+//static float dyna_min_r[NumOnRamp]={0.0};
+//static float dyna_max_r[NumOnRamp]={0.0};
+//static float Ramp_rt[NumOnRamp]={0.0,0.0,0.0};
+//static float RM_occ[NumOnRamp]={0.0,0.0,0.0};
 //static float RM_occ_All[NumOnRamp+5]={0.0,0.0,0.0};
-static float ln_RM_rt[NumOnRamp][max_onramp_ln]={{0.0,0.0,0.0},{0.0,0.0,0.0}};
-static float ln_LRRM_rt[NumOnRamp][max_onramp_ln]={{0.0,0.0,0.0},{0.0,0.0,0.0}};   // local responsive RM
-const int ln_meteringId[16][max_onramp_ln]={{21044,21045,21046},{19780,0,0},{19782,0,0},{19789,0,0},{21063,21062,21060},
-                       {19892,0,19796},{21080,21081,21082},{19924,0,19801},{19936,0,19804},{19811,0,0},{19968,0,19815},
-                       {19959,0,19819},{19948,0,19823},{19827,0,0},{19831,0,0},{19836,0,0}};
+//static float ln_RM_rt[NumOnRamp][max_onramp_ln]={{0.0,0.0,0.0},{0.0,0.0,0.0}};
+//static float ln_LRRM_rt[NumOnRamp][max_onramp_ln]={{0.0,0.0,0.0},{0.0,0.0,0.0}};   // local responsive RM
+//const int ln_meteringId[16][max_onramp_ln]={{21044,21045,21046},{19780,0,0},{19782,0,0},{19789,0,0},{21063,21062,21060},
+//                       {19892,0,19796},{21080,21081,21082},{19924,0,19801},{19936,0,19804},{19811,0,0},{19968,0,19815},
+//                       {19959,0,19819},{19948,0,19823},{19827,0,0},{19831,0,0},{19836,0,0}};
 
 
 
-	static int release_cycle[NumOnRamp][max_onramp_ln]={{0,0,0}};
+//	static int release_cycle[NumOnRamp][max_onramp_ln]={{0,0,0}};
 //	static float actual_r[NumOnRamp][max_onramp_ln]={{0.0,0.0,0.0}};
-	static float total_rt[NumOnRamp]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-	static float total_field_rt[NumOnRamp]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+//	static float total_rt[NumOnRamp]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+//	static float total_field_rt[NumOnRamp]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
 	
-	static float L[SecSize]={555.2,1562.0,455.4,1971.8,440.2,2402.1,427.6,1509.9,374.4,1374.9,377.9,1863.9};  // composite length; including most downstream sec; 1st section has no meter; 10_21_13
-	const float Q[SecSize]={2050.0,2000.0,2050.0,2050.0,2050.0,2000.0,2050.0,2050.0,2050.0,2000.0,2000.0,2000.0};	 //onramp flow capacity
+//	static float L[SecSize]={555.2,1562.0,455.4,1971.8,440.2,2402.1,427.6,1509.9,374.4,1374.9,377.9,1863.9};  // composite length; including most downstream sec; 1st section has no meter; 10_21_13
+//	const float Q[SecSize]={2050.0,2000.0,2050.0,2050.0,2050.0,2000.0,2050.0,2050.0,2050.0,2000.0,2000.0,2000.0};	 //onramp flow capacity
 	//const float min_Ln_RM_rt[NumOnRamp]={480,600,681,240,500,700,480,480,480,575,800}; // field lower bound
 	//const float min_Ln_RM_rt[NumOnRamp]=  {380,500,520,240,400,550,380,380,380,475,550}; // revised lower bound; used Day_1
 	//const float min_Ln_RM_rt[NumOnRamp]=  {380,500,520,240,350,500,380,350,380,420,550}; // revised lower bound; 9/27/16
-	const float min_Ln_RM_rt[NumOnRamp]=  {350,380,480,240,350,400,350,320,330,420,550};   // revised lower bound; 9/28/16
+//	const float min_Ln_RM_rt[NumOnRamp]=  {350,380,480,240,350,400,350,320,330,420,550};   // revised lower bound; 9/28/16
 	//const float max_Ln_RM_rt[NumOnRamp]={1000,750,910,900,900,990,900,900,750,920,1080}; // field upper bound;   used Day_1
 	//const float max_Ln_RM_rt[NumOnRamp]=  {1000,750,910,800,800,850,900,850,750,850,1080}; // revised lower bound
-	const float max_Ln_RM_rt[NumOnRamp]=  {750,750,800,800,800,850,900,850,750,850,1080}; // revised lower bound  9/28/16
+//	const float max_Ln_RM_rt[NumOnRamp]=  {750,750,800,800,800,850,900,850,750,850,1080}; // revised lower bound  9/28/16
 										  
 	
 	// for downstream 11 onramps only
@@ -176,7 +176,7 @@ const int ln_meteringId[16][max_onramp_ln]={{21044,21045,21046},{19780,0,0},{197
 	
 	
 //for measuremnt only
-static float onrampL[NumOnRamp]={379.2,453.6,587.6,831.7,284.8,615.9,334.6,470.7,402.7,522.7,272.3};
+//static float onrampL[NumOnRamp]={379.2,453.6,587.6,831.7,284.8,615.9,334.6,470.7,402.7,522.7,272.3};
 const int OnRampDetectionEndId[NumOnRamp]={19797,20139,19802,19806,19812,19816,20140,19824,19828,19832,19835}; // single detector after meter
 
 const int OnRamp_Ln_AdvanceDetEndId[NumOnRamp][max_onramp_ln]={{19886,0,18424},{19906,19898,18425},{19922,0,18689},{19934,0,18691},
