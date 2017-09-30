@@ -2,7 +2,7 @@
  * clt_vars.c	Creates all database client variables for ramp metering project    File to save the data from the arterial coordination
  */
 
-#include "xml_parser.h"
+#include "resource.h"
 
 static int sig_list[] = 
 {
