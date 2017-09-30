@@ -5,7 +5,8 @@
 #include <db_include.h>
 
 //#include "clt_vars.h"
-#include "xml_parser.h"
+//#include "xml_parser.h"
+#include "resource.h"
 
 static int sig_list[] =
 {
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
 	char *domain = DEFAULT_SERVICE; // usually no need to change this
 	int xport = COMM_OS_XPORT;      // set correct for OS in sys_os.h
 //      int verbose = 0;
-	db_vsa_ctl_t	db_vsa_ctl[NUM_LDS];
+	db_vsa_ctl_t db_vsa_ctl[NUM_LDS];
 	int i;
 
         while ((option = getopt(argc, argv, "i:")) != EOF) {

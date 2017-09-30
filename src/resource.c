@@ -7,6 +7,7 @@
 #define NAN_ERROR -1.0 
 #define RANGE_ERROR -2.0 
 #define MAX_30_SEC_FLOW		40 // JAS,8/26/2016 I saw 30 in the data (corresponding to 3600 VPH), so this number is larger than that, but XYL says that's local
+#define NUM_LANES	3
 //#define MAX_30_SEC_FLOW	17 //JAS,8/26/2016 from XYL:Maximum 30-second flow rate per lane (sample time is 30 seconds, so this value corresponds to 2000 vehicles per hour)
 
 // units
@@ -15,6 +16,8 @@
 // occupancy is 0 to 100
 
 //float flow_aggregation_3_lanes(float flow_lane_1,float flow_lane_2, float flow_lane_3);
+
+//extern db_id_t db_vds_list[];
 
 float maxd(float a,float b){
 	if(a>=b){
@@ -86,26 +89,148 @@ long int nCr(int n, int r){
 	return ncr;
 }
 
-// Def minimum lane flow 
-float flow_aggregation_mainline(db_urms_status_t *controller_data, struct confidence *confidence){
+db_id_t db_vds_list[] =  {
+	{DB_JEFFERSON_VAR, sizeof(db_urms_status_t)},
+	{DB_EL_CAMINO_REAL_VAR	, sizeof(db_urms_status_t)},
+	{DB_PLAZA_VAR, sizeof(db_urms_status_t)},
+	{DB_EMERALD_VAR, sizeof(db_urms_status_t)},
+	{DB_VISTA_VILLAGE_VAR, sizeof(db_urms_status_t)},
+	{DB_ESCONDIDO_VAR, sizeof(db_urms_status_t)},
+	{DB_MAR_VISTA_VAR, sizeof(db_urms_status_t)},
+	{DB_SYCAMORE_VAR, sizeof(db_urms_status_t)},
+	{DB_SANTA_FE_VAR, sizeof(db_urms_status_t)},
+	{DB_LAS_POSAS_VAR, sizeof(db_urms_status_t)},
+	{DB_SAN_MARCOS_VAR, sizeof(db_urms_status_t)},
+	{DB_TWIN_OAKS_VAR, sizeof(db_urms_status_t)},
+	{DB_BARHAM_VAR	, sizeof(db_urms_status_t)},
+	{DB_NORDAHL_VAR, sizeof(db_urms_status_t)},
+
+	{DB_JEFFERSON_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_EL_CAMINO_REAL_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_PLAZA_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_EMERALD_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_VISTA_VILLAGE_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_ESCONDIDO_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_MAR_VISTA_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_SYCAMORE_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_SANTA_FE_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_LAS_POSAS_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_SAN_MARCOS_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_TWIN_OAKS_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_BARHAM_VAR + 1, sizeof(db_urms_status2_t)},
+	{DB_NORDAHL_VAR + 1, sizeof(db_urms_status2_t)},
+
+	{DB_JEFFERSON_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_EL_CAMINO_REAL_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_PLAZA_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_EMERALD_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_VISTA_VILLAGE_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_ESCONDIDO_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_MAR_VISTA_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_SYCAMORE_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_SANTA_FE_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_LAS_POSAS_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_SAN_MARCOS_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_TWIN_OAKS_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_BARHAM_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_NORDAHL_VAR + 2, sizeof(db_urms_status3_t)}
+
+};
+
+//#define NUM_LDS (sizeof(db_vds_list)/sizeof(db_id_t)/3)
+//int NUM_LDS = (sizeof(db_vds_list)/sizeof(db_id_t)/3);
+
+const int LdsId_onramp_int[] =
+{
+        201,
+        200,
+        199,
+        24,
+        205,
+        198,
+        197,
+        203,
+        152,
+        398,
+        180,
+        234,
+        236,
+        13006
+};
+
+const char *LdsId_onramp[] =
+{
+	"201",
+	"200",
+	"199",
+	"24",
+	"205",
+	"198",
+	"197",
+	"203",
+	"152",
+	"398",
+	"180",
+	"234",
+	"236",
+	"13006",
+};
+
+const char *LdsId_onramp2[][2] =
+{
+	{"201", "Jefferson"},
+	{"200", "El_Camino"},
+	{"199", "Plaza"},
+	{"24",  "Emerald"},
+	{"205", "Vista_Village"},
+	{"198", "Sunset-Escondido"},
+	{"197", "Mar_Vista"},
+	{"203", "Sycamore"},
+	{"152", "Santa_Fe"},
+	{"398", "Las_Posas"},
+	{"180", "San_Marcos"},
+	{"234", "Twin_Oaks"},
+	{"236", "Barham"},
+	{"13006", "Nordahl"},
+};
+
+const char *loopname_list[] = //Comprehensive only for above LDS list!!
+{	
+	"MLE1", 
+	"MLE2", 
+	"MLE3",
+	"OFF1",
+	"OFF2",
+	"D1",
+	"D2",
+	"P1",
+	"P2",
+	"P3",
+	"Q1",
+	"Q2"
+};
+
+// Def minimum lane flow.  NOTE TO CHENG-JU: In the mainline functions, we can iterate in the range 0 <= i <= 3 because the 
+// first three elements in the loopname_list are also the three mainline lanes. Other functions, dealing with on/offramps
+// and queues, will be different
+
+float flow_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], struct confidence *confidence){
 	int i;
 	int j = 0;
 	float flow = 0.0;
 	    float mean_flow = 0.0;
 	    float var_flow = 0.0;
-	    int num_lane = controller_data->num_main;
 	    float flow_temp [MAX_MAINLINES];
 		memset(flow_temp, 0, sizeof(float) * MAX_MAINLINES);
 
-	confidence->num_total_vals = num_lane;
-	confidence->num_good_vals = num_lane;
+	confidence->num_total_vals = NUM_LANES;
+	confidence->num_good_vals = NUM_LANES;
 
 	// this loop get data from data base
-	if( (controller_data->num_main > 0) && (controller_data->num_main <= 8) ) {
-	    for(i=0 ; i < controller_data->num_main; i++) {
-		if(controller_data->mainline_stat[i].lead_stat == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
-			if((float)controller_data->mainline_stat[i].lead_vol >= 0 && (float)controller_data->mainline_stat[i].lead_vol <= MAX_30_SEC_FLOW){ // if flow is in the range
-			    flow_temp[j]=(float)controller_data->mainline_stat[i].lead_vol;  
+	    for(i=0 ; i < NUM_LANES; i++) {
+		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i]->rawvolume >= 0 && (float)lds[i]->rawvolume <= MAX_30_SEC_FLOW){ // if flow is in the range
+			    flow_temp[j]=(float)lds[i]->rawvolume;  
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;
@@ -115,15 +240,12 @@ float flow_aggregation_mainline(db_urms_status_t *controller_data, struct confid
 		}
 
 	    }
-	}
-	else
-		return NAN_ERROR; // <--handle the float error here
 
 	mean_flow = mean_array(flow_temp, confidence->num_good_vals);
 	var_flow = var_array(flow_temp, confidence->num_good_vals);
 
 	// this loop replace data with large variance
-	for(i=0 ; i < confidence->num_good_vals; i++) {
+	for(i=0 ; i < 3 ; i++) {
 	    if (abs(flow_temp[i]-mean_flow)>5*sqrt(abs(var_flow)))
 	    flow_temp[i] = mean_flow;
 	}
@@ -134,14 +256,14 @@ float flow_aggregation_mainline(db_urms_status_t *controller_data, struct confid
 	if(isnan(flow)){
 		flow = NAN_ERROR;
 	}else{
-	    flow = num_lane * (flow * 120); // convert 30 second data into hour data
+	    flow = NUM_LANES * (flow * 120); // convert 30 second data into hour data
 	}
 	printf("FLOW_AGGREGATION_MAINLINE: flow_temp ");
 	for(i=0; i<MAX_MAINLINES;i++)
 		printf("%d:%2.2f ",i, flow_temp[i]);
-	printf("num_lane %d mean_flow %f var_flow %f calculated flow %4.2f max flow %4.2f min flow %d ", num_lane, mean_flow, var_flow, flow, MAX_FLOW_PER_LANE*num_lane, 600*num_lane);
-	flow = maxd(flow,MIN_FLOW*num_lane); //factor 600 is veh/hr/lane in free flow
-	flow = mind(MAX_FLOW_PER_LANE*num_lane,flow);
+	printf("num_lane %d mean_flow %f var_flow %f calculated flow %4.2f max flow %4.2f min flow %d ", NUM_LANES, mean_flow, var_flow, flow, MAX_FLOW_PER_LANE*NUM_LANES, 600*NUM_LANES);
+	flow = maxd(flow,MIN_FLOW*NUM_LANES); //factor 600 is veh/hr/lane in free flow
+	flow = mind(MAX_FLOW_PER_LANE*NUM_LANES,flow);
 	printf("returned flow %4.2f\n", flow);
 	return flow;
 }

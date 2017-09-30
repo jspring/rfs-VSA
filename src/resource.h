@@ -3,6 +3,7 @@
 // Used by app.rc
 
 #pragma once
+#include "xml_parser.h"
 #include <urms.h>
 
 // define the array size of look up table here
@@ -22,6 +23,7 @@
 #define MAX_OR_RAMP_FLOW_PER_LANE 950
 #define MIN_FR_RAMP_FLOW_PER_LANE 50
 #define MAX_FR_RAMP_FLOW_PER_LANE 1500 
+#define NUM_LDS 14 
 
 struct confidence {
         float num_good_vals;
@@ -48,7 +50,7 @@ extern long int nCr(int n, int r);
 
 //extern float get_on_ramp_flow_by_flow_balance(float upstream_total_flow, float downstream_total_flow, float off_ramp_flow);
 
-extern float flow_aggregation_mainline(db_urms_status_t *controller_data, struct confidence *confidence);
+extern float flow_aggregation_mainline(loop_data_t *lds[], struct confidence *confidence);
 extern float flow_aggregation_onramp(db_urms_status_t *controller_data, struct confidence *confidence);
 extern float flow_aggregation_onramp_queue(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence);
 extern float flow_aggregation_offramp(db_urms_status3_t *controller_data, struct confidence *confidence);
@@ -84,3 +86,25 @@ extern float butt_2_ML_flow(float flow, int ML_idx);
 extern float butt_2_ML_speed(float speed, int ML_idx);
 extern float butt_2_ML_occupancy(float occ, int ML_idx);
 extern float butt_2_ML_density(float density, int ML_idx);
+extern db_id_t db_vds_list[42];
+extern const int LdsId_onramp_int[];
+extern const char *LdsId_onramp[];
+extern const char *LdsId_onramp2[][2];
+extern const char *loopname_list[];
+//extern int NUM_LDS;
+enum loopname_enum
+{
+        MLE1_e, 
+        MLE2_e, 
+        MLE3_e, 
+        OFF1_e,
+        OFF2_e, 
+        D1_e, 
+        D2_e, 
+        P1_e, 
+        P2_e, 
+        P3_e, 
+        Q1_e, 
+        Q2_e  
+};
+

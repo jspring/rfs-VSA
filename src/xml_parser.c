@@ -3,6 +3,7 @@
 #include <mxml.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "resource.h"
 #include "xml_parser.h"
 
 static int sig_list[] =
@@ -48,7 +49,7 @@ int main(int argc, char *argv[]) {
         mxml_node_t *node;
         mxml_node_t *node2 = {0};
         mxml_node_t *node3;
-	loop_data_t lds[NUM_LDS][NUM_LOOPNAMES] = {0};
+	loop_data_t lds[14][NUM_LOOPNAMES] = {0};
         int whitespacevalue;
 	char *textvalue; 
 	char *rawlooperrorstatus; 
@@ -62,12 +63,8 @@ int main(int argc, char *argv[]) {
 	int create_db_vars = 0;
 	const char *usage = "-c (create db variables) -f <input data file (required)>";
 
-	db_urms_status_t controller_data[NUM_LDS];  //See warning at top of file
-	db_urms_status2_t controller_data2[NUM_LDS];  //See warning at top of file
-	db_urms_status3_t controller_data3[NUM_LDS];  //See warning at top of file
-
 	printf("sizeof loop_data_t %ld sizeof datafilename %ld\n", sizeof(loop_data_t), sizeof(datafilename));
-	printf("sizeof %ld db_urms_status_t sizeof db_urms_status2_t %ld sizeof(db_urms_status3_t %ld NUM_LDS %ld\n", sizeof(db_urms_status_t), sizeof(db_urms_status2_t ), sizeof(db_urms_status3_t), NUM_LDS);
+	printf("sizeof %ld db_urms_status_t sizeof db_urms_status2_t %ld sizeof(db_urms_status3_t %ld NUM_LDS %d\n", sizeof(db_urms_status_t), sizeof(db_urms_status2_t ), sizeof(db_urms_status3_t), NUM_LDS);
         while ((option = getopt(argc, argv, "cf:")) != EOF) {
                 switch(option) {
                         case 'c':
@@ -148,7 +145,6 @@ int main(int argc, char *argv[]) {
         			textvalue = (char *)mxmlGetText(node3, &whitespacevalue);
 				for(j = 0; j < NUM_LOOPNAMES; j++) {
 					if(strcmp(textvalue, loopname_list[j]) == 0) {
-						lds[i][j].loopnameindex = j;
 						if( (strcmp(textvalue, "MLE")) >= 0){ //Pick out eastbound mainline volume, occupancy, and speed
 							mle_flag = 1;
 							mainline_counter++;
@@ -178,31 +174,28 @@ int main(int argc, char *argv[]) {
 	
         			node3 = mxmlFindElement(node3, node, "RawOccupancy", NULL, NULL, MXML_DESCEND);
         			textvalue = (char *)mxmlGetText(node3, &whitespacevalue);
-				lds[i][j].rawoccupancy = atof(textvalue);
+				lds[i][j].rawoccupancy = (unsigned short)(atof(textvalue) * 10);
 				if(mle_flag)
 					mainline_occupancy += lds[i][j].rawoccupancy;
 	
         			node3 = mxmlFindElement(node3, node, "RawOccupancyCount", NULL, NULL, MXML_DESCEND);
         			textvalue = (char *)mxmlGetText(node3, &whitespacevalue);
-				lds[i][j].rawoccupancycount = atoi(textvalue);
 
-				printf("LoopName %s loopindex %d RawloopErrorStatus %d rawLoopErrorStatus %s RawSpeed %d RawVolume %d RawOccupancy %.2f RawOccupancyCount %d\n",
-					loopname_list[lds[i][j].loopnameindex],
-					lds[i][j].loopnameindex,
+				printf("LoopName %s RawloopErrorStatus %d rawLoopErrorStatus %s RawSpeed %d RawVolume %d RawOccupancy %.2f\n",
+					lds[i][j].loopname,
 					lds[i][j].rawlooperrorstatus,
 					rawlooperrorstatus,
 					lds[i][j].rawspeed,
 					lds[i][j].rawvolume,
-					lds[i][j].rawoccupancy,
-					lds[i][j].rawoccupancycount
+					lds[i][j].rawoccupancy/10.0
 				);
 
         		}
 			printf("\n");
-			per_controller_mapping(&lds[0][i], &controller_data[i], &controller_data2[i], &controller_data3[i]);
-			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC), sizeof(db_urms_status_t), &controller_data[i]);
-			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 1, sizeof(db_urms_status2_t), &controller_data2[i]);
-			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 2, sizeof(db_urms_status3_t), &controller_data3[i]);
+			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC), sizeof(loop_data_t)*10, &lds[i][0]);
+//			per_controller_mapping(&lds[0][i], &controller_data[i], &controller_data2[i], &controller_data3[i]);
+//			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC), sizeof(db_urms_status_t), &controller_data[i]);
+//			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 1, sizeof(db_urms_status2_t), &controller_data2[i]);
 //			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC), 120, &controller_data[i]);
 //			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 1, 85, &controller_data2[i]);
 //			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 2, 102, &controller_data3[i]);
