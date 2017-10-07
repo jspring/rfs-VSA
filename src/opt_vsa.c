@@ -187,8 +187,8 @@ int main(int argc, char *argv[])
 	if(debug)
 		num_controller_vars = 2; //Use just the first two controllers in the list, i.e. 10.29.248.108 and 10.254.25.113.
 
-	for (i = 0; i < num_controller_vars; i++){   //See warning at top of file
-		db_clt_read(pclt, db_vds_list[i].id, db_vds_list[i].size, &lds[i][0]);
+	for (i = 0; i < NUM_LDS; i++){   //See warning at top of file
+		db_clt_read(pclt, db_vars_list[i].id, db_vars_list[i].size, &lds[i][0]);
 //		db_clt_read(pclt, db_vds_list[i].id, db_vds_list[i].size, &controller_data[i]);
 //		db_clt_read(pclt, db_vds_list[i+14].id, db_vds_list[i+14].size, &controller_data2[i]);
 //		db_clt_read(pclt, db_vds_list[i+28].id, db_vds_list[i+28].size, &controller_data3[i]);
@@ -200,8 +200,8 @@ int main(int argc, char *argv[])
 
 	cycle_index++;
 	cycle_index = cycle_index % NUM_CYCLE_BUFFS;
-	for (i = 0; i < num_controller_vars; i++){  //See warning at top of file
-		db_clt_read(pclt, db_vds_list[i].id, db_vds_list[i].size, &lds[i][0]);
+	for (i = 0; i < NUM_LDS; i++){  //See warning at top of file
+		db_clt_read(pclt, db_vars_list[i].id, db_vars_list[i].size, &lds[i][0]);
 //		db_clt_read(pclt, db_vds_list[i].id, db_vds_list[i].size, &controller_data[i]);
 //		db_clt_read(pclt, db_vds_list[i+14].id, db_vds_list[i+14].size, &controller_data2[i]);
 //		db_clt_read(pclt, db_vds_list[i+28].id, db_vds_list[i+28].size, &controller_data3[i]);

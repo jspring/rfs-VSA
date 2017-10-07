@@ -89,7 +89,7 @@ long int nCr(int n, int r){
 	return ncr;
 }
 
-db_id_t db_vds_list[] =  {
+db_id_t db_vars_list[] =  {
 	{DB_JEFFERSON_VAR, sizeof(db_urms_status_t)},
 	{DB_EL_CAMINO_REAL_VAR	, sizeof(db_urms_status_t)},
 	{DB_PLAZA_VAR, sizeof(db_urms_status_t)},
@@ -133,12 +133,12 @@ db_id_t db_vds_list[] =  {
 	{DB_SAN_MARCOS_VAR + 2, sizeof(db_urms_status3_t)},
 	{DB_TWIN_OAKS_VAR + 2, sizeof(db_urms_status3_t)},
 	{DB_BARHAM_VAR + 2, sizeof(db_urms_status3_t)},
-	{DB_NORDAHL_VAR + 2, sizeof(db_urms_status3_t)}
-
+	{DB_NORDAHL_VAR + 2, sizeof(db_urms_status3_t)},
+	{DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t)},
 };
 
-//#define NUM_LDS (sizeof(db_vds_list)/sizeof(db_id_t)/3)
-//int NUM_LDS = (sizeof(db_vds_list)/sizeof(db_id_t)/3);
+#define NUM_DB_VARS (sizeof(db_vars_list)/sizeof(db_id_t))
+int num_db_vars = (sizeof(db_vars_list)/sizeof(db_id_t));
 
 const int LdsId_onramp_int[] =
 {
