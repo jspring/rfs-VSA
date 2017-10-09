@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         mxml_node_t *node;
         mxml_node_t *node2 = {0};
         mxml_node_t *node3;
-	loop_data_t lds[14][NUM_LOOPNAMES] = {0};
+	loop_data_t lds[NUM_LDS][NUM_LOOPNAMES] = {0};
         int whitespacevalue;
 	char *textvalue; 
 	char *rawlooperrorstatus; 
@@ -192,13 +192,7 @@ int main(int argc, char *argv[]) {
 
         		}
 			printf("\n");
-			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC), sizeof(loop_data_t)*10, &lds[i][0]);
-//			per_controller_mapping(&lds[0][i], &controller_data[i], &controller_data2[i], &controller_data3[i]);
-//			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC), sizeof(db_urms_status_t), &controller_data[i]);
-//			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 1, sizeof(db_urms_status2_t), &controller_data2[i]);
-//			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC), 120, &controller_data[i]);
-//			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 1, 85, &controller_data2[i]);
-//			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC) + 2, 102, &controller_data3[i]);
+			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC), sizeof(loop_data_t)*NUM_LOOPNAMES, &lds[i][0]);
 
 		if(mle_flag) { //Print only eastbound mainline values
 			if(mainline_counter > 0) {
@@ -219,67 +213,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	longjmp(exit_env, SIGTERM);
-
-	return 0;
-}
-
-
-
-int per_controller_mapping(loop_data_t lds[], db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, db_urms_status3_t *controller_data3) {
-
-        controller_data->mainline_stat[0].speed = lds[0].rawspeed;
-        controller_data->mainline_stat[0].lead_vol = lds[0].rawvolume;
-        controller_data->mainline_stat[0].lead_stat = lds[0].rawlooperrorstatus;
-        controller_data->mainline_stat[0].lead_occ_msb = (((int)(lds[0].rawoccupancy * 10)) & 0xFF00) >> 8; 
-        controller_data->mainline_stat[0].lead_occ_lsb = (((int)(lds[0].rawoccupancy * 10)) & 0x00FF); 
-
-        controller_data->mainline_stat[1].speed = lds[1].rawspeed;
-        controller_data->mainline_stat[1].lead_vol = lds[1].rawvolume;
-        controller_data->mainline_stat[1].lead_stat = lds[1].rawlooperrorstatus;
-        controller_data->mainline_stat[1].lead_occ_msb = (((int)(lds[1].rawoccupancy * 10)) & 0xFF00) >> 8; 
-        controller_data->mainline_stat[1].lead_occ_lsb = (((int)(lds[1].rawoccupancy * 10)) & 0x00FF); 
-
-        controller_data->mainline_stat[2].speed = lds[2].rawspeed;
-        controller_data->mainline_stat[2].lead_vol = lds[2].rawvolume;
-        controller_data->mainline_stat[2].lead_stat = lds[2].rawlooperrorstatus;
-        controller_data->mainline_stat[2].lead_occ_msb = (((int)(lds[2].rawoccupancy * 10)) & 0xFF00) >> 8; 
-        controller_data->mainline_stat[2].lead_occ_lsb = (((int)(lds[2].rawoccupancy * 10)) & 0x00FF); 
-
-        controller_data3->additional_det[0].volume = lds[3].rawvolume;
-        controller_data3->additional_det[0].stat = lds[3].rawlooperrorstatus;
-        controller_data3->additional_det[0].occ_msb = (((int)(lds[3].rawoccupancy * 10)) & 0xFF00) >> 8; 
-        controller_data3->additional_det[0].occ_lsb = (((int)(lds[3].rawoccupancy * 10)) & 0x00FF); 
-
-        controller_data3->additional_det[1].volume = lds[4].rawvolume;
-        controller_data3->additional_det[1].stat = lds[4].rawlooperrorstatus;
-        controller_data3->additional_det[1].occ_msb = (((int)(lds[4].rawoccupancy * 10)) & 0xFF00) >> 8; 
-        controller_data3->additional_det[1].occ_lsb = (((int)(lds[4].rawoccupancy * 10)) & 0x00FF); 
-
-        controller_data->metered_lane_stat[0].demand_vol = lds[5].rawvolume;
-        controller_data->metered_lane_stat[0].demand_stat = lds[5].rawlooperrorstatus;
-
-        controller_data->metered_lane_stat[1].demand_vol = lds[6].rawvolume;
-        controller_data->metered_lane_stat[1].demand_stat = lds[6].rawlooperrorstatus;
-
-        controller_data->metered_lane_stat[0].passage_vol = lds[7].rawvolume;
-        controller_data->metered_lane_stat[0].passage_stat = lds[7].rawlooperrorstatus;
-
-        controller_data->metered_lane_stat[1].passage_vol = lds[8].rawvolume;
-        controller_data->metered_lane_stat[1].passage_stat = lds[8].rawlooperrorstatus;
-
-        controller_data->metered_lane_stat[2].passage_vol = lds[9].rawvolume;
-        controller_data->metered_lane_stat[2].passage_stat = lds[9].rawlooperrorstatus;
-
-        controller_data2->queue_stat[0][0].stat = lds[10].rawlooperrorstatus;
-        controller_data2->queue_stat[0][0].vol = lds[10].rawvolume;
-        controller_data2->queue_stat[0][0].occ_msb = (((int)(lds[10].rawoccupancy * 10)) & 0xFF00) >> 8; 
-        controller_data2->queue_stat[0][0].occ_lsb = (((int)(lds[10].rawoccupancy * 10)) & 0x00FF); 
-
-        controller_data2->queue_stat[1][0].stat = lds[11].rawlooperrorstatus;
-        controller_data2->queue_stat[1][0].vol = lds[11].rawvolume;
-        controller_data2->queue_stat[1][0].occ_msb = (((int)(lds[11].rawoccupancy * 10)) & 0xFF00) >> 8; 
-        controller_data2->queue_stat[1][0].occ_lsb = (((int)(lds[11].rawoccupancy * 10)) & 0x00FF); 
-
 
 	return 0;
 }
