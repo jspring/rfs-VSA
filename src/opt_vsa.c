@@ -221,17 +221,17 @@ int main(int argc, char *argv[])
 		printf("opt_crm: IP %s onramp1 passage volume %d\n", controller_strings[i][2], lds[i][P1_e].rawvolume);
 		
 		// min max function bound the data range and exclude nans.
-//        controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(&controller_data[i], &confidence[i][0]) ) );
-		controller_mainline_data[i].agg_occ = mind(90.0, maxd( 1.0, occupancy_aggregation_mainline(&controller_data[i], &confidence[i][0]) ) );
+        controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(lds[i][MLE1_e].rawvolume, &confidence[i][0]) ) );
+		controller_mainline_data[i].agg_occ = mind(90.0, maxd( 1.0, occupancy_aggregation_mainline(lds[i][MLE1_e].rawoccupancy, &confidence[i][0]) ) );
 		 
-		float_temp = hm_speed_aggregation_mainline(&controller_data[i], hm_speed_prev[i], &confidence[i][0]);
+		float_temp = hm_speed_aggregation_mainline(lds[i][MLE1_e].rawspeed, hm_speed_prev[i], &confidence[i][0]);
 		if(float_temp < 0){
 			printf("Error %f in calculating harmonic speed for controller %s\n", float_temp, controller_strings[i][2]);
 			float_temp = hm_speed_prev[i];
 		}
 		controller_mainline_data[i].agg_speed = mind(150.0, maxd( 1.0, float_temp) );
 		 
-		float_temp = mean_speed_aggregation_mainline(&controller_data[i], mean_speed_prev[i], &confidence[i][0]);
+		float_temp = mean_speed_aggregation_mainline(lds[i][MLE1_e].rawspeed, mean_speed_prev[i], &confidence[i][0]);
 		if(float_temp < 0){
 			printf("Error %f in calculating mean speed for controller %s\n", float_temp, controller_strings[i][2]);
 			float_temp = mean_speed_prev[i];
@@ -241,7 +241,7 @@ int main(int argc, char *argv[])
 		if(confidence[i][0].num_total_vals > 0)
 			printf("Confidence for controller %s mainline %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][0].num_good_vals/confidence[i][0].num_total_vals, (float)confidence[i][0].num_total_vals, (float)confidence[i][0].num_good_vals);
         
-        controller_mainline_data[i].agg_density = mind(125.0,maxd( 1.0,  density_aggregation_mainline(controller_mainline_data[i].agg_vol, controller_mainline_data[i].agg_speed, density_prev[i]) ) );
+        controller_mainline_data[i].agg_density = mind(125.0,maxd( 1.0,  density_aggregation_mainline(lds[i][MLE1_e].rawvolume, lds[i][MLE1_e].rawspeed, density_prev[i]) ) );
 		
 		hm_speed_prev[i] = controller_mainline_data[i].agg_speed;
         mean_speed_prev[i] = controller_mainline_data[i].agg_mean_speed;
