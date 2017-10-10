@@ -1,14 +1,15 @@
 #include <db_include.h>
 #include "resource.h"
 
-#include <urms.h>
+//#include <urms.h>
 #include <math.h>
 
 #define NAN_ERROR -1.0 
 #define RANGE_ERROR -2.0 
 #define MAX_30_SEC_FLOW		40 // JAS,8/26/2016 I saw 30 in the data (corresponding to 3600 VPH), so this number is larger than that, but XYL says that's local
 #define NUM_LANES	3
-
+#define MAX_METERED_LANES 3    // Cheng-Ju Wu defined this variable 10/10/2017
+#define MAX_OFFRAMPS 3         // Cheng-Ju Wu defined this variable 10/10/2017
 //#define MAX_30_SEC_FLOW	17 //JAS,8/26/2016 from XYL:Maximum 30-second flow rate per lane (sample time is 30 seconds, so this value corresponds to 2000 vehicles per hour)
 
 // units
@@ -262,57 +263,45 @@ float flow_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], struct confiden
 	printf("FLOW_AGGREGATION_MAINLINE: flow_temp ");
 	for(i=0; i<MAX_MAINLINES;i++)
 		printf("%d:%2.2f ",i, flow_temp[i]);
-	printf("num_lane %d mean_flow %f var_flow %f calculated flow %4.2f max flow %4.2f min flow %d ", NUM_LANES, mean_flow, var_flow, flow, MAX_FLOW_PER_LANE*NUM_LANES, 600*NUM_LANES);
+	printf("num_lane %d mean_flow %f var_flow %f calculated flow %4.2f max flow %4.2f min flow %d ", confidence->num_good_vals, mean_flow, var_flow, flow, MAX_FLOW_PER_LANE*NUM_LANES, 600*NUM_LANES);
 	flow = maxd(flow,MIN_FLOW*NUM_LANES); //factor 600 is veh/hr/lane in free flow
 	flow = mind(MAX_FLOW_PER_LANE*NUM_LANES,flow);
 	printf("returned flow %4.2f\n", flow);
 	return flow;
 }
 
-float flow_aggregation_onramp(db_urms_status_t *controller_data, struct confidence *confidence){
+float flow_aggregation_onramp(loop_data_t *lds[NUM_LOOPNAMES], struct confidence *confidence){
 	int i;
-		int j = 0;
+	int j = 0;
 	float flow = 0;
-		float mean_flow = 0.0;
-		float var_flow = 0.0;
-	int num_lane = controller_data->num_meter;
-		float flow_temp [MAX_METERED_LANES];
+	float mean_flow = 0.0;
+	float var_flow = 0.0;
+	float flow_temp [MAX_METERED_LANES];
 	memset(flow_temp, 0, sizeof(float) * MAX_METERED_LANES); 
 
-
-		confidence->num_total_vals = num_lane;
-	    confidence->num_good_vals = num_lane;
+      
+	confidence->num_total_vals = MAX_METERED_LANES;
+	confidence->num_good_vals = MAX_METERED_LANES;
 		
 	// this loop get data from data base
-	if( (controller_data->num_meter > 0) && (controller_data->num_meter <= MAX_METERED_LANES) ) {
-	    for(i=0 ; i< controller_data->num_meter;i++) {
- 		if(controller_data->metered_lane_stat[i].passage_stat == 2){ 
-			if((float)controller_data->metered_lane_stat[i].passage_vol>= 0 && (float)controller_data->metered_lane_stat[i].passage_vol <= MAX_30_SEC_FLOW){ // if flow is in the range
-			    flow_temp[j]=(float)controller_data->metered_lane_stat[i].passage_vol;
-				j++;
+	for(i=0 ; i < MAX_METERED_LANES; i++) {
+		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i]->rawvolume >= 0 && (float)lds[i]->rawvolume <= MAX_30_SEC_FLOW){ // if flow is in the range
+			    flow_temp[j]=(float)lds[i]->rawvolume;  
+			    j++;
 			}else{  // replace the flow measurement if it is not in the range
-		confidence->num_good_vals--;
+				confidence->num_good_vals--;
 			}
- 		}else if(controller_data->metered_lane_stat[i].demand_stat == 2){
-			if((float)controller_data->metered_lane_stat[i].demand_vol>= 0 && (float)controller_data->metered_lane_stat[i].demand_vol <= MAX_30_SEC_FLOW){ 
-			    flow_temp[j]=(float)controller_data->metered_lane_stat[i].demand_vol;
-				j++;
-			}else{  // replace the flow measurement if it is not in the range
-		confidence->num_good_vals--;
-			}
- 		}else{
- 			confidence->num_good_vals--;
- 		}
-	    }
+		}else{
+			confidence->num_good_vals--;
+		}
 	}
-	else
-		return NAN_ERROR;
 
 	mean_flow = mean_array(flow_temp, confidence->num_good_vals);
 	var_flow = var_array(flow_temp, confidence->num_good_vals);
 
 	// this loop replace data with large variance
-	for(i=0 ; i <confidence->num_good_vals; i++) {
+	for(i=0 ; i<MAX_METERED_LANES; i++) {
 	    if (abs(flow_temp[i]-mean_flow)>5*sqrt(abs(var_flow)))
 	    flow_temp[i] = mean_flow;
 	}
@@ -328,48 +317,46 @@ float flow_aggregation_onramp(db_urms_status_t *controller_data, struct confiden
 	//printf("OR-flow_agg %4.2f num_meter %d\n",	flow, controller_data->num_meter);
 	flow = maxd(flow,MIN_OR_RAMP_FLOW_PER_LANE); //factor 200 is veh/hr/lane in free flow
 	printf("FLOW_AGGREGATION_ONRAMP: flow_temp ");
-	for(i=0; i<MAX_MAINLINES;i++)
+	for(i=0; i<MAX_METERED_LANES;i++)
 		printf("%d:%2.2f ",i, flow_temp[i]);
-	printf("num_lane %d mean_flow %f var_flow %f flow %4.2f\n", num_lane, mean_flow, var_flow, flow);
-	return mind(num_lane * MAX_OR_RAMP_FLOW_PER_LANE,flow); 
+	    printf("num_lane %d mean_flow %f var_flow %f flow %4.2f\n", confidence->num_good_vals, mean_flow, var_flow, flow);
+	return mind(MAX_METERED_LANES * MAX_OR_RAMP_FLOW_PER_LANE,flow); 
 }
 
-float flow_aggregation_offramp(db_urms_status3_t *controller_data, struct confidence *confidence){
+float flow_aggregation_offramp(loop_data_t *lds[NUM_LOOPNAMES], struct confidence *confidence){
 	int i;
-		int j = 0;
+	int j = 0;
 	float flow = 0.0;
-		float mean_flow = 0.0;
-		float var_flow = 0.0;
-		int num_lane = 1;
-	num_lane = controller_data->num_addl_det;
-		float flow_temp [MAX_OFFRAMPS];
+	float mean_flow = 0.0;
+	float var_flow = 0.0;
+	//	int num_lane = 1;
+	//num_lane = controller_data->num_addl_det;
+	float flow_temp [MAX_OFFRAMPS];
 	memset(flow_temp, 0, sizeof(float) * MAX_OFFRAMPS); 
 
-	 	confidence->num_total_vals = num_lane;
-	    confidence->num_good_vals = num_lane;
+	confidence->num_total_vals = MAX_OFFRAMPS;
+	confidence->num_good_vals = MAX_OFFRAMPS;
 
-	if( (controller_data->num_addl_det > 0) && (controller_data->num_addl_det <= MAX_OFFRAMPS) ) {
-	    for(i=0 ; i< controller_data->num_addl_det; i++){  
-	     if( (controller_data->additional_det[i].stat == 2) || (controller_data->additional_det[i].stat == 1) ){ // if the controller report the flow data is correct, then check the data is in the range or not
-			    if((float)controller_data->additional_det[i].volume>= 0 && (float)controller_data->additional_det[i].volume <= MAX_30_SEC_FLOW){ // if flow is in the range
-				flow_temp[j]=(float)controller_data->additional_det[i].volume;
-					j++;
-				}else{  // replace the flow measurement if it is not in the range
-					confidence->num_good_vals--;
-				}
- 			}else{
- 				confidence->num_good_vals--;
- 		    }
-	    }
-	}
-	else
-		return NAN_ERROR;
+    // this loop get data from data base
+	for(i=0 ; i < NUM_LANES; i++) {
+		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i]->rawvolume >= 0 && (float)lds[i]->rawvolume <= MAX_30_SEC_FLOW){ // if flow is in the range
+			    flow_temp[j]=(float)lds[i]->rawvolume;  
+			    j++;
+			}else{  // replace the flow measurement if it is not in the range
+				confidence->num_good_vals--;
+			}
+		}else{
+			confidence->num_good_vals--;
+		}
+
+	 }
 
 	mean_flow = mean_array(flow_temp, confidence->num_good_vals);
 	var_flow = var_array(flow_temp, confidence->num_good_vals);
 
 	// this loop replace data with large variance
-	for(i=0 ; i < confidence->num_good_vals; i++) {
+	for(i=0 ; i < MAX_OFFRAMPS; i++) {
 	    if (abs(flow_temp[i]-mean_flow)>5*sqrt(abs(var_flow)))
 	    flow_temp[i] = mean_flow;
 	}
@@ -380,15 +367,15 @@ float flow_aggregation_offramp(db_urms_status3_t *controller_data, struct confid
 	if(isnan(flow)){
 		flow = NAN_ERROR;
 	}else{
-	    	flow = num_lane * (flow * 120); // convert 30 second data into hour data
+	    	flow = MAX_OFFRAMPS * (flow * 120); // convert 30 second data into hour data
 	}
 	//printf("FR-flow_agg %4.2f num_addl_det %d\n", flow, controller_data->num_addl_det );
-	flow = maxd(flow,num_lane * MIN_FR_RAMP_FLOW_PER_LANE); //factor 200 is veh/hr/lane in free flow
+	flow = maxd(flow,MAX_OFFRAMPS * MIN_FR_RAMP_FLOW_PER_LANE); //factor 200 is veh/hr/lane in free flow
 	printf("FLOW_AGGREGATION_OFFRAMP: flow_temp ");
-	for(i=0; i<MAX_MAINLINES;i++)
+	for(i=0; i<MAX_OFFRAMPS;i++)
 		printf("%d:%2.2f ",i, flow_temp[i]);
-	printf("num_lane %d mean_flow %f var_flow %f flow %4.2f\n", num_lane, mean_flow, var_flow, flow);
-	return mind(num_lane * MAX_FR_RAMP_FLOW_PER_LANE,flow); 
+	    printf("num_lane %d mean_flow %f var_flow %f flow %4.2f\n", confidence->num_good_vals, mean_flow, var_flow, flow);
+	return mind(MAX_OFFRAMPS * MAX_FR_RAMP_FLOW_PER_LANE,flow); 
 }
 
 float occupancy_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], struct confidence *confidence){
@@ -422,7 +409,7 @@ float occupancy_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], struct con
 	var_occ = var_array(occ_temp, confidence->num_good_vals);
 
 	// this loop replace data with large variance
-	for(i=0 ; i < 3; i++) {
+	for(i=0 ; i < confidence->num_good_vals; i++) {
 	    if (abs(occ_temp[i]-mean_occ)>5*sqrt(abs(var_occ)))
 	    occ_temp[i] = mean_occ;
 	}
@@ -437,11 +424,11 @@ float occupancy_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], struct con
 	printf("OCCUPANCY_AGGREGATION_MAINLINE: occ_temp ");
 	for(i=0; i<MAX_MAINLINES;i++)
 		printf("%d:%2.2f ",i, occ_temp[i]);
-	printf("num_lane %d mean_occupancy %f var_occupancy %f occupancy %4.2f\n", NUM_LANES, mean_occ, var_occ, occupancy);
+	printf("num_lane %d mean_occupancy %f var_occupancy %f occupancy %4.2f\n", confidence->num_good_vals, mean_occ, var_occ, occupancy);
 	return  mind(MAX_OCCUPANCY, occupancy);
 }
 
-float occupancy_aggregation_onramp(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence){ 
+float occupancy_aggregation_onramp(loop_data_t *lds[NUM_LOOPNAMES], struct confidence *confidence){ 
 	int i;
 	int j;
 	int k=0;
@@ -451,29 +438,22 @@ float occupancy_aggregation_onramp(db_urms_status_t *controller_data, db_urms_st
 	float occ_temp [MAX_METERED_LANES * MAX_QUEUE_LOOPS];
 
 	memset(occ_temp, 0, sizeof(float) * MAX_METERED_LANES * MAX_QUEUE_LOOPS);
+    confidence->num_total_vals = MAX_METERED_LANES;
+	confidence->num_good_vals = MAX_METERED_LANES;
 
-
-	if( (controller_data->num_meter > 0) && (controller_data->num_meter <= 4) ) {
-		confidence->num_total_vals = controller_data->num_meter * MAX_QUEUE_LOOPS;
-		confidence->num_good_vals = controller_data->num_meter * MAX_QUEUE_LOOPS;
-	    for(i=0 ; i < controller_data->num_meter; i++) {
-	   	    for(j=0 ; j < MAX_QUEUE_LOOPS; j++) { 
- 			    if( (controller_data2->queue_stat[i][j].stat == 2) || (controller_data2->queue_stat[i][j].stat == 1) ){
-				    occupancy = 0.1 * ( ((controller_data2->queue_stat[i][j].occ_msb << 8) & 0xFF00) + ((controller_data2->queue_stat[i][j].occ_lsb) & 0xFF) );
-					if(occupancy>=0 && occupancy<=100){
-					    occ_temp[k] = occupancy;
-						k++;
-					}else{
-					     confidence->num_good_vals--;
-					}
- 			    }else{
- 				    confidence->num_good_vals--;
- 				}
+		// this loop get data from data base
+	for(i=0 ; i < MAX_METERED_LANES; i++) {
+		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i]->rawvolume >= 0 && (float)lds[i]->rawoccupancy <= MAX_OCCUPANCY){ // if occupancy is in the range
+			    occ_temp[j]=(float)lds[i]->rawoccupancy;  
+			    j++;
+			}else{  // replace the flow measurement if it is not in the range
+				confidence->num_good_vals--;
+			}
+		}else{
+			confidence->num_good_vals--;
 		}
-	    }
 	}
-	else
-		return NAN_ERROR;
 
 	mean_occ = mean_array(occ_temp, confidence->num_good_vals);
 	var_occ = var_array(occ_temp, confidence->num_good_vals);
@@ -495,50 +475,44 @@ float occupancy_aggregation_onramp(db_urms_status_t *controller_data, db_urms_st
 	//printf("Occ_agg %4.2f num_meter %d\n", occupancy, controller_data->num_meter);
 	occupancy = maxd(occupancy,MIN_OCCUPANCY); 
 	printf("OCCUPANCY_AGGREGATION_ONRAMP: occ_temp ");
-	for(i=0; i<MAX_MAINLINES;i++)
+	for(i=0; i<MAX_METERED_LANES;i++)
 		printf("%d:%2.2f ",i, occ_temp[i]);
 	printf("num_lane %2.0f mean_occupancy %f var_occupancy %f occupancy %4.2f\n", confidence->num_good_vals, mean_occ, var_occ, occupancy);
 	return  mind(MAX_OCCUPANCY, occupancy);
 }
 
-float occupancy_aggregation_offramp(db_urms_status3_t *controller_data, struct confidence *confidence){
+float occupancy_aggregation_offramp(loop_data_t *lds[NUM_LOOPNAMES], struct confidence *confidence){
 	int i;
 	int j=0;
 	float occupancy = 0;
 	float mean_occ = 0.0;
 	float var_occ = 0.0;
-	int num_lane = controller_data->num_addl_det;
+	//int num_lane = controller_data->num_addl_det;
 	float occ_temp [MAX_OFFRAMPS];
-
 	memset(occ_temp, 0, sizeof(float) * MAX_OFFRAMPS);
 
-	confidence->num_total_vals = num_lane;
-	confidence->num_good_vals = num_lane;
+	confidence->num_total_vals = MAX_OFFRAMPS;
+	confidence->num_good_vals = MAX_OFFRAMPS;
 
-	if( (controller_data->num_addl_det > 0) && (controller_data->num_addl_det <= MAX_OFFRAMPS) ) {
-	    for(i=0 ; i < controller_data->num_addl_det; i++) {
- 		if( (controller_data->additional_det[i].stat == 2) || (controller_data->additional_det[i].stat == 1) ){
-			occupancy = (float)((controller_data->additional_det[i].occ_msb << 8) + controller_data->additional_det[i].occ_lsb);
-			occupancy = 0.1 * ( ((controller_data->additional_det[i].occ_msb << 8) & 0xFF00) + ((controller_data->additional_det[i].occ_lsb) & 0xFF) );
-			   if(occupancy>=0 && occupancy<=100){
-				   occ_temp[j] = occupancy;
-		   j++;
-			   }else{
-			       confidence->num_good_vals--;
-			   }
- 		}else{
- 		      confidence->num_good_vals--;	
- 		}
-	    }
+	// this loop get data from data base
+	for(i=0 ; i < MAX_OFFRAMPS; i++) {
+		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i]->rawvolume >= 0 && (float)lds[i]->rawoccupancy <= MAX_OCCUPANCY){ // if occupancy is in the range
+			    occ_temp[j]=(float)lds[i]->rawoccupancy;  
+			    j++;
+			}else{  // replace the flow measurement if it is not in the range
+				confidence->num_good_vals--;
+			}
+		}else{
+			confidence->num_good_vals--;
+		}
 	}
-	else
-		return NAN_ERROR;
 
 	mean_occ = mean_array(occ_temp, confidence->num_good_vals);
 	var_occ = var_array(occ_temp, confidence->num_good_vals);
 	
 	// this loop replace data with large variance
-	for(i=0 ; i < confidence->num_good_vals; i++) {
+	for(i=0 ; i < MAX_OFFRAMPS; i++) {
 	    if (abs(occ_temp[i]-mean_occ)>5*sqrt(abs(var_occ)))
 	    occ_temp[i] = mean_occ;
 	}
@@ -554,9 +528,9 @@ float occupancy_aggregation_offramp(db_urms_status3_t *controller_data, struct c
 	//printf("Occ_agg %4.2f num_addl_det %d\n", occupancy, controller_data->num_addl_det);
 	occupancy = maxd(occupancy,MIN_OCCUPANCY); 
 	printf("OCCUPANCY_AGGREGATION_OFFRAMP: occ_temp ");
-	for(i=0; i<MAX_MAINLINES;i++)
+	for(i=0; i<MAX_OFFRAMPS;i++)
 		printf("%d:%2.2f ",i, occ_temp[i]);
-	printf("num_lane %d mean_occupancy %f var_occupancy %f occupancy %4.2f\n", num_lane, mean_occ, var_occ, occupancy);
+	printf("num_lane %d mean_occupancy %f var_occupancy %f occupancy %4.2f\n", confidence->num_good_vals, mean_occ, var_occ, occupancy);
 	return  mind(MAX_OCCUPANCY, occupancy);
 }
 
@@ -722,6 +696,7 @@ float mean_speed_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], float mea
 	printf("num_lane %d mean_speed %f var_speed %f speed %4.2f\n", NUM_LANES, mean_speed, var_speed, speed);
 	return mind(MAX_MEAN_SPEED, speed); // speed is in km/hr
 }
+/*
 float flow_aggregation_onramp_queue(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence){
 	float onramp_demand = 0.0;
 	int i; //  lane number index
@@ -751,11 +726,13 @@ float flow_aggregation_onramp_queue(db_urms_status_t *controller_data, db_urms_s
 
 	return mind(MAX_OR_RAMP_FLOW_PER_LANE*num_lane,onramp_demand);
 }
-
+*/
+/*
 float occupancy_aggregation_onramp_queue(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence){
 	float occ_onramp_queue = 0.0;
    	return occ_onramp_queue;
 }
+*/
 /*
 float queue_onramp(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence){
 	float average_vehicle_length = 4.5; // average vehicle length 4.5 meters
@@ -840,7 +817,7 @@ float density_aggregation_mainline(float flow, float hm_speed, float density_pre
 	);
 	return mind(MAX_DENSITY, maxd(density,MIN_DENSITY));
 }
-
+/*
 float turning_ratio_offramp(float FR_flow, float ML_flow){
 float turning_ratio_offramp = 0.0;
 	if(FR_flow>=0 && ML_flow>0){
@@ -851,7 +828,7 @@ float turning_ratio_offramp = 0.0;
 
 	return mind(100,turning_ratio_offramp);
 }
-
+*/
 float butt_2(float in_dat){
    float x[2]={0.0,0.0}, out_dat=0.0;
    static float x_old[2]={0.0,0.0};

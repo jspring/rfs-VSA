@@ -256,9 +256,9 @@ int main(int argc, char *argv[])
         //fprintf(dbg_st_file_out,"\n");
         
 		// assign off-ramp data to array
-		controller_offramp_data[i].agg_vol =  mind(6000.0, maxd( 0, flow_aggregation_offramp(&controller_data3[i], &confidence[i][2]) ) );
-        controller_offramp_data[i].agg_occ =  mind(100.0, maxd( 0, occupancy_aggregation_offramp(&controller_data3[i], &confidence[i][2]) ) );            
-		controller_offramp_data[i].turning_ratio = turning_ratio_offramp(controller_offramp_data[i].agg_vol,controller_mainline_data[i-1].agg_vol);
+		controller_offramp_data[i].agg_vol =  mind(6000.0, maxd( 0, flow_aggregation_offramp(lds[i][P1_e].rawvolume, &confidence[i][2]) ) );
+        controller_offramp_data[i].agg_occ =  mind(100.0, maxd( 0, occupancy_aggregation_offramp(lds[i][P1_e].rawoccupancy, &confidence[i][2]) ) );            
+		controller_offramp_data[i].turning_ratio = 0.0; //turning_ratio_offramp(controller_offramp_data[i].agg_vol,controller_mainline_data[i-1].agg_vol);
 		if(confidence[i][2].num_total_vals > 0)
 			printf("Confidence for controller %s offramp %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][2].num_good_vals/confidence[i][2].num_total_vals, (float)confidence[i][2].num_total_vals, (float)confidence[i][2].num_good_vals);
 		
@@ -270,13 +270,13 @@ int main(int argc, char *argv[])
         //fprintf(dbg_st_file_out,"\n");
         
 		// assign on-ramp data to array
-		controller_onramp_data[i].agg_vol = mind(6000.0, maxd( 0, flow_aggregation_onramp(&controller_data[i], &confidence[i][1]) ) );
+		controller_onramp_data[i].agg_vol = mind(6000.0, maxd( 0, flow_aggregation_onramp(lds[i][P1_e].rawvolume, &confidence[i][1]) ) );
 		if(confidence[i][1].num_total_vals > 0)
 			printf("Confidence for controller %s onramp flow %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);
-		controller_onramp_data[i].agg_occ = mind(100.0, maxd( 0, occupancy_aggregation_onramp(&controller_data[i], &controller_data2[i], &confidence[i][1]) ) );
+		controller_onramp_data[i].agg_occ = mind(100.0, maxd( 0, occupancy_aggregation_onramp(lds[i][P1_e].rawoccupancy, &confidence[i][1]) ) );
 		// data from on-ramp queue detector
-		controller_onramp_queue_detector_data[i].agg_vol = mind(6000.0, maxd( 0, flow_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
-        controller_onramp_queue_detector_data[i].agg_occ = mind(100.0, maxd( 0, occupancy_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
+		controller_onramp_queue_detector_data[i].agg_vol = 0.0;//mind(6000.0, maxd( 0, flow_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
+        controller_onramp_queue_detector_data[i].agg_occ = 0.0;//mind(100.0, maxd( 0, occupancy_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
 
 		if(confidence[i][1].num_total_vals > 0)
 			printf("Confidence for controller %s onramp occupancy (queue) %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);

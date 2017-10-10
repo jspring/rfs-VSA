@@ -4,7 +4,7 @@
 
 #pragma once
 #include "xml_parser.h"
-#include <urms.h>
+//#include <urms.h>
 
 // define the array size of look up table here
 #define	NUM_5MIN_INTERVALS	288
@@ -51,18 +51,16 @@ extern long int nCr(int n, int r);
 //extern float get_on_ramp_flow_by_flow_balance(float upstream_total_flow, float downstream_total_flow, float off_ramp_flow);
 
 extern float flow_aggregation_mainline(loop_data_t *lds[], struct confidence *confidence);
-extern float flow_aggregation_onramp(db_urms_status_t *controller_data, struct confidence *confidence);
-extern float flow_aggregation_onramp_queue(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence);
-extern float flow_aggregation_offramp(db_urms_status3_t *controller_data, struct confidence *confidence);
+extern float flow_aggregation_onramp(loop_data_t *lds[], struct confidence *confidence);
+//extern float flow_aggregation_onramp_queue(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence);
+extern float flow_aggregation_offramp(loop_data_t *lds[], struct confidence *confidence);
 
 extern float occupancy_aggregation_mainline(loop_data_t *lds[], struct confidence *confidence);
-extern float occupancy_aggregation_onramp(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence);
-extern float occupancy_aggregation_onramp_queue(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence);
-extern float occupancy_aggregation_offramp(db_urms_status3_t *controller_data, struct confidence *confidence);
+extern float occupancy_aggregation_onramp(loop_data_t *lds[], struct confidence *confidence);
+//extern float occupancy_aggregation_onramp_queue(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence);
+extern float occupancy_aggregation_offramp(loop_data_t *lds[], struct confidence *confidence);
 
-
-
-extern float queue_onramp(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence);
+//extern float queue_onramp(db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, struct confidence *confidence);
 
 extern float hm_speed_aggregation_mainline(loop_data_t *lds[], float hm_speed_prev,struct confidence *confidence);   // harmonic mean speed 
 extern float mean_speed_aggregation_mainline(loop_data_t *lds[], float mean_speed_prev, struct confidence *confidence);  // mean speed
