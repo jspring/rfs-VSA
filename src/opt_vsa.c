@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
 		printf("opt_crm: IP %s onramp1 passage volume %d\n", controller_strings[i][2], lds[i][P1_e].rawvolume);
 		
 		// min max function bound the data range and exclude nans.
-        controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(lds[i][MLE1_e].rawvolume, &confidence[i][0]) ) );
+        controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
 		controller_mainline_data[i].agg_occ = mind(90.0, maxd( 1.0, occupancy_aggregation_mainline(lds[i][MLE1_e].rawoccupancy, &confidence[i][0]) ) );
 		 
 		float_temp = hm_speed_aggregation_mainline(lds[i][MLE1_e].rawspeed, hm_speed_prev[i], &confidence[i][0]);
