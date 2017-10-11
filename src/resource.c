@@ -186,7 +186,7 @@ const char *loopname_list[] = //Comprehensive only for above LDS list!!
 // first three elements in the loopname_list are also the three mainline lanes. Other functions, dealing with on/offramps
 // and queues, will be different
 
-float flow_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], struct confidence *confidence){
+float flow_aggregation_mainline(loop_data_t *lds[], struct confidence *confidence){
 	int i;
 	int j = 0;
 	float flow = 0.0;
