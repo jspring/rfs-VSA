@@ -44,29 +44,29 @@
  * Long long support...
  */
 
-#define HAVE_LONG_LONG 1
+#undef HAVE_LONG_LONG
 
 
 /*
  * Do we have the snprintf() and vsnprintf() functions?
  */
 
-#define HAVE_SNPRINTF 1
-#define HAVE_VSNPRINTF 1
+#undef HAVE_SNPRINTF
+#undef HAVE_VSNPRINTF
 
 
 /*
  * Do we have the strXXX() functions?
  */
 
-#define HAVE_STRDUP 1
+#undef HAVE_STRDUP
 
 
 /*
  * Do we have threading support?
  */
 
-#define HAVE_PTHREAD_H 1
+#undef HAVE_PTHREAD_H
 
 
 /*

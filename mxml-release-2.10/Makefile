@@ -34,7 +34,7 @@ LN		=	/usr/bin/ln -s
 MKDIR		=	/usr/bin/mkdir
 OPTIM		=	-Os -g
 RANLIB		=	ranlib
-RM		=	/usr/bin/rm -f
+RM		=	/bin/rm -f
 SHELL		=	/bin/sh
 
 
