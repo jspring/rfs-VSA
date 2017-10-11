@@ -25,8 +25,6 @@ static void sig_hand(int code)
                 longjmp(exit_env, code);
 }
 
-int per_controller_mapping(loop_data_t lds[], db_urms_status_t *controller_data, db_urms_status2_t *controller_data2, db_urms_status3_t *controller_data3);
-
 int main(int argc, char *argv[]) {
 
         int option;
@@ -64,7 +62,6 @@ int main(int argc, char *argv[]) {
 	const char *usage = "-c (create db variables) -f <input data file (required)>";
 
 	printf("sizeof loop_data_t %ld sizeof datafilename %ld\n", sizeof(loop_data_t), sizeof(datafilename));
-	printf("sizeof %ld db_urms_status_t sizeof db_urms_status2_t %ld sizeof(db_urms_status3_t %ld NUM_LDS %d\n", sizeof(db_urms_status_t), sizeof(db_urms_status2_t ), sizeof(db_urms_status3_t), NUM_LDS);
         while ((option = getopt(argc, argv, "cf:")) != EOF) {
                 switch(option) {
                         case 'c':
