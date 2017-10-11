@@ -73,9 +73,6 @@ int main(int argc, char *argv[])
 	float time = 0; // , time2 = 0,timeSta = 0, tmp=0.0;
 	static int init_sw=1;
 	int i;
-	db_urms_status_t controller_data[NUM_LDS];  //See warning at top of file
-	db_urms_status2_t controller_data2[NUM_LDS];  //See warning at top of file
-	db_urms_status3_t controller_data3[NUM_LDS];  //See warning at top of file
 	loop_data_t lds[NUM_LDS][NUM_LOOPNAMES] = {0}; 	// Row (NUM_LDS) = controller index, 
 							// column (NUM_LOOPNAMES) = loop index
 							// Each lds element has speed, occupancy, 
@@ -146,9 +143,6 @@ int main(int argc, char *argv[])
 			case 'i':
 				interval = atoi(optarg);
 				break;
-			case 'r':
-				pts = &controller_data2[20].ts;
-				break;
 			default:
 				printf("\nUsage: %s %s\n", argv[0], usage);
 				exit(EXIT_FAILURE);
@@ -156,8 +150,6 @@ int main(int argc, char *argv[])
 		}
 	}
 	memset(lds, 0, NUM_LDS * NUM_LOOPNAMES * (sizeof(loop_data_t)));
-	memset(controller_data2, 0, NUM_LDS * (sizeof(db_urms_status2_t)));//See warning at top of file
-	memset(controller_data3, 0, NUM_LDS * (sizeof(db_urms_status3_t)));//See warning at top of file
 
 	get_local_name(hostname, MAXHOSTNAMELEN);
 
@@ -189,9 +181,6 @@ int main(int argc, char *argv[])
 
 	for (i = 0; i < NUM_LDS; i++){   //See warning at top of file
 		db_clt_read(pclt, db_vars_list[i].id, db_vars_list[i].size, &lds[i][0]);
-//		db_clt_read(pclt, db_vds_list[i].id, db_vds_list[i].size, &controller_data[i]);
-//		db_clt_read(pclt, db_vds_list[i+14].id, db_vds_list[i+14].size, &controller_data2[i]);
-//		db_clt_read(pclt, db_vds_list[i+28].id, db_vds_list[i+28].size, &controller_data3[i]);
 	}
 
 //BEGIN MAIN FOR LOOP HERE
@@ -202,9 +191,6 @@ int main(int argc, char *argv[])
 	cycle_index = cycle_index % NUM_CYCLE_BUFFS;
 	for (i = 0; i < NUM_LDS; i++){  //See warning at top of file
 		db_clt_read(pclt, db_vars_list[i].id, db_vars_list[i].size, &lds[i][0]);
-//		db_clt_read(pclt, db_vds_list[i].id, db_vds_list[i].size, &controller_data[i]);
-//		db_clt_read(pclt, db_vds_list[i+14].id, db_vds_list[i+14].size, &controller_data2[i]);
-//		db_clt_read(pclt, db_vds_list[i+28].id, db_vds_list[i+28].size, &controller_data3[i]);
 	}
 
 /*#################################################################################################################
@@ -217,11 +203,10 @@ int main(int argc, char *argv[])
 	print_timestamp(dbg_st_file_out, pts); // #1 print out current time step to file
  
 	for(i=0;i<NUM_LDS;i++){
-//		printf("opt_crm: IP %s onramp1 passage volume %d demand vol %d offramp volume %d\n", controller_strings[i][2], lds[i][P1_e].rawvolume, controller_data[i].metered_lane_stat[0].demand_vol, controller_data3[i].additional_det[0].volume);
 		printf("opt_crm: IP %s onramp1 passage volume %d\n", controller_strings[i][2], lds[i][P1_e].rawvolume);
 		
 		// min max function bound the data range and exclude nans.
-        controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(lds[i][MLE1_e].rawvolume, &confidence[i][0]) ) );
+        controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
 		controller_mainline_data[i].agg_occ = mind(90.0, maxd( 1.0, occupancy_aggregation_mainline(lds[i][MLE1_e].rawoccupancy, &confidence[i][0]) ) );
 		 
 		float_temp = hm_speed_aggregation_mainline(lds[i][MLE1_e].rawspeed, hm_speed_prev[i], &confidence[i][0]);
