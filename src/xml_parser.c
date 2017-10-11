@@ -211,6 +211,15 @@ int main(int argc, char *argv[]) {
 
 	    }
 	}
+	if (node == NULL) {
+		for(i = 0; i < NUM_LDS; i++) {
+			memset(&datafilename[0], 0, 1000);
+			sprintf(datafilename, "%s%s", pathname, LdsId_onramp2[i][0]);
+			datafp = fopen(datafilename, "w");
+			fprintf(datafp, "No data ");
+			fclose(datafp);
+		}
+	}
 
 	longjmp(exit_env, SIGTERM);
 
