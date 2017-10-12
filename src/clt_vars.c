@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 		printf("Database initialization error in %s.\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
-	for (i = 0; i < NUM_LDS * 3; i++){
+	for (i = 0; i < num_db_vars; i++){
 		db_clt_write(pclt,
 		db_vars_list[i].id,
 		db_vars_list[i].size,
