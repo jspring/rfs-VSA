@@ -186,7 +186,7 @@ const char *loopname_list[] = //Comprehensive only for above LDS list!!
 // first three elements in the loopname_list are also the three mainline lanes. Other functions, dealing with on/offramps
 // and queues, will be different
 
-float flow_aggregation_mainline(loop_data_t *lds[], struct confidence *confidence){
+float flow_aggregation_mainline(loop_data_t lds[], struct confidence *confidence){
 	int i;
 	int j = 0;
 	float flow = 0.0;
@@ -200,9 +200,9 @@ float flow_aggregation_mainline(loop_data_t *lds[], struct confidence *confidenc
 
 	// this loop get data from data base
 	    for(i=0 ; i < NUM_LANES; i++) {
-		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
-			if((float)lds[i]->rawvolume >= 0 && (float)lds[i]->rawvolume <= MAX_30_SEC_FLOW){ // if flow is in the range
-			    flow_temp[j]=(float)lds[i]->rawvolume;  
+		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i].rawvolume >= 0 && (float)lds[i].rawvolume <= MAX_30_SEC_FLOW){ // if flow is in the range
+			    flow_temp[j]=(float)lds[i].rawvolume;  
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;
@@ -240,7 +240,7 @@ float flow_aggregation_mainline(loop_data_t *lds[], struct confidence *confidenc
 	return flow;
 }
 
-float flow_aggregation_onramp(loop_data_t *lds[NUM_LOOPNAMES], struct confidence *confidence){
+float flow_aggregation_onramp(loop_data_t lds[], struct confidence *confidence){
 	int i;
 	int j = 0;
 	float flow = 0;
@@ -255,9 +255,9 @@ float flow_aggregation_onramp(loop_data_t *lds[NUM_LOOPNAMES], struct confidence
 		
 	// this loop get data from data base
 	for(i=0 ; i < MAX_METERED_LANES; i++) {
-		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
-			if((float)lds[i]->rawvolume >= 0 && (float)lds[i]->rawvolume <= MAX_30_SEC_FLOW){ // if flow is in the range
-			    flow_temp[j]=(float)lds[i]->rawvolume;  
+		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i].rawvolume >= 0 && (float)lds[i].rawvolume <= MAX_30_SEC_FLOW){ // if flow is in the range
+			    flow_temp[j]=(float)lds[i].rawvolume;  
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;
@@ -293,7 +293,7 @@ float flow_aggregation_onramp(loop_data_t *lds[NUM_LOOPNAMES], struct confidence
 	return mind(MAX_METERED_LANES * MAX_OR_RAMP_FLOW_PER_LANE,flow); 
 }
 
-float flow_aggregation_offramp(loop_data_t *lds[NUM_LOOPNAMES], struct confidence *confidence){
+float flow_aggregation_offramp(loop_data_t lds[], struct confidence *confidence){
 	int i;
 	int j = 0;
 	float flow = 0.0;
@@ -309,9 +309,9 @@ float flow_aggregation_offramp(loop_data_t *lds[NUM_LOOPNAMES], struct confidenc
 
     // this loop get data from data base
 	for(i=0 ; i < NUM_LANES; i++) {
-		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
-			if((float)lds[i]->rawvolume >= 0 && (float)lds[i]->rawvolume <= MAX_30_SEC_FLOW){ // if flow is in the range
-			    flow_temp[j]=(float)lds[i]->rawvolume;  
+		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i].rawvolume >= 0 && (float)lds[i].rawvolume <= MAX_30_SEC_FLOW){ // if flow is in the range
+			    flow_temp[j]=(float)lds[i].rawvolume;  
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;
@@ -348,10 +348,9 @@ float flow_aggregation_offramp(loop_data_t *lds[NUM_LOOPNAMES], struct confidenc
 	return mind(MAX_OFFRAMPS * MAX_FR_RAMP_FLOW_PER_LANE,flow); 
 }
 
-float occupancy_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], struct confidence *confidence){
+float occupancy_aggregation_mainline(loop_data_t lds[], struct confidence *confidence){
 	int i;
 	int j = 0;
-	float lead_occ = 0.0;
 	float occupancy = 0.0;
 	float mean_occ = 0.0;
 	float var_occ = 0.0;
@@ -364,9 +363,9 @@ float occupancy_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], struct con
 
 	// this loop get data from data base
 	for(i=0 ; i < NUM_LANES; i++) {
-		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
-			if((float)lds[i]->rawvolume >= 0 && (float)lds[i]->rawoccupancy <= MAX_OCCUPANCY){ // if occupancy is in the range
-			    occ_temp[j]=(float)lds[i]->rawoccupancy;  
+		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i].rawvolume >= 0 && (float)lds[i].rawoccupancy <= MAX_OCCUPANCY){ // if occupancy is in the range
+			    occ_temp[j]=(float)lds[i].rawoccupancy;  
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;
@@ -398,10 +397,9 @@ float occupancy_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], struct con
 	return  mind(MAX_OCCUPANCY, occupancy);
 }
 
-float occupancy_aggregation_onramp(loop_data_t *lds[NUM_LOOPNAMES], struct confidence *confidence){ 
+float occupancy_aggregation_onramp(loop_data_t lds[], struct confidence *confidence){ 
 	int i;
 	int j;
-	int k=0;
 	float occupancy = 0;
 	float mean_occ = 0.0;
 	float var_occ = 0.0;
@@ -413,9 +411,9 @@ float occupancy_aggregation_onramp(loop_data_t *lds[NUM_LOOPNAMES], struct confi
 
 		// this loop get data from data base
 	for(i=0 ; i < MAX_METERED_LANES; i++) {
-		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
-			if((float)lds[i]->rawvolume >= 0 && (float)lds[i]->rawoccupancy <= MAX_OCCUPANCY){ // if occupancy is in the range
-			    occ_temp[j]=(float)lds[i]->rawoccupancy;  
+		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i].rawvolume >= 0 && (float)lds[i].rawoccupancy <= MAX_OCCUPANCY){ // if occupancy is in the range
+			    occ_temp[j]=(float)lds[i].rawoccupancy;  
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;
@@ -447,11 +445,11 @@ float occupancy_aggregation_onramp(loop_data_t *lds[NUM_LOOPNAMES], struct confi
 	printf("OCCUPANCY_AGGREGATION_ONRAMP: occ_temp ");
 	for(i=0; i<MAX_METERED_LANES;i++)
 		printf("%d:%2.2f ",i, occ_temp[i]);
-	printf("num_lane %2.0f mean_occupancy %f var_occupancy %f occupancy %4.2f\n", confidence->num_good_vals, mean_occ, var_occ, occupancy);
+	printf("num_lane %d mean_occupancy %f var_occupancy %f occupancy %4.2f\n", confidence->num_good_vals, mean_occ, var_occ, occupancy);
 	return  mind(MAX_OCCUPANCY, occupancy);
 }
 
-float occupancy_aggregation_offramp(loop_data_t *lds[NUM_LOOPNAMES], struct confidence *confidence){
+float occupancy_aggregation_offramp(loop_data_t lds[], struct confidence *confidence){
 	int i;
 	int j=0;
 	float occupancy = 0;
@@ -466,9 +464,9 @@ float occupancy_aggregation_offramp(loop_data_t *lds[NUM_LOOPNAMES], struct conf
 
 	// this loop get data from data base
 	for(i=0 ; i < MAX_OFFRAMPS; i++) {
-		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
-			if((float)lds[i]->rawvolume >= 0 && (float)lds[i]->rawoccupancy <= MAX_OCCUPANCY){ // if occupancy is in the range
-			    occ_temp[j]=(float)lds[i]->rawoccupancy;  
+		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i].rawvolume >= 0 && (float)lds[i].rawoccupancy <= MAX_OCCUPANCY){ // if occupancy is in the range
+			    occ_temp[j]=(float)lds[i].rawoccupancy;  
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;
@@ -505,7 +503,7 @@ float occupancy_aggregation_offramp(loop_data_t *lds[NUM_LOOPNAMES], struct conf
 }
 
 
-float hm_speed_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], float hm_speed_prev, struct confidence *confidence){
+float hm_speed_aggregation_mainline(loop_data_t lds[], float hm_speed_prev, struct confidence *confidence){
 	// compute harmonic mean of speed
 	int i; //  lane number index
 	int j = 0; 
@@ -525,11 +523,11 @@ float hm_speed_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], float hm_sp
 
 	// this loop get data from data base
 	for(i=0 ; i < NUM_LANES; i++) {
-		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
-			if((float)lds[i]->rawspeed >= 0 && (float)lds[i]->rawspeed <= MAX_MEAN_SPEED){ // if flow is in the range
-			    speed_temp[j]=(float)lds[i]->rawspeed;
-				occupancy[j]= (float)lds[i]->rawoccupancy;
-				flow[j]=(float)lds[i]->rawvolume; 
+		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i].rawspeed >= 0 && (float)lds[i].rawspeed <= MAX_MEAN_SPEED){ // if flow is in the range
+			    speed_temp[j]=(float)lds[i].rawspeed;
+				occupancy[j]= (float)lds[i].rawoccupancy;
+				flow[j]=(float)lds[i].rawvolume; 
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;
@@ -585,7 +583,7 @@ float hm_speed_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], float hm_sp
 	return mind(MAX_HARMONIC_SPEED, speed); // speed is in km/hr
 }
 
-float mean_speed_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], float mean_speed_prev, struct confidence *confidence){
+float mean_speed_aggregation_mainline(loop_data_t lds[], float mean_speed_prev, struct confidence *confidence){
 	// compute mean of speed
 	int i; //  lane number index
 	int j = 0; 
@@ -605,11 +603,11 @@ float mean_speed_aggregation_mainline(loop_data_t *lds[NUM_LOOPNAMES], float mea
 
 	// this loop get data from data base
 	for(i=0 ; i < NUM_LANES; i++) {
-		if(lds[i]->rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
-			if((float)lds[i]->rawspeed >= 0 && (float)lds[i]->rawspeed <= MAX_MEAN_SPEED){ // if flow is in the range
-			    speed_temp[j]=(float)lds[i]->rawspeed;
-				occupancy[j]= (float)lds[i]->rawoccupancy;
-				flow[j]=(float)lds[i]->rawvolume; 
+		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
+			if((float)lds[i].rawspeed >= 0 && (float)lds[i].rawspeed <= MAX_MEAN_SPEED){ // if flow is in the range
+			    speed_temp[j]=(float)lds[i].rawspeed;
+				occupancy[j]= (float)lds[i].rawoccupancy;
+				flow[j]=(float)lds[i].rawvolume; 
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;

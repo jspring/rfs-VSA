@@ -38,8 +38,10 @@ static void sig_hand(int code)
 {
         if (code == SIGALRM)
                 return;
-        else
+        else {
+		printf("exit code %d\n", code);
                 longjmp(exit_env, code);
+	}
 }
 
 const char *usage = "-i <loop interval> -r (run in replay mode)";
@@ -70,7 +72,6 @@ int main(int argc, char *argv[])
 {
 	timestamp_t ts;
 	timestamp_t *pts = &ts;
-	float time = 0; // , time2 = 0,timeSta = 0, tmp=0.0;
 	static int init_sw=1;
 	int i;
 	loop_data_t lds[NUM_LDS][NUM_LOOPNAMES] = {0}; 	// Row (NUM_LDS) = controller index, 
@@ -89,17 +90,7 @@ int main(int argc, char *argv[])
 	char *domain = DEFAULT_SERVICE; // usually no need to change this
 	int xport = COMM_OS_XPORT;      // set correct for OS in sys_os.h
 //	int verbose = 0;
-	agg_data_t mainline_out[NUM_CYCLE_BUFFS][SecSize] =  {0};      // data aggregated section by section
-	agg_data_t onramp_out[NUM_CYCLE_BUFFS][NumOnRamp] = {0};      // data aggregated section by section
-    agg_data_t onramp_queue_out[NUM_CYCLE_BUFFS][NumOnRamp] = {0};      // data aggregated section by section
-	agg_data_t offramp_out[NUM_CYCLE_BUFFS][NUM_OFFRAMPS] = {0};  // data aggregated section by section
     
-    agg_data_t mainline_out_f[SecSize] = {0};        // save filtered data to this array
-	agg_data_t onramp_out_f[NumOnRamp] = {0};        // save filtered data to this array
-	agg_data_t offramp_out_f[NUM_OFFRAMPS] = {0};    // save filtered data to this array
-	agg_data_t onramp_queue_out_f[NumOnRamp] = {0};  // save filtered data queue detector data to this array
-	 
-	
 	agg_data_t controller_mainline_data[NUM_LDS] = {0};     // data aggregated controller by controller 
 	agg_data_t controller_onramp_data[NUM_ONRAMPS] = {0};                 // data aggregated controller by controller
 	agg_data_t controller_onramp_queue_detector_data[NUM_ONRAMPS] = {0};
@@ -107,10 +98,6 @@ int main(int argc, char *argv[])
 	float hm_speed_prev [NUM_LDS] = {1.0};               // this is the register of harmonic mean speed in previous time step
 	float mean_speed_prev [NUM_LDS] = {1.0};             // this is the register of mean speed in previous time step
     float density_prev [NUM_LDS] = {0};             // this is the register of density in previous time step
-	float OR_flow_prev [NUM_ONRAMPS] = {0};               // this is the register of on-ramp flow in previous time step
-	float OR_occupancy_prev [NUM_ONRAMPS] = {0};               // this is the register of on-ramp occupancy in previous time step
-	float FR_flow_prev [NUM_ONRAMPS] = {0};               // this is the register of on-ramp flow in previous time step
-	float FR_occupancy_prev [NUM_ONRAMPS] = {0};               // this is the register of on-ramp occupancy in previous time step
 	float float_temp;
     //float ML_flow_ratio = 0.0; // current most upstream flow to historical most upstream flow
     //float current_most_upstream_flow = 0.0;
@@ -165,6 +152,7 @@ int main(int argc, char *argv[])
 	}
 
 	if(( exitsig = setjmp(exit_env)) != 0) {
+		printf("exiting....\n");
 		db_list_done(pclt, NULL, 0, NULL, 0);
 		exit(EXIT_SUCCESS);
 	} else
@@ -203,20 +191,20 @@ int main(int argc, char *argv[])
 	print_timestamp(dbg_st_file_out, pts); // #1 print out current time step to file
  
 	for(i=0;i<NUM_LDS;i++){
-		printf("opt_crm: IP %s onramp1 passage volume %d\n", controller_strings[i][2], lds[i][P1_e].rawvolume);
+		printf("opt_vsa: IP %s onramp1 passage volume %d\n", controller_strings[i][2], lds[i][P1_e].rawvolume);
 		
 		// min max function bound the data range and exclude nans.
         controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
-		controller_mainline_data[i].agg_occ = mind(90.0, maxd( 1.0, occupancy_aggregation_mainline(lds[i][MLE1_e].rawoccupancy, &confidence[i][0]) ) );
+		controller_mainline_data[i].agg_occ = mind(90.0, maxd( 1.0, occupancy_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
 		 
-		float_temp = hm_speed_aggregation_mainline(lds[i][MLE1_e].rawspeed, hm_speed_prev[i], &confidence[i][0]);
+		float_temp = hm_speed_aggregation_mainline(&lds[i][MLE1_e], hm_speed_prev[i], &confidence[i][0]);
 		if(float_temp < 0){
 			printf("Error %f in calculating harmonic speed for controller %s\n", float_temp, controller_strings[i][2]);
 			float_temp = hm_speed_prev[i];
 		}
 		controller_mainline_data[i].agg_speed = mind(150.0, maxd( 1.0, float_temp) );
 		 
-		float_temp = mean_speed_aggregation_mainline(lds[i][MLE1_e].rawspeed, mean_speed_prev[i], &confidence[i][0]);
+		float_temp = mean_speed_aggregation_mainline(&lds[i][MLE1_e], mean_speed_prev[i], &confidence[i][0]);
 		if(float_temp < 0){
 			printf("Error %f in calculating mean speed for controller %s\n", float_temp, controller_strings[i][2]);
 			float_temp = mean_speed_prev[i];
@@ -226,7 +214,7 @@ int main(int argc, char *argv[])
 		if(confidence[i][0].num_total_vals > 0)
 			printf("Confidence for controller %s mainline %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][0].num_good_vals/confidence[i][0].num_total_vals, (float)confidence[i][0].num_total_vals, (float)confidence[i][0].num_good_vals);
         
-        controller_mainline_data[i].agg_density = mind(125.0,maxd( 1.0,  density_aggregation_mainline(lds[i][MLE1_e].rawvolume, lds[i][MLE1_e].rawspeed, density_prev[i]) ) );
+        controller_mainline_data[i].agg_density = mind(125.0,maxd( 1.0,  density_aggregation_mainline(controller_mainline_data[i].agg_vol, controller_mainline_data[i].agg_speed, density_prev[i]) ) );
 		
 		hm_speed_prev[i] = controller_mainline_data[i].agg_speed;
         mean_speed_prev[i] = controller_mainline_data[i].agg_mean_speed;
@@ -241,8 +229,8 @@ int main(int argc, char *argv[])
         //fprintf(dbg_st_file_out,"\n");
         
 		// assign off-ramp data to array
-		controller_offramp_data[i].agg_vol =  mind(6000.0, maxd( 0, flow_aggregation_offramp(lds[i][P1_e].rawvolume, &confidence[i][2]) ) );
-        controller_offramp_data[i].agg_occ =  mind(100.0, maxd( 0, occupancy_aggregation_offramp(lds[i][P1_e].rawoccupancy, &confidence[i][2]) ) );            
+		controller_offramp_data[i].agg_vol =  mind(6000.0, maxd( 0, flow_aggregation_offramp(&lds[i][P1_e], &confidence[i][2]) ) );
+        controller_offramp_data[i].agg_occ =  mind(100.0, maxd( 0, occupancy_aggregation_offramp(&lds[i][P1_e], &confidence[i][2]) ) );            
 		controller_offramp_data[i].turning_ratio = 0.0; //turning_ratio_offramp(controller_offramp_data[i].agg_vol,controller_mainline_data[i-1].agg_vol);
 		if(confidence[i][2].num_total_vals > 0)
 			printf("Confidence for controller %s offramp %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][2].num_good_vals/confidence[i][2].num_total_vals, (float)confidence[i][2].num_total_vals, (float)confidence[i][2].num_good_vals);
@@ -255,10 +243,10 @@ int main(int argc, char *argv[])
         //fprintf(dbg_st_file_out,"\n");
         
 		// assign on-ramp data to array
-		controller_onramp_data[i].agg_vol = mind(6000.0, maxd( 0, flow_aggregation_onramp(lds[i][P1_e].rawvolume, &confidence[i][1]) ) );
+		controller_onramp_data[i].agg_vol = mind(6000.0, maxd( 0, flow_aggregation_onramp(&lds[i][P1_e], &confidence[i][1]) ) );
 		if(confidence[i][1].num_total_vals > 0)
 			printf("Confidence for controller %s onramp flow %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);
-		controller_onramp_data[i].agg_occ = mind(100.0, maxd( 0, occupancy_aggregation_onramp(lds[i][P1_e].rawoccupancy, &confidence[i][1]) ) );
+		controller_onramp_data[i].agg_occ = mind(100.0, maxd( 0, occupancy_aggregation_onramp(&lds[i][P1_e], &confidence[i][1]) ) );
 		// data from on-ramp queue detector
 		controller_onramp_queue_detector_data[i].agg_vol = 0.0;//mind(6000.0, maxd( 0, flow_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
         controller_onramp_queue_detector_data[i].agg_occ = 0.0;//mind(100.0, maxd( 0, occupancy_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
@@ -283,13 +271,14 @@ int main(int argc, char *argv[])
 //		get_meas(time);
 		for(i=0; i<NUM_SIGNS; i++){
 			db_vsa_ctl.vsa[i]= 0; //NOTE to Chengju: Assign variable speeds here
-		    db_clt_write(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
+	    	} 
+		db_clt_write(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
 		    TIMER_WAIT(ptimer);	
-	    } 
 	
+	}
+
 	Finish_sim_data_io();
 	      	
-	}
 	return 0;
 }
 
