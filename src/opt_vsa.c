@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
 	timestamp_t *pts = &ts;
 	static int init_sw=1;
 	int i;
+	int j;
 	loop_data_t lds[NUM_LDS][NUM_LOOPNAMES] = {0}; 	// Row (NUM_LDS) = controller index, 
 							// column (NUM_LOOPNAMES) = loop index
 							// Each lds element has speed, occupancy, 
@@ -104,6 +105,7 @@ int main(int argc, char *argv[])
 	int debug = 0;
 	int num_controller_vars = NUM_LDS; //See warning at top of file
 	struct confidence confidence[num_controller_vars][3]; 
+	char strtmp[100];
 
     //float temp_ary_vol[NUM_CYCLE_BUFFS] = {0};    // temporary array of cyclic buffer
 	//float temp_ary_speed[NUM_CYCLE_BUFFS] = {0};
@@ -192,6 +194,12 @@ int main(int argc, char *argv[])
  
 	for(i=0;i<NUM_LDS;i++){
 		printf("opt_vsa: IP %s onramp1 passage volume %d\n", controller_strings[i][2], lds[i][P1_e].rawvolume);
+		fprintf(dbg_st_file_out, "%d ", LdsId_onramp_int[i]);
+		for(j=0; j<NUM_LOOPNAMES; j++) {
+			memset(strtmp, 0, 100);
+			sprintf(strtmp, "%s", loopname_list[j]);
+			fprintf(dbg_st_file_out, "%s %d %d %d ", strtmp, lds[i][j].rawvolume, lds[i][j].rawoccupancy, lds[i][j].rawspeed);
+		}
 		
 		// min max function bound the data range and exclude nans.
         controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
