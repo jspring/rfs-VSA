@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
 //		det_data_4_contr(time);	
 //		get_meas(time);
 		for(i=0; i<NUM_SIGNS; i++){
-			db_vsa_ctl.vsa[i]= 0; //NOTE to Chengju: Assign variable speeds here
+			db_vsa_ctl.vsa[i]= 0; //NOTE to Chengju: Assign variable speeds here, remember to convert to kph
 	    	} 
 		db_clt_write(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
 		    TIMER_WAIT(ptimer);	
