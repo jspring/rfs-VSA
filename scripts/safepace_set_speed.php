@@ -11,7 +11,7 @@
 	));
 //	echo "context: $context";
 	$speed = file_get_contents('/var/www/html/php/speed.txt');
-	$request_url = 'https://api.streetsoncloud.com/sv1/set-speed-limit/location/3068/speed-limit/'.$speed;
+	$request_url = 'https://api.streetsoncloud.com/sv1/set-speed-limit/location/2859/speed-limit/'.$speed;
 //	echo "request_url: $request_url";
 	//Try using file_get_contents to get location information
 	$xml_string = file_get_contents($request_url, false, $context);
