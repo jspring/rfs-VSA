@@ -1,9 +1,29 @@
 #!/bin/bash
 
-sudo killall opt_vsa
-sudo killall xml_parser
-sudo killall clt_vars
-sudo killall db_slv
+ps -ef | grep -v grep | grep opt_vsa
+if [[ $? -ne 0 ]]
+then
+	sudo killall opt_vsa
+fi
+
+ps -ef | grep -v grep | grep xml_parser
+if [[ $? -ne 0 ]]
+then
+	sudo killall xml_parser
+fi
+
+ps -ef | grep -v grep | grep clt_vars
+if [[ $? -ne 0 ]]
+then
+	sudo killall clt_vars
+fi
+
+ps -ef | grep -v grep | grep db_slv
+if [[ $? -ne 0 ]]
+then
+	sudo killall db_slv
+fi
+
 sudo /home/path/db/db_clean.sh
 
 ps -elf | grep -v grep | grep db_slv
@@ -36,7 +56,12 @@ done
 
 if [[ $TIMESINCELASTDATA -gt 7200 ]]
 then
-	echo Latest data is $TIMESINCELASTDATA seconds old. That is longer than 7200 seconds, so we are exiting....
+	echo Latest data is $TIMESINCELASTDATA seconds old. That is longer than 7200 seconds, so we are exiting.... >>/var/log/vsa/run_vsa.err
+	cd /var/www/html/VSA/webdata
+	for x in `ls [123]*`
+	do
+		echo "Stale data" >$x
+	done
 	exit 0
 fi
 
