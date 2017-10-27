@@ -130,8 +130,8 @@ int main(int argc, char *argv[]) {
 			datafp = fopen(datafilename, "w");
 			mainline_counter = mainline_speed = mainline_occupancy = mainline_volume = 0;
 
-			fprintf(datafp, "LdsID %s: ", textvalue);
-			printf("%s: LdsID %s:\n", LdsId_onramp2[i][1], textvalue);
+			fprintf(datafp, "LdsID: %s\n", textvalue);
+			printf("%s: LdsID %s\n", LdsId_onramp2[i][1], textvalue);
 		        for (node3 = mxmlFindElement(node, node, "LoopDiags", NULL, NULL,
                                     MXML_DESCEND);
              		node3 != NULL;
@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
 
 		if(mle_flag) { //Print only eastbound mainline values
 			if(mainline_counter > 0) {
-				fprintf(datafp, "Speed %d Volume %d Occupancy %.2f",
+				fprintf(datafp, "  Speed %d\n  Volume %d\n  Occupancy %.2f\n",
 					(int)(mainline_speed/mainline_counter),
 					(int)(mainline_volume/mainline_counter),
 					mainline_occupancy/mainline_counter
@@ -207,15 +207,6 @@ int main(int argc, char *argv[]) {
 
 
 	    }
-	}
-	if (node == NULL) {
-		for(i = 0; i < NUM_LDS; i++) {
-			memset(&datafilename[0], 0, 1000);
-			sprintf(datafilename, "%s%s", pathname, LdsId_onramp2[i][0]);
-			datafp = fopen(datafilename, "w");
-			fprintf(datafp, "No data ");
-			fclose(datafp);
-		}
 	}
 
 	longjmp(exit_env, SIGTERM);
