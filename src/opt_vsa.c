@@ -55,7 +55,6 @@ const char *controller_strings[][3] = {
 	{"1108640", "200", "EL CAMINO REAL"},
 	{"1108638", "199", "PLAZA DR (COLLEGE)"},
 	{"1108329", "24", "EMERALD DR"},
-	{"LDS 110433", "0", "MELROSE DR"},
 	{"1108650", "205", "VISTA VILLAGE DR"},
 	{"1108636", "198", "SUNSET/ESCONDIDO"},    // VSA 1
 	{"1108634", "197", "MAR VISTA DR"},       
@@ -106,6 +105,9 @@ int main(int argc, char *argv[])
 	int num_controller_vars = NUM_LDS; //See warning at top of file
 	struct confidence confidence[num_controller_vars][3]; 
 	char strtmp[100];
+	FILE *datafp;
+	char datafilename[1000];
+	const char *pathname = "/var/www/html/VSA/webdata/";
 
     //float temp_ary_vol[NUM_CYCLE_BUFFS] = {0};    // temporary array of cyclic buffer
 	//float temp_ary_speed[NUM_CYCLE_BUFFS] = {0};
@@ -229,12 +231,23 @@ int main(int argc, char *argv[])
         density_prev[i] = controller_mainline_data[i].agg_density;
 
         //fprintf(dbg_st_file_out,"C%d ", i); //controller index 
-		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_vol); //2
-		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_occ); //3
-		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_speed); //4
-		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_density); //5
-		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_mean_speed);//6
+		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_vol); //51, 112, 173, 234, 295, 356, 417, 478, 539, 600, 661, 722, 783, 844
+		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_occ); //52
+		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_speed); //53
+		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_density); //54
+		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_mean_speed);//55
         //fprintf(dbg_st_file_out,"\n");
+		memset(&datafilename[0], 0, 1000);
+		sprintf(datafilename, "%s%d", pathname, LdsId_onramp_int[i]);
+		datafp = fopen(datafilename, "w");
+		fprintf(datafp, "LdsID: %d\n", LdsId_onramp_int[i]);
+		fprintf(datafp, "  Aggregated Speed %.1f\n  Aggregated Volume %.1f\n  Aggregated Occupancy %.1f\n",
+			controller_mainline_data[i].agg_speed,
+			controller_mainline_data[i].agg_vol,
+			controller_mainline_data[i].agg_occ
+		);
+		fclose(datafp);
+
         
 		// assign off-ramp data to array
 		controller_offramp_data[i].agg_vol =  mind(6000.0, maxd( 0, flow_aggregation_offramp(&lds[i][P1_e], &confidence[i][2]) ) );
@@ -244,9 +257,9 @@ int main(int argc, char *argv[])
 			printf("Confidence for controller %s offramp %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][2].num_good_vals/confidence[i][2].num_total_vals, (float)confidence[i][2].num_total_vals, (float)confidence[i][2].num_good_vals);
 		
 		//fprintf(dbg_st_file_out,"FR%d ", i); //controller index 
-        fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].agg_vol); //7
-		fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].agg_occ); //8
-		fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].turning_ratio);//9
+        fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].agg_vol); //56
+		fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].agg_occ); //57
+		fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].turning_ratio);//58
 
         //fprintf(dbg_st_file_out,"\n");
         
@@ -263,10 +276,10 @@ int main(int argc, char *argv[])
 			printf("Confidence for controller %s onramp occupancy (queue) %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);
  
 		//fprintf(dbg_st_file_out,"OR%d ", i); //controller index 
-		fprintf(dbg_st_file_out,"%f ", controller_onramp_data[i].agg_vol); //10
-        fprintf(dbg_st_file_out,"%f ", controller_onramp_data[i].agg_occ);//11
-		fprintf(dbg_st_file_out,"%f ", controller_onramp_queue_detector_data[i].agg_vol); //12
-        fprintf(dbg_st_file_out,"%f ", controller_onramp_queue_detector_data[i].agg_occ);//13
+		fprintf(dbg_st_file_out,"%f ", controller_onramp_data[i].agg_vol); //59
+        fprintf(dbg_st_file_out,"%f ", controller_onramp_data[i].agg_occ);//60
+		fprintf(dbg_st_file_out,"%f ", controller_onramp_queue_detector_data[i].agg_vol); //61
+        fprintf(dbg_st_file_out,"%f ", controller_onramp_queue_detector_data[i].agg_occ);//62
 
 		 
 		//fprintf(dbg_st_file_out,"\n");
