@@ -1,4 +1,5 @@
 // XML parser for District 11 data feed
+// This program runs once, on a given file, and exits. There is no infinite loop.
 
 #include <mxml.h>
 #include <stdio.h>
@@ -37,11 +38,7 @@ int main(int argc, char *argv[]) {
         int xport = COMM_OS_XPORT;      // set correct for OS in sys_os.h
 
 	FILE *fp;
-	FILE *datafp;
 	char *datainputfile = NULL;
-	char datafilename[1000];
-	const char *pathname = "/var/www/html/VSA/webdata/";
-
 
         mxml_node_t *tree;
         mxml_node_t *node;
@@ -58,15 +55,10 @@ int main(int argc, char *argv[]) {
 	int mainline_volume = 0;
 	int mle_flag;
 	float mainline_occupancy = 0;
-	int create_db_vars = 0;
-	const char *usage = "-c (create db variables) -f <input data file (required)>";
+	const char *usage = "-f <input data file (required)>";
 
-	printf("sizeof loop_data_t %ld sizeof datafilename %ld\n", sizeof(loop_data_t), sizeof(datafilename));
         while ((option = getopt(argc, argv, "cf:")) != EOF) {
                 switch(option) {
-                        case 'c':
-                                create_db_vars = 1;
-                                break;
                         case 'f':
                                 datainputfile = strdup(optarg);
                                 break;
@@ -83,17 +75,9 @@ int main(int argc, char *argv[]) {
 	}
         get_local_name(hostname, MAXHOSTNAMELEN);
 
-	if(create_db_vars) {
-		if ( (pclt = db_list_init(argv[0], hostname, domain, xport, db_vars_list, num_db_vars, NULL, 0)) == NULL) {
-			printf("Database initialization error in %s.\n", argv[0]);
-			exit(EXIT_FAILURE);
-		}
-	}
-	else {
-		if ( (pclt = db_list_init(argv[0], hostname, domain, xport, NULL, 0, NULL, 0)) == NULL) {
-			printf("Database initialization error in %s.\n", argv[0]);
-			exit(EXIT_FAILURE);
-		}
+	if ( (pclt = db_list_init(argv[0], hostname, domain, xport, NULL, 0, NULL, 0)) == NULL) {
+		printf("Database initialization error in %s.\n", argv[0]);
+		exit(EXIT_FAILURE);
 	}
         /* Setup a timer for every 'interval' msec. */
         if ( ((ptimer = timer_init(interval, DB_CHANNEL(pclt) )) == NULL)) {
@@ -102,9 +86,6 @@ int main(int argc, char *argv[]) {
         }
 
         if(( exitsig = setjmp(exit_env)) != 0) {
-		if(create_db_vars)
-			db_list_done(pclt, db_vars_list, num_db_vars, NULL, 0);
-		else
 			db_list_done(pclt, NULL, 0, NULL, 0);
 		if(fp != NULL)
 			fclose(fp);
@@ -125,12 +106,8 @@ int main(int argc, char *argv[]) {
             textvalue = (char *)mxmlGetText(node2, &whitespacevalue);
 	    for(i = 0; i < NUM_LDS; i++) {
 		if( (strcmp(textvalue, LdsId_onramp2[i][0]) ) == 0) {
-			memset(&datafilename[0], 0, 1000);
-			sprintf(datafilename, "%s%s", pathname, textvalue);
-			datafp = fopen(datafilename, "w");
 			mainline_counter = mainline_speed = mainline_occupancy = mainline_volume = 0;
 
-			fprintf(datafp, "LdsID: %s\n", textvalue);
 			printf("%s: LdsID %s\n", LdsId_onramp2[i][1], textvalue);
 		        for (node3 = mxmlFindElement(node, node, "LoopDiags", NULL, NULL,
                                     MXML_DESCEND);
@@ -190,19 +167,6 @@ int main(int argc, char *argv[]) {
         		}
 			printf("\n");
 			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC), sizeof(loop_data_t)*NUM_LOOPNAMES, &lds[i][0]);
-
-		if(mle_flag) { //Print only eastbound mainline values
-			if(mainline_counter > 0) {
-				fprintf(datafp, "  Speed %d\n  Volume %d\n  Occupancy %.2f\n",
-					(int)(mainline_speed/mainline_counter),
-					(int)(mainline_volume/mainline_counter),
-					mainline_occupancy/mainline_counter
-				);
-			}
-			else 
-				fprintf(datafp, "Speed 0 Volume 0 Occupancy 0");
-		}
-		fclose(datafp);
 		}
 
 
