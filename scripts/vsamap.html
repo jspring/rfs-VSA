@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="refresh" content="30" />
+</head>
+
+<div id="map" style="width:100%;height:300px;"></div>
+<script>
+function myMap() {
+        var mapCanvas = document.getElementById("map");
+        var myCenter = new google.maps.LatLng(33.16353595,-117.1946107);
+        var mapOptions = {center: myCenter, zoom: 12};
+        var map = new google.maps.Map(mapCanvas, mapOptions);
+
+        var sunset_coord = new google.maps.LatLng(33.1908452,-117.2427287);
+        var sycamore_coord = new google.maps.LatLng(33.1690623,-117.2176544);
+        var las_posas_coord = new google.maps.LatLng(33.1443846,-117.1919029);
+        var san_marcos_coord = new google.maps.LatLng(33.1385111,-117.1783248);
+        var twin_oaks_coord = new google.maps.LatLng(33.1369707,-117.1655708);
+        var woodland_coord = new google.maps.LatLng(33.1394515,-117.1473142);
+        var nordahl_coord = new google.maps.LatLng(33.1326605, -117.122801);
+
+        var sunset_marker = new google.maps.Marker({ position: sunset_coord, map: map });
+        var sycamore_marker = new google.maps.Marker({ position: sycamore_coord, map: map });
+        var las_posas_marker = new google.maps.Marker({ position: las_posas_coord, map: map });
+        var san_marcos_marker = new google.maps.Marker({ position: san_marcos_coord, map: map });
+        var twin_oaks_marker = new google.maps.Marker({ position: twin_oaks_coord, map: map });
+        var woodland_marker = new google.maps.Marker({ position: woodland_coord, map: map });
+        var nordahl_marker = new google.maps.Marker({ position: nordahl_coord, map: map });
+
+        google.maps.event.addListener(sunset_marker, 'mouseover', function(event) { placeMarkerSunset(map, sunset_coord); });
+        google.maps.event.addListener(sycamore_marker, 'mouseover', function(event) { placeMarkerSycamore(map, sycamore_coord); });
+        google.maps.event.addListener(las_posas_marker, 'mouseover', function(event) { placeMarkerLasPosas(map, las_posas_coord); });
+        google.maps.event.addListener(san_marcos_marker, 'mouseover', function(event) { placeMarkerSanMarcos(map, san_marcos_coord); });
+        google.maps.event.addListener(twin_oaks_marker, 'mouseover', function(event) { placeMarkerTwinOaks(map, twin_oaks_coord); });
+        google.maps.event.addListener(woodland_marker, 'mouseover', function(event) { placeMarkerWoodland(map, woodland_coord); });
+        google.maps.event.addListener(nordahl_marker, 'mouseover', function(event) { placeMarkerNordahl(map, nordahl_coord); });
+}
+
+function LoadFile() {
+    var oFrame = document.getElementById("frmFile");
+    var strRawContents = oFrame.contentWindow.document.body.childNodes[0].innerHTML;
+    while (strRawContents.indexOf("\r") >= 0)
+        strRawContents = strRawContents.replace("\r", "");
+    var arrLines = strRawContents.split("\n");
+//    alert("File " + oFrame.src + " has " + arrLines.length + " lines");
+    for (var i = 0; i < arrLines.length; i++) {
+        var curLine = arrLines[i];
+//        alert("Line #" + (i + 1) + " is: '" + curLine + "'");
+        alert(curLine);
+    }
+}
+
+function placeMarkerSunset(map, location) {
+  var marker = new google.maps.Marker({ position: location, map: map, });
+  var infowindow = new google.maps.InfoWindow({ });
+  infowindow.setContent('<center>Currently, only aggregated data</br>are available. Radar speed and</br>speed advisories will be</br>available 2/2018.</br><a href="../webdata/198" target="_blank">VSA<F2></a>');
+  infowindow.open(map,marker);
+}
+
+function placeMarkerSycamore(map, location) {
+  var marker = new google.maps.Marker({ position: location, map: map });
+  var infowindow = new google.maps.InfoWindow({ });
+  infowindow.setContent('<center>Currently, only aggregated data</br>are available. Radar speed and</br>speed advisories will be</br>available 2/2018.</br><a href="../webdata/203" target="_blank">VSA<F2></a>');
+  infowindow.open(map,marker);
+}
+
+function placeMarkerLasPosas(map, location) {
+  var marker = new google.maps.Marker({ position: location, map: map });
+  var infowindow = new google.maps.InfoWindow({ });
+  infowindow.setContent('<center>Currently, only aggregated data</br>are available. Radar speed and</br>speed advisories will be</br>available 2/2018.</br><a href="../webdata/398" target="_blank">VSA<F2></a>');
+  infowindow.open(map,marker);
+}
+
+function placeMarkerSanMarcos(map, location) {
+  var marker = new google.maps.Marker({ position: location, map: map }); 
+  var infowindow = new google.maps.InfoWindow({ });
+  infowindow.setContent('<center>Currently, only aggregated data</br>are available. Radar speed and</br>speed advisories will be</br>available 2/2018.</br><a href="../webdata/180" target="_blank">VSA<F2></a>');
+  infowindow.open(map,marker);
+}
+
+function placeMarkerTwinOaks(map, location) {
+  var marker = new google.maps.Marker({ position: location, map: map });
+  var infowindow = new google.maps.InfoWindow({ });
+  infowindow.setContent('<center>Currently, only aggregated data</br>are available. Radar speed and</br>speed advisories will be</br>available 2/2018.</br><a href="../webdata/234" target="_blank">VSA<F2></a>');
+  infowindow.open(map,marker);
+}
+
+function placeMarkerWoodland(map, location) {
+  var marker = new google.maps.Marker({ position: location, map: map });
+  var infowindow = new google.maps.InfoWindow({ });
+  infowindow.setContent('<center>Currently, only aggregated data</br>are available. Radar speed and</br>speed advisories will be</br>available 2/2018.</br><a href="../webdata/236" target="_blank">VSA<F2></a>');
+  infowindow.open(map,marker);
+}
+
+function placeMarkerNordahl(map, location) {
+  var marker = new google.maps.Marker({ position: location, map: map });
+  var infowindow = new google.maps.InfoWindow({ });
+  infowindow.setContent('<center>Currently, only aggregated data</br>are available. Radar speed and</br>speed advisories will be</br>available 2/2018.</br><a href="../webdata/13006" target="_blank">VSA<F2></a>');
+  infowindow.open(map,marker);
+}
+
+
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXMSv7dAwwKUruo7YaAU_KMYUf46jWb-4&callback=myMap"></script>
+</html>
+
