@@ -195,17 +195,23 @@ int main(int argc, char *argv[])
 	print_timestamp(dbg_st_file_out, pts); // #1 print out current time step to file
  
 	for(i=0;i<NUM_LDS;i++){
-		printf("opt_vsa: IP %s onramp1 passage volume %d\n", controller_strings[i][2], lds[i][P1_e].rawvolume);
-		fprintf(dbg_st_file_out, "%d ", LdsId_onramp_int[i]);
+		fprintf(dbg_st_file_out, "%d ", LdsId_onramp_int[i]); //2,75,148,221,294,367,440,513,582,659,732,805,878,951
 		for(j=0; j<NUM_LOOPNAMES; j++) {
 			memset(strtmp, 0, 100);
 			sprintf(strtmp, "%s", loopname_list[j]);
-			fprintf(dbg_st_file_out, "%s %d %d %d %d", strtmp, lds[i][j].rawvolume, lds[i][j].rawoccupancy, lds[i][j].rawspeed, lds[i][j].rawlooperrorstatus);
+			fprintf(dbg_st_file_out, "%s %d %d %d %d ", 
+				strtmp, 				//3,8,17
+				lds[i][j].rawvolume, 			//4,9,18
+				lds[i][j].rawoccupancy, 		//5,10,19
+				lds[i][j].rawspeed,			//6,11,20
+				lds[i][j].rawlooperrorstatus		//7,12,21
+			);
 		}
 		
+		printf("\n\nBeginning aggregation for %s\n", controller_strings[i][2]);
 		// min max function bound the data range and exclude nans.
         controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
-		controller_mainline_data[i].agg_occ = mind(100.0, maxd( 0.0, occupancy_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0])/10 ) ); // raw occupancy value should divide by 10
+		controller_mainline_data[i].agg_occ = mind(90.0, maxd( 1.0, occupancy_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
 		 
 		float_temp = hm_speed_aggregation_mainline(&lds[i][MLE1_e], hm_speed_prev[i], &confidence[i][0]);
 		if(float_temp < 0){
@@ -231,11 +237,11 @@ int main(int argc, char *argv[])
         density_prev[i] = controller_mainline_data[i].agg_density;
 
         //fprintf(dbg_st_file_out,"C%d ", i); //controller index 
-		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_vol); //51, 112, 173, 234, 295, 356, 417, 478, 539, 600, 661, 722, 783, 844
-		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_occ); //52
-		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_speed); //53
-		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_density); //54
-		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_mean_speed);//55
+		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_vol); //62
+		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_occ); //63,136,209,282,355,428,501,574,647,720,793,866,939,1012
+		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_speed); //64
+		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_density); //65
+		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_mean_speed);//66
         //fprintf(dbg_st_file_out,"\n");
 		memset(&datafilename[0], 0, 1000);
 		sprintf(datafilename, "%s%d", pathname, LdsId_onramp_int[i]);
@@ -251,15 +257,15 @@ int main(int argc, char *argv[])
         
 		// assign off-ramp data to array
 		controller_offramp_data[i].agg_vol =  mind(6000.0, maxd( 0, flow_aggregation_offramp(&lds[i][P1_e], &confidence[i][2]) ) );
-        controller_offramp_data[i].agg_occ =  mind(100.0, maxd( 0, occupancy_aggregation_offramp(&lds[i][P1_e], &confidence[i][2])/10.0 ) ); // raw occupancy value should divide by 10.0            
+        controller_offramp_data[i].agg_occ =  mind(100.0, maxd( 0, occupancy_aggregation_offramp(&lds[i][P1_e], &confidence[i][2]) ) );            
 		controller_offramp_data[i].turning_ratio = 0.0; //turning_ratio_offramp(controller_offramp_data[i].agg_vol,controller_mainline_data[i-1].agg_vol);
 		if(confidence[i][2].num_total_vals > 0)
 			printf("Confidence for controller %s offramp %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][2].num_good_vals/confidence[i][2].num_total_vals, (float)confidence[i][2].num_total_vals, (float)confidence[i][2].num_good_vals);
 		
 		//fprintf(dbg_st_file_out,"FR%d ", i); //controller index 
-        fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].agg_vol); //56
-		fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].agg_occ); //57
-		fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].turning_ratio);//58
+        fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].agg_vol); //67
+		fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].agg_occ); //68
+		fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].turning_ratio);//69
 
         //fprintf(dbg_st_file_out,"\n");
         
@@ -267,7 +273,7 @@ int main(int argc, char *argv[])
 		controller_onramp_data[i].agg_vol = mind(6000.0, maxd( 0, flow_aggregation_onramp(&lds[i][P1_e], &confidence[i][1]) ) );
 		if(confidence[i][1].num_total_vals > 0)
 			printf("Confidence for controller %s onramp flow %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);
-		controller_onramp_data[i].agg_occ = mind(100.0, maxd( 0, occupancy_aggregation_onramp(&lds[i][P1_e], &confidence[i][1])/10.0 ) ); // raw occupancy value should divide by 10.0 
+		controller_onramp_data[i].agg_occ = mind(100.0, maxd( 0, occupancy_aggregation_onramp(&lds[i][P1_e], &confidence[i][1]) ) );
 		// data from on-ramp queue detector
 		controller_onramp_queue_detector_data[i].agg_vol = 0.0;//mind(6000.0, maxd( 0, flow_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
         controller_onramp_queue_detector_data[i].agg_occ = 0.0;//mind(100.0, maxd( 0, occupancy_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
@@ -276,10 +282,10 @@ int main(int argc, char *argv[])
 			printf("Confidence for controller %s onramp occupancy (queue) %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);
  
 		//fprintf(dbg_st_file_out,"OR%d ", i); //controller index 
-		fprintf(dbg_st_file_out,"%f ", controller_onramp_data[i].agg_vol); //59
-        fprintf(dbg_st_file_out,"%f ", controller_onramp_data[i].agg_occ);//60
-		fprintf(dbg_st_file_out,"%f ", controller_onramp_queue_detector_data[i].agg_vol); //61
-        fprintf(dbg_st_file_out,"%f ", controller_onramp_queue_detector_data[i].agg_occ);//62
+		fprintf(dbg_st_file_out,"%f ", controller_onramp_data[i].agg_vol); //70
+        fprintf(dbg_st_file_out,"%f ", controller_onramp_data[i].agg_occ);//71
+		fprintf(dbg_st_file_out,"%f ", controller_onramp_queue_detector_data[i].agg_vol); //72
+        fprintf(dbg_st_file_out,"%f ", controller_onramp_queue_detector_data[i].agg_occ);//73
 
 		 
 		//fprintf(dbg_st_file_out,"\n");
