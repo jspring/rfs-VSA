@@ -364,8 +364,8 @@ float occupancy_aggregation_mainline(loop_data_t lds[], struct confidence *confi
 	// this loop get data from data base
 	for(i=0 ; i < NUM_LANES; i++) {
 		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
-			if((float)lds[i].rawvolume >= 0 && (float)lds[i].rawoccupancy <= MAX_OCCUPANCY){ // if occupancy is in the range
-			    occ_temp[j]=(float)lds[i].rawoccupancy;  
+			if((float)lds[i].rawvolume >= 0 && (float)lds[i].rawoccupancy/10.0 <= MAX_OCCUPANCY){ // if occupancy is in the range
+			    occ_temp[j]=(float)lds[i].rawoccupancy/10.0;
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;
@@ -392,7 +392,7 @@ float occupancy_aggregation_mainline(loop_data_t lds[], struct confidence *confi
 	}
 	printf("OCCUPANCY_AGGREGATION_MAINLINE: occ_temp ");
 	for(i=0; i<NUM_LANES;i++)
-		printf("%d:%2.2f ",i, occ_temp[i]);
+		printf("%d:%2.2f error status %d rawvolume %d rawoccupancy %f ",i, occ_temp[i], lds[i].rawlooperrorstatus, lds[i].rawvolume, lds[i].rawoccupancy/10.0);
 	printf("num_lane %d mean_occupancy %f var_occupancy %f occupancy %4.2f\n", confidence->num_good_vals, mean_occ, var_occ, occupancy);
 	return  mind(MAX_OCCUPANCY, occupancy);
 }
@@ -412,8 +412,8 @@ float occupancy_aggregation_onramp(loop_data_t lds[], struct confidence *confide
 		// this loop get data from data base
 	for(i=0 ; i < MAX_METERED_LANES; i++) {
 		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
-			if((float)lds[i].rawvolume >= 0 && (float)lds[i].rawoccupancy <= MAX_OCCUPANCY){ // if occupancy is in the range
-			    occ_temp[j]=(float)lds[i].rawoccupancy;  
+			if((float)lds[i].rawvolume >= 0 && (float)lds[i].rawoccupancy/10.0 <= MAX_OCCUPANCY){ // if occupancy is in the range
+			    occ_temp[j]=(float)lds[i].rawoccupancy/10.0;  
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;
@@ -465,8 +465,8 @@ float occupancy_aggregation_offramp(loop_data_t lds[], struct confidence *confid
 	// this loop get data from data base
 	for(i=0 ; i < MAX_OFFRAMPS; i++) {
 		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
-			if((float)lds[i].rawvolume >= 0 && (float)lds[i].rawoccupancy <= MAX_OCCUPANCY){ // if occupancy is in the range
-			    occ_temp[j]=(float)lds[i].rawoccupancy;  
+			if((float)lds[i].rawvolume >= 0 && (float)lds[i].rawoccupancy/10.0 <= MAX_OCCUPANCY){ // if occupancy is in the range
+			    occ_temp[j]=(float)lds[i].rawoccupancy/10.0;  
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
 				confidence->num_good_vals--;
@@ -526,7 +526,7 @@ float hm_speed_aggregation_mainline(loop_data_t lds[], float hm_speed_prev, stru
 		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
 			if((float)lds[i].rawspeed >= 0 && (float)lds[i].rawspeed <= MAX_MEAN_SPEED){ // if flow is in the range
 			    speed_temp[j]=(float)lds[i].rawspeed;
-				occupancy[j]= (float)lds[i].rawoccupancy;
+				occupancy[j]= (float)lds[i].rawoccupancy/10.0;
 				flow[j]=(float)lds[i].rawvolume; 
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
@@ -606,7 +606,7 @@ float mean_speed_aggregation_mainline(loop_data_t lds[], float mean_speed_prev, 
 		if(lds[i].rawlooperrorstatus == 2){ // if the controller report the flow data is correct, then check the data is in the range or not
 			if((float)lds[i].rawspeed >= 0 && (float)lds[i].rawspeed <= MAX_MEAN_SPEED){ // if flow is in the range
 			    speed_temp[j]=(float)lds[i].rawspeed;
-				occupancy[j]= (float)lds[i].rawoccupancy;
+				occupancy[j]= (float)lds[i].rawoccupancy/10.0;
 				flow[j]=(float)lds[i].rawvolume; 
 			    j++;
 			}else{  // replace the flow measurement if it is not in the range
