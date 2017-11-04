@@ -1,50 +1,45 @@
 #!/bin/bash
 
-ps -ef | grep -v grep | grep opt_vsa
-if [[ $? -ne 0 ]]
-then
-	sudo killall opt_vsa
-fi
+sudo killall opt_vsa
+sudo killall xml_parser
+sudo killall clt_vars
+sudo killall db_slv
 
-ps -ef | grep -v grep | grep xml_parser
-if [[ $? -ne 0 ]]
-then
-	sudo killall xml_parser
+#Kill other run_vsa processes (it's run under a bash shell)
+RUNVSAPIDS=`ps -ef | grep run_vsa | grep -v grep | awk '{print $2}'`
+OTHERBASHPIDS=`pidof -o %PPID bash`
+echo RUNVSAPIDS $RUNVSAPIDS OTHERBASHPIDS $OTHERBASHPIDS
+for x in `echo $RUNVSAPIDS`
+do 
+	echo x $x
+	echo $OTHERBASHPIDS | grep $x 
+	if [[ $? -eq 0 ]] 
+	then 
+		echo "Im gonna kill $x"
+		kill $x
+	else 
+		echo "Im not gonna kill $x"
+		ps -ef | grep $x
 fi
-
-ps -ef | grep -v grep | grep clt_vars
-if [[ $? -ne 0 ]]
-then
-	sudo killall clt_vars
-fi
-
-ps -ef | grep -v grep | grep db_slv
-if [[ $? -ne 0 ]]
-then
-	sudo killall db_slv
-fi
+done
 
 sudo /home/path/db/db_clean.sh
 
-ps -elf | grep -v grep | grep db_slv
-if [[ $? != 0 ]]
-then
-	/home/path/db/lnx/db_slv &
-fi
+#Move Out_Data contents to a saved directory
+NOW_TIME_SUFFIX=`date +%Y%m%d%H%M%S`
+NOW_OUT_DIR="/home/rfs-VSA/src/Out_Data_"$NOW_TIME_SUFFIX
+mkdir $NOW_OUT_DIR
+mv /home/rfs-VSA/src/Out_Data/* $NOW_OUT_DIR
 
-ps -elf | grep -v grep | grep clt_vars
-if [[ $? != 0 ]]
-then
-	/home/rfs-VSA/src/lnx/clt_vars &
-fi
+#Start everything back up
+/home/path/db/lnx/db_slv &
+sleep 1
+/home/rfs-VSA/src/lnx/clt_vars &
+sleep 1
+cd /home/rfs-VSA/src
+./lnx/opt_vsa &
 
-ps -elf | grep -v grep | grep opt_vsa
-if [[ $? != 0 ]]
-then
-	cd /home/rfs-VSA/src
-	./lnx/opt_vsa &
- fi
-
+sleep 1
 while [[ 1 ]]
 do
 	COUNTER=0
