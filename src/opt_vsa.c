@@ -296,8 +296,69 @@ int main(int argc, char *argv[])
 	 	
 //		det_data_4_contr(time);	
 //		get_meas(time);
+	 //int num_VSA_device = 8; // number of VSA devices
+	 double suggested_speed[8]= {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // the first entry is the suggested speed of FMS, so seven VSA puls one FMS is eight units in total.
+	 suggested_speed[0]= 60; // first FMS1 is always 60 mph (free flow speed), where is the starting point of VSA test site 
+     int i = 0;
+     double slope = 0.0;
+     double interception = 0.0;
+	 double device_location[8] = {0.9,1.5,3.7,5.9,6.6,7.4,8.5,10}; // absolute distance in miles of each VSA device 
+     double speed_increment = 5;
+	 double last_occ = 0.0;
+     double last_density = 0.0;
+	 double last_flow = 0.0;
+	 double last_speed = 0.0;
+	 double up_last_speed = 0;
+     
+	 // VSA control parameters
+     double last_occ_threshold = 12; // occupancy threshold in last VDS (suggested 10 to 12.5)
+	 //double gamma = 0.0; 
+     //double Q_b = 1200;
+	 //double rho_c = 80;
+
+	 //double q_m_up = 0.0;
+	 //double v_m_down = 0.0;
+	 //double rho_M_down = 0.0;
+     
+	 double alpha = 1.2; // speed based VSA gain 1.1-1.5
+	 double beta = 0.8; // speed based VSA gain 0.7-0.9
+     //double xi = 0.5;    // occupancy based VSA gain
+
+	 int speed_based_VSA = 1; //activate speed based VSA control
+     
+	 // get feedback information from the most downstream VSA
+	 last_occ = controller_mainline_data[NUM_LDS-1].agg_occ;           // occupancy
+	 last_density = controller_mainline_data[NUM_LDS-1].agg_density;   // density
+	 last_flow = controller_mainline_data[NUM_LDS-1].agg_vol;          // flow
+	 last_speed = controller_mainline_data[NUM_LDS-1].agg_speed;      // harmonic mean speed
+     
+	 // get speed information from the immediately upstream of the most downstream VSA
+	 //up_last_speed = controller_mainline_data[NUM_LDS-2].agg_speed;
+	 // speed based VSA 
+	 if (speed_based_VSA){
+         // VSA at bottleneck section
+         suggested_speed[7] = alpha*last_speed;
+		 suggested_speed[6] = beta*last_speed; // reduce VSA at immediate bottleneck section if occupancy too high
+
+		 if(last_occ>last_occ_threshold){
+		 // do linear interpolation to usstream VSA
+	     slope = (suggested_speed[6]-suggested_speed[0])/(device_location[6]-device_location[0]);
+		 interception =  (suggested_speed[0]*device_location[6]-suggested_speed[6]*device_location[0])/(device_location[6]-device_location[0]);
+		 for (i=1; i<NUM_SIGNS-1; i++){
+		      suggested_speed[i]= (slope*device_location[i]+interception); // if occupancy in the most downstream is high, then use linear interpolation
+		 } 
+		 }else{
+		  for (i=1; i<NUM_SIGNS+1; i++){
+		        suggested_speed[i] =  suggested_speed[0]; // if occupancy in the most downstream is low, then use free flow speed
+		  }
+		 }          
+	  }
+
+
 		for(i=0; i<NUM_SIGNS; i++){
-			db_vsa_ctl.vsa[i]= 0; //NOTE to Chengju: Assign variable speeds here, remember to convert to kph
+			db_vsa_ctl.vsa[i]= suggested_speed[i+1]*1.60934; //NOTE to Chengju: Assign variable speeds here, remember to convert to kph
+			// To Do: round VSA speed into five base numbers
+			fprintf(dbg_st_file_out,"%d ", db_vsa_ctl.vsa[i]);
 	    	} 
 		db_clt_write(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
 		    TIMER_WAIT(ptimer);	
