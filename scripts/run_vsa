@@ -1,6 +1,7 @@
 #!/bin/bash
 
 sudo killall opt_vsa
+sudo killall sign_control
 sudo killall xml_parser
 sudo killall clt_vars
 sudo killall db_slv
@@ -27,7 +28,7 @@ sudo /home/path/db/db_clean.sh
 
 #Move Out_Data contents to a saved directory
 NOW_TIME_SUFFIX=`date +%Y%m%d%H%M%S`
-NOW_OUT_DIR="/home/rfs-VSA/src/Out_Data_"$NOW_TIME_SUFFIX
+NOW_OUT_DIR="/linux2/big/data/VSA/Out_Data/Out_Data_"$NOW_TIME_SUFFIX
 mkdir $NOW_OUT_DIR
 mv /home/rfs-VSA/src/Out_Data/* $NOW_OUT_DIR
 
@@ -37,6 +38,8 @@ sleep 1
 /home/rfs-VSA/src/lnx/clt_vars &
 sleep 1
 cd /home/rfs-VSA/src
+./lnx/sign_control &
+sleep 1
 ./lnx/opt_vsa &
 
 sleep 1

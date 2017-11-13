@@ -20,7 +20,7 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 # 
 # m h  dom mon dow   command
-0 */2 * * * /usr/local/bin/kill_vsa; /var/www/html/VSA/scripts/run_vsa
 58 1 * * * /var/www/html/VSA/scripts/check_vsa_data_feed.sh
 0 2 * * * /home/jspring/bin/remove_yesterdays_VSA_data.sh
+5 2 * * * /var/www/html/VSA/scripts/run_vsa
 #* * * * * /var/www/html/VSA/scripts/safepace_set_speed.php
