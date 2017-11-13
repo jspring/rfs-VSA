@@ -290,7 +290,6 @@ int main(int argc, char *argv[])
 		 
 		//fprintf(dbg_st_file_out,"\n");
 	}
-	fprintf(dbg_st_file_out,"\n");
 
     // VSA control code start from here
 	 	
@@ -360,6 +359,8 @@ int main(int argc, char *argv[])
 			// To Do: round VSA speed into five base numbers
 			fprintf(dbg_st_file_out,"%d ", db_vsa_ctl.vsa[i]);
 	    	} 
+
+	fprintf(dbg_st_file_out,"\n");
 		db_clt_write(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
 		    TIMER_WAIT(ptimer);	
 	
