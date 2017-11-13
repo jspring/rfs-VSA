@@ -37,7 +37,7 @@ int vsa_sign_ids[NUM_SIGNS] = {
 	2846, //Las Posas
 	2845, //San Marcos
 	2843, //Twin Oaks Valley
-	3068, //Woodland
+	2859, //Woodland
 	2842  //Nordahl
 };
 
