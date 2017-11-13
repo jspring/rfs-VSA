@@ -355,8 +355,8 @@ int main(int argc, char *argv[])
 
 
 		for(i=0; i<NUM_SIGNS; i++){
-			db_vsa_ctl.vsa[i]= suggested_speed[i+1]*1.60934; //NOTE to Chengju: Assign variable speeds here, remember to convert to kph
-			// To Do: round VSA speed into five base numbers
+            // round VSA speed into five base numbers (VSA value is multiple of five)
+			db_vsa_ctl.vsa[i]= floor(suggested_speed[i+1]*1.60934/5)*5; //NOTE to Chengju: Assign variable speeds here, remember to convert to kph
 			fprintf(dbg_st_file_out,"%d ", db_vsa_ctl.vsa[i]);
 	    	} 
 
