@@ -67,6 +67,16 @@ const char *controller_strings[][3] = {
 	{"1108707", "13006", "NORDAHL RD"}         // VSA 7
 };
 
+const int sign_ids[] = {
+	198,	// VSA 1
+	203,	// VSA 2
+	398,	// VSA 3
+	180,	// VSA 4
+	234,	// VSA 5
+	236,	// VSA 6
+	13006	// VSA 7
+};
+
 int main(int argc, char *argv[])
 {
 	timestamp_t ts;
@@ -358,6 +368,11 @@ int main(int argc, char *argv[])
             // round VSA speed into five base numbers (VSA value is multiple of five)
 			db_vsa_ctl.vsa[i]= (char)(rint(suggested_speed[i+1]*1.60934/5)*5); //NOTE to Chengju: Assign variable speeds here, remember to convert to kph
 			fprintf(dbg_st_file_out,"%d ", db_vsa_ctl.vsa[i]);
+			memset(&datafilename[0], 0, 1000);
+			sprintf(datafilename, "%s%d", pathname, sign_ids[i]);
+			datafp = fopen(datafilename, "a");
+			fprintf(datafp, "  VSA: %d\n", db_vsa_ctl.vsa[i]);
+			fclose(datafp);
 	    	} 
 
 	fprintf(dbg_st_file_out,"\n");
