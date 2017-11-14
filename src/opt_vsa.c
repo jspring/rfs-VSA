@@ -343,18 +343,19 @@ int main(int argc, char *argv[])
      
 	 // get speed information from the immediately upstream of the most downstream VSA
 	 //up_last_speed = controller_mainline_data[NUM_LDS-2].agg_speed;
+	 // VSA speed is a value between 20 mph to 65 mph
 	 // speed based VSA 
 	 if (speed_based_VSA){
          // VSA at bottleneck section
-         suggested_speed[7] = alpha*last_speed;
-		 suggested_speed[6] = beta*last_speed; // reduce VSA at immediate bottleneck section if occupancy too high
+         suggested_speed[7] = mind(65, maxd(20,alpha*last_speed));
+		 suggested_speed[6] = mind(65, maxd(20,beta*last_speed)); // reduce VSA at immediate bottleneck section if occupancy too high
 
 		 if(last_occ>last_occ_threshold){
 		 // do linear interpolation to usstream VSA
 	     slope = (suggested_speed[6]-suggested_speed[0])/(device_location[6]-device_location[0]);
 		 interception =  (suggested_speed[0]*device_location[6]-suggested_speed[6]*device_location[0])/(device_location[6]-device_location[0]);
 		 for (i=1; i<NUM_SIGNS-1; i++){
-		      suggested_speed[i]= (slope*device_location[i]+interception); // if occupancy in the most downstream is high, then use linear interpolation
+		      suggested_speed[i]= mind(65, maxd(20,(slope*device_location[i]+interception)) ); // if occupancy in the most downstream is high, then use linear interpolation
 		 } 
 		 }else{
 		  for (i=1; i<NUM_SIGNS+1; i++){
