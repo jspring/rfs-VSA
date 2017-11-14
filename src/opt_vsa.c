@@ -372,7 +372,7 @@ int main(int argc, char *argv[])
 			memset(&datafilename[0], 0, 1000);
 			sprintf(datafilename, "%s%d", pathname, sign_ids[i]);
 			datafp = fopen(datafilename, "a");
-			fprintf(datafp, "  VSA: %d\n", db_vsa_ctl.vsa[i]);
+			fprintf(datafp, "  VSA: %d\n", (char)rint(suggested_speed[i+1]));
 			fclose(datafp);
 	    	} 
 
