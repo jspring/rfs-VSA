@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
 		memset(&datafilename[0], 0, 1000);
 		sprintf(datafilename, "%s%d", pathname, LdsId_onramp_int[i]);
 		datafp = fopen(datafilename, "w");
-		fprintf(datafp, "LdsID: %d\n", LdsId_onramp_int[i]);
+		fprintf(datafp, "%s, LdsID: %d\n", controller_strings[i][2], LdsId_onramp_int[i]);
 		fprintf(datafp, "  Aggregated Speed %.1f\n  Aggregated Volume %.1f\n  Aggregated Occupancy %.1f\n",
 			controller_mainline_data[i].agg_speed,
 			controller_mainline_data[i].agg_vol,
