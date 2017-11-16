@@ -27,6 +27,9 @@ function myMap() {
         var twin_oaks_marker = new google.maps.Marker({ position: twin_oaks_coord, map: map });
         var woodland_marker = new google.maps.Marker({ position: woodland_coord, map: map });
         var nordahl_marker = new google.maps.Marker({ position: nordahl_coord, map: map });
+	var trafficLayer = new google.maps.TrafficLayer();
+        trafficLayer.setMap(map);
+
 
         google.maps.event.addListener(sunset_marker, 'mouseover', function(event) { placeMarkerSunset(map, sunset_coord); });
         google.maps.event.addListener(sycamore_marker, 'mouseover', function(event) { placeMarkerSycamore(map, sycamore_coord); });
@@ -54,8 +57,7 @@ function LoadFile() {
 function placeMarkerSunset(map, location) {
   var marker = new google.maps.Marker({ position: location, map: map, });
   var infowindow = new google.maps.InfoWindow({ });
-  infowindow.setContent('<center>Currently, only aggregated data</br>and</br>speed advisories are available. Radar speed will be</br>available 2/2018.</br><a href="../webdata/198" target="_blank">VSA<F2></a>');
-  infowindow.setContent('<center>Currently, only aggregated data</br>and speed advisories are </br>available. Radar speed will be</br>available 2/2018.</br><a href="../webdata/203" target="_blank">Realtime Data<F2></a>');
+  infowindow.setContent('<center>Currently, only aggregated data</br>and speed advisories are </br>available. Radar speed will be</br>available 2/2018.</br><a href="../webdata/198" target="_blank">Realtime Data<F2></a>');
   infowindow.open(map,marker);
 }
 
