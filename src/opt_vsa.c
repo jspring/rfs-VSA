@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
 		sprintf(datafilename, "%s%d", pathname, LdsId_onramp_int[i]);
 		datafp = fopen(datafilename, "w");
 		fprintf(datafp, "%s, LdsID: %d\n", controller_strings[i][2], LdsId_onramp_int[i]);
-		fprintf(datafp, "  Aggregated Speed %.1f\n  Aggregated Volume %.1f\n  Aggregated Occupancy %.1f\n",
+		fprintf(datafp, "  Aggregated Speed (mph): %.1f\n  Aggregated Volume (vph): %.1f\n  Aggregated Occupancy (%%): %.1f\n",
 			controller_mainline_data[i].agg_speed,
 			controller_mainline_data[i].agg_vol,
 			controller_mainline_data[i].agg_occ
@@ -374,7 +374,7 @@ int main(int argc, char *argv[])
 			memset(&datafilename[0], 0, 1000);
 			sprintf(datafilename, "%s%d", pathname, sign_ids[i]);
 			datafp = fopen(datafilename, "a");
-			fprintf(datafp, "  VSA: %d\n", suggested_speed_int);
+			fprintf(datafp, "  VSA(mph): %d\n", suggested_speed_int);
 			fclose(datafp);
 	    	} 
 
