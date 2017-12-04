@@ -6,5 +6,8 @@ killall xml_parser 2>>/var/log/vsa/run_vsa.err
 killall clt_vars 2>>/var/log/vsa/run_vsa.err
 killall db_slv 2>>/var/log/vsa/run_vsa.err
 VSAPIDS=`ps -ef | grep -v grep | grep run_vsa | awk '{print $2}'`
-kill -9 $VSAPIDS
+if [[ q$VSAPIDS -ne 'q' ]]
+then
+	kill -9 $VSAPIDS
+fi
 /home/path/db/db_clean.sh 2>>/var/log/vsa/run_vsa.err

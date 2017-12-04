@@ -307,17 +307,18 @@ int main(int argc, char *argv[])
 //		get_meas(time);
 	 //int num_VSA_device = 8; // number of VSA devices
 	 double suggested_speed[8]= {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // the first entry is the suggested speed of FMS, so seven VSA puls one FMS is eight units in total.
+	int suggested_speed_int = 0;
 	 suggested_speed[0]= 60; // first FMS1 is always 60 mph (free flow speed), where is the starting point of VSA test site 
      int i = 0;
      double slope = 0.0;
      double interception = 0.0;
 	 double device_location[8] = {0.9,1.5,3.7,5.9,6.6,7.4,8.5,10}; // absolute distance in miles of each VSA device 
-     double speed_increment = 5;
+     //double speed_increment = 5;
 	 double last_occ = 0.0;
-     double last_density = 0.0;
-	 double last_flow = 0.0;
+     //double last_density = 0.0;
+	 //double last_flow = 0.0;
 	 double last_speed = 0.0;
-	 double up_last_speed = 0;
+	 //double up_last_speed = 0;
      
 	 // VSA control parameters
      double last_occ_threshold = 12; // occupancy threshold in last VDS (suggested 10 to 12.5)
@@ -336,9 +337,9 @@ int main(int argc, char *argv[])
 	 int speed_based_VSA = 1; //activate speed based VSA control
      
 	 // get feedback information from the most downstream VSA
-	 last_occ = controller_mainline_data[NUM_LDS-1].agg_occ;           // occupancy
-	 last_density = controller_mainline_data[NUM_LDS-1].agg_density;   // density
-	 last_flow = controller_mainline_data[NUM_LDS-1].agg_vol;          // flow
+	 //last_occ = controller_mainline_data[NUM_LDS-1].agg_occ;           // occupancy
+	 //last_density = controller_mainline_data[NUM_LDS-1].agg_density;   // density
+	 //last_flow = controller_mainline_data[NUM_LDS-1].agg_vol;          // flow
 	 last_speed = controller_mainline_data[NUM_LDS-1].agg_speed;      // harmonic mean speed
      
 	 // get speed information from the immediately upstream of the most downstream VSA
@@ -367,12 +368,13 @@ int main(int argc, char *argv[])
 
 		for(i=0; i<NUM_SIGNS; i++){
             // round VSA speed into five base numbers (VSA value is multiple of five)
-			db_vsa_ctl.vsa[i]= (char)(rint(suggested_speed[i+1]*1.60934/5)*5); //NOTE to Chengju: Assign variable speeds here, remember to convert to kph
-			fprintf(dbg_st_file_out,"%d ", db_vsa_ctl.vsa[i]);
+			suggested_speed_int = (((char)(rint(suggested_speed[i+1])))/5)*5; //NOTE to Chengju: Assign variable speeds here, remember to convert to kph
+			db_vsa_ctl.vsa[i] = (char)suggested_speed_int * 1.609344;
+			fprintf(dbg_st_file_out,"%d %d ", suggested_speed_int, db_vsa_ctl.vsa[i]);
 			memset(&datafilename[0], 0, 1000);
 			sprintf(datafilename, "%s%d", pathname, sign_ids[i]);
 			datafp = fopen(datafilename, "a");
-			fprintf(datafp, "  VSA: %d\n", (char)rint(suggested_speed[i+1]));
+			fprintf(datafp, "  VSA: %d\n", suggested_speed_int);
 			fclose(datafp);
 	    	} 
 
