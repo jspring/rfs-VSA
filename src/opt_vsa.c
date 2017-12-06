@@ -362,7 +362,13 @@ int main(int argc, char *argv[])
 		  for (i=1; i<NUM_SIGNS+1; i++){
 		        suggested_speed[i] =  suggested_speed[0]; // if occupancy in the most downstream is low, then use free flow speed
 		  }
-		 }          
+		 }
+
+		 for (i=1; i<NUM_SIGNS-1; i++){
+			 if(controller_mainline_data[i-1].agg_speed<20){ // if local speed is less than 20 mph (very low speed), then use local speed.
+			 suggested_speed[i]= mind(65,maxd(20,controller_mainline_data[i-1].agg_speed)); 
+			 }
+		 }
 	  }
 
 
