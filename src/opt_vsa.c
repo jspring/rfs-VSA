@@ -362,15 +362,24 @@ int main(int argc, char *argv[])
 		  for (i=1; i<NUM_SIGNS+1; i++){
 		        suggested_speed[i] =  suggested_speed[0]; // if occupancy in the most downstream is low, then use free flow speed
 		  }
+		  }
+	     }
+
+      	 // check local speed of VSA
+	     // check downstream speed of VSA 1
+     	 if(controller_mainline_data[6].agg_speed<20){ // if local speed is less than 20 mph (very low speed), then use local speed.
+			 suggested_speed[1]= mind(65,maxd(20,controller_mainline_data[6].agg_speed)); 
+		 }
+		 
+	     if(controller_mainline_data[8].agg_speed<20){ // if local speed is less than 20 mph (very low speed), then use local speed.
+			 suggested_speed[2]= mind(65,maxd(20,controller_mainline_data[8].agg_speed)); 
 		 }
 
-//		 for (i=1; i<NUM_SIGNS-1; i++){
-//			 if(controller_mainline_data[i-1].agg_speed<20){ // if local speed is less than 20 mph (very low speed), then use local speed.
-//			 suggested_speed[i]= mind(65,maxd(20,controller_mainline_data[i-1].agg_speed)); 
-//			 }
-//		 }
-	  }
-
+		 for(i=3; i<6; i++){
+		   if(controller_mainline_data[i+7].agg_speed<20){ // if local speed is less than 20 mph (very low speed), then use local speed.
+			 suggested_speed[i]= mind(65,maxd(20,controller_mainline_data[i+7].agg_speed)); 
+		  }
+		 }
 
 		for(i=0; i<NUM_SIGNS; i++){
             // round VSA speed into five base numbers (VSA value is multiple of five)
