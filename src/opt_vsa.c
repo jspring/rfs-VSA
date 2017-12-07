@@ -337,7 +337,7 @@ int main(int argc, char *argv[])
 	 int speed_based_VSA = 1; //activate speed based VSA control
      
 	 // get feedback information from the most downstream VSA
-	 //last_occ = controller_mainline_data[NUM_LDS-1].agg_occ;           // occupancy
+	 last_occ = controller_mainline_data[NUM_LDS-1].agg_occ;           // occupancy
 	 //last_density = controller_mainline_data[NUM_LDS-1].agg_density;   // density
 	 //last_flow = controller_mainline_data[NUM_LDS-1].agg_vol;          // flow
 	 last_speed = controller_mainline_data[NUM_LDS-1].agg_speed;      // harmonic mean speed
@@ -364,11 +364,11 @@ int main(int argc, char *argv[])
 		  }
 		 }
 
-		 for (i=1; i<NUM_SIGNS-1; i++){
-			 if(controller_mainline_data[i-1].agg_speed<20){ // if local speed is less than 20 mph (very low speed), then use local speed.
-			 suggested_speed[i]= mind(65,maxd(20,controller_mainline_data[i-1].agg_speed)); 
-			 }
-		 }
+//		 for (i=1; i<NUM_SIGNS-1; i++){
+//			 if(controller_mainline_data[i-1].agg_speed<20){ // if local speed is less than 20 mph (very low speed), then use local speed.
+//			 suggested_speed[i]= mind(65,maxd(20,controller_mainline_data[i-1].agg_speed)); 
+//			 }
+//		 }
 	  }
 
 
@@ -376,7 +376,7 @@ int main(int argc, char *argv[])
             // round VSA speed into five base numbers (VSA value is multiple of five)
 			suggested_speed_int = (((char)(rint(suggested_speed[i+1])))/5)*5; //NOTE to Chengju: Assign variable speeds here, remember to convert to kph
 			db_vsa_ctl.vsa[i] = (char)suggested_speed_int * 1.609344;
-			fprintf(dbg_st_file_out,"%d %d ", suggested_speed_int, db_vsa_ctl.vsa[i]);
+			fprintf(dbg_st_file_out,"%.2f %d %d ", suggested_speed[i+1], suggested_speed_int, db_vsa_ctl.vsa[i]);
 			memset(&datafilename[0], 0, 1000);
 			sprintf(datafilename, "%s%d", pathname, sign_ids[i]);
 			datafp = fopen(datafilename, "a");
