@@ -32,13 +32,13 @@ char *usage = " -i (loop interval)" ;
 int send_vsa(db_vsa_ctl_t *db_vsa_ctl, char *outfilename);
 
 int vsa_sign_ids[NUM_SIGNS] = {
-	2848, //Sunset
-	2847, //Sycamore
-	2846, //Las Posas
-	2845, //San Marcos
-	2843, //Twin Oaks Valley
-	2859, //Woodland
-	2842  //Nordahl
+	2848, //Sunset, 59410147 
+	2847, //Sycamore, 59410119 
+	2846, //Las Posas, 59410040 
+	2845, //San Marcos, 59410198 
+	2843, //Twin Oaks Valley, 59410071
+	2859, //Woodland, 59410084
+	2842  //Nordahl, 52150192
 };
 
 int main(int argc, char *argv[])

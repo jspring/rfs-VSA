@@ -172,6 +172,8 @@ int main(int argc, char *argv[]) {
 
 	    }
 	}
+//	db_trig_retrieve_radar = 1;
+//	db_clt_write(pclt, DB_TRIG_RETRIEVE_RADAR_VAR, sizeof(db_trig_retrieve_radar_t), &db_trig_retrieve_radar);
 
 	longjmp(exit_env, SIGTERM);
 
