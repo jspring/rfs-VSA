@@ -9,7 +9,7 @@
 	)
 	));
 //	echo "context: $context";
-	$request_url = 'https://api.streetsoncloud.com/sv1/location-info/2859/period/.5';
+	$request_url = 'https://api.streetsoncloud.com/sv1/location-info/2859/period/5';
 //	echo "request_url: $request_url";
 	//Try using file_get_contents to get location information
 	$xml_string = file_get_contents($request_url, false, $context);
