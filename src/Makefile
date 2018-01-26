@@ -11,7 +11,7 @@ PATH_LDFLAGS += -L./lnx -L../mxml-release-2.10
 PATH_OBJS += $(OBJDIR)/resource.o $(OBJDIR)/nrutil2.o
 DATADIR = Out_Data
 
-EXEC = $(OBJDIR)/sign_control $(OBJDIR)/clt_vars  $(OBJDIR)/xml_parser $(OBJDIR)/opt_vsa 
+EXEC = $(OBJDIR)/sign_control $(OBJDIR)/clt_vars  $(OBJDIR)/xml_parser $(OBJDIR)/radar_xml_parser $(OBJDIR)/opt_vsa 
 #EXEC =  $(OBJDIR)/xml_parser $(OBJDIR)/sign_control $(OBJDIR)/opt_vsa $(OBJDIR)/clt_vars^M
 
 
