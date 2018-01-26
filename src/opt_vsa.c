@@ -391,7 +391,7 @@ int main(int argc, char *argv[])
 		  }
 		 }
 
-		webdatafp = fopen("/var/www/html/VSA/scripts/Johnplot.txt", "w");
+		webdatafp = fopen("/var/www/html/VSA/scripts/VSA_performance_plot.txt", "w");
 		fprintf(webdatafp, "Intersection Name,speed(mph),volume(VPH/100),occupancy(%%),VSA(mph)");
 		for(i=0; i<NUM_SIGNS; i++){
             // round VSA speed into five base numbers (VSA value is multiple of five)
