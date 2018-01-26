@@ -1,0 +1,66 @@
+<html>
+  <head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <style>
+   .chartWithMarkerOverlay {
+       position: relative;
+       width: 700px;
+   }
+   .overlay-text {
+       width: 200px;
+       height: 200px;
+       position: relative;
+       top: 50px;   /* chartArea top */
+       left: 200px; /* chartArea left */
+   }
+   .overlay-marker {
+       width: 50px;
+       height: 50px;
+       position: relative;
+       top: -375px;   /* chartArea top */
+       left: 528px; /* chartArea left */
+   }
+  </style>
+   
+   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+		  $.ajax({
+			  "url": "VSA_performance_json.php",
+			  "dataType": "json",
+			  "success": function(results)
+			  {
+				  if (results[results.length-1].length < 5)
+				  {
+					  results = results.slice(0, results.length-1);
+				  }
+				  var data = google.visualization.arrayToDataTable(results);
+				          var options = {
+					  title: 'EB SR 78 Current Performance Metric',
+					  curveType: 'function',
+					  legend: { position: 'bottom' }
+					};
+
+					var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+					chart.draw(data, options);
+			  }
+		  })
+		
+
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id="curve_chart" style="width: 1300px; height: 400px"></div>
+	<div class="overlay-marker">
+	
+  </div>
+  </body>
+
+</html>
+</div>
