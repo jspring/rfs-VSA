@@ -51,30 +51,40 @@ const char *usage = "-i <loop interval> -r (run in replay mode)";
 #define NUM_CYCLE_BUFFS  5
 //
 const char *controller_strings[][3] = {
-	{"1108642", "201", "JEFFERSON ST"}, 
-	{"1108640", "200", "EL CAMINO REAL"},
-	{"1108638", "199", "PLAZA DR (COLLEGE)"},
-	{"1108329", "24", "EMERALD DR"},
-	{"1108650", "205", "VISTA VILLAGE DR"},
-	{"1108636", "198", "SUNSET/ESCONDIDO"},    // VSA 1
-	{"1108634", "197", "MAR VISTA DR"},       
-	{"1108646", "203", "SYCAMORE AVE"},        // VSA 2
-	{"1108550", "152", "RANCHO SANTA FE RD"},
-	{"1116450", "398", "Las Posas Rd"},        // VSA 3
-	{"1108602", "180", "SAN MARCOS BLVD"},     // VSA 4
-	{"1113559", "234", "TWIN OAKS VALLEY RD"}, // VSA 5
-	{"1108703", "236", "BARHAM DR"},           // VSA 6
-	{"1108707", "13006", "NORDAHL RD"}         // VSA 7
+	{"1108642", "201", "JEFFERSON_ST"}, 
+	{"1108640", "200", "EL_CAMINO_REAL"},
+	{"1108638", "199", "PLAZA_DR_COLLEGE"},
+	{"1108329", "24",  "EMERALD_DR"},
+	{"1108650", "205", "VISTA_VILLAGE_DR"},
+	{"1108636", "198", "SUNSET_ESCONDIDO"},    // VSA 1
+	{"1108634", "197", "MAR_VISTA_DR"},       
+	{"1108646", "203", "SYCAMORE_AVE"},        // VSA 2
+	{"1108550", "152", "RANCHO_SANTA_FE_RD"},
+	{"1116450", "398", "LAS_POSAS_RD"},        // VSA 3
+	{"1108602", "180", "SAN_MARCOS_BLVD"},     // VSA 4
+	{"1113559", "234", "TWIN_OAKS_VALLEY_RD"}, // VSA 5
+	{"1108703", "236", "BARHAM_DR"},           // VSA 6
+	{"1108707", "13006", "NORDAHL_RD"}         // VSA 7
 };
 
-const int sign_ids[] = {
-	198,	// VSA 1
-	203,	// VSA 2
-	398,	// VSA 3
-	180,	// VSA 4
-	234,	// VSA 5
-	236,	// VSA 6
-	13006	// VSA 7
+const int sign_ids[][2] = {
+	{198,5},	// VSA 1
+	{203,7},	// VSA 2
+	{398,9},	// VSA 3
+	{180,10},	// VSA 4
+	{234,11},	// VSA 5
+	{236,12},	// VSA 6
+	{13006,13}	// VSA 7
+};
+
+const char *sign_strings[] = {
+	"Sunset",	// VSA 1
+	"Sycamore",	// VSA 2
+	"Las Posas",	// VSA 3
+	"San Marcos",	// VSA 4
+	"Twin Oaks",	// VSA 5
+	"Barham",	// VSA 6
+	"Nordahl"	// VSA 7
 };
 
 int main(int argc, char *argv[])
@@ -116,6 +126,7 @@ int main(int argc, char *argv[])
 	struct confidence confidence[num_controller_vars][3]; 
 	char strtmp[100];
 	FILE *datafp;
+	FILE *webdatafp;
 	char datafilename[1000];
 	const char *pathname = "/var/www/html/VSA/webdata/";
 
@@ -216,8 +227,7 @@ int main(int argc, char *argv[])
 				lds[i][j].rawspeed,			//6,11,20
 				lds[i][j].rawlooperrorstatus		//7,12,21
 			);
-		}
-		
+		}		
 		printf("\n\nBeginning aggregation for %s\n", controller_strings[i][2]);
 		// min max function bound the data range and exclude nans.
         controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
@@ -381,17 +391,29 @@ int main(int argc, char *argv[])
 		  }
 		 }
 
+		webdatafp = fopen("/var/www/html/VSA/scripts/Johnplot.txt", "w");
+		fprintf(webdatafp, "Intersection Name,speed(mph),volume(VPH/100),occupancy(%%),VSA(mph)");
 		for(i=0; i<NUM_SIGNS; i++){
             // round VSA speed into five base numbers (VSA value is multiple of five)
 			suggested_speed_int = (((char)(rint(suggested_speed[i+1])))/5)*5; //NOTE to Chengju: Assign variable speeds here, remember to convert to kph
 			db_vsa_ctl.vsa[i] = (char)suggested_speed_int * 1.609344;
 			fprintf(dbg_st_file_out,"%.2f %d %d ", suggested_speed[i+1], suggested_speed_int, db_vsa_ctl.vsa[i]);
 			memset(&datafilename[0], 0, 1000);
-			sprintf(datafilename, "%s%d", pathname, sign_ids[i]);
+			sprintf(datafilename, "%s%d", pathname, sign_ids[i][0]);
 			datafp = fopen(datafilename, "a");
 			fprintf(datafp, "  VSA(mph): %d\n", suggested_speed_int);
+
+			// Write web data to file
+			fprintf(webdatafp, "\n%s,%.1f,%.1f,%.1f,%d",
+				sign_strings[i],
+				controller_mainline_data[sign_ids[i][1]].agg_speed,
+				controller_mainline_data[sign_ids[i][1]].agg_vol/100.0,
+				controller_mainline_data[sign_ids[i][1]].agg_occ,
+				suggested_speed_int
+			);
 			fclose(datafp);
 	    	} 
+		fclose(webdatafp);
 
 	fprintf(dbg_st_file_out,"\n");
 		db_clt_write(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
