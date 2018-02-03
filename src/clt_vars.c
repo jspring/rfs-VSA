@@ -3,6 +3,7 @@
  */
 
 #include "resource.h"
+#include "radar_xml_parser.h"
 
 static int sig_list[] = 
 {
@@ -65,6 +66,18 @@ int main(int argc, char *argv[])
 		db_clt_write(pclt,
 		db_vars_list[i].id,
 		db_vars_list[i].size,
+		zero_array);
+	}
+        
+	if ((pclt = db_list_init(argv[0], hostname, domain, xport, 
+			db_vsa_sign_ids, NUM_SIGNS, NULL, 0)) == NULL) {
+		printf("Database initialization error in %s.\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
+	for (i = 0; i < NUM_SIGNS; i++){
+		db_clt_write(pclt,
+		db_vsa_sign_ids[i].id,
+		db_vsa_sign_ids[i].size,
 		zero_array);
 	}
         

@@ -107,6 +107,7 @@ db_id_t db_vars_list[] =  {
 	{DB_BARHAM_VAR	, sizeof(loop_data_t)*12},
 	{DB_NORDAHL_VAR, sizeof(loop_data_t)*12},
 	{DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t)},
+	{DB_OPT_VSA_TRIGGER_VAR, sizeof(db_opt_vsa_trigger_t)}
 };
 
 #define NUM_DB_VARS (sizeof(db_vars_list)/sizeof(db_id_t))

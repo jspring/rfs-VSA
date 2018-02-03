@@ -17,6 +17,7 @@
 #include "look_up_table.h"
 #include "rm_algo.h"
 #include "xml_parser.h"
+#include "radar_xml_parser.h"
 
 char str[len_str];
 
@@ -43,8 +44,6 @@ static void sig_hand(int code)
                 longjmp(exit_env, code);
 	}
 }
-
-const char *usage = "-i <loop interval> -r (run in replay mode)";
 
 #define NUM_ONRAMPS	16   // this variable is used by data base
 #define NUM_OFFRAMPS 12  // this variable is used by data base
@@ -97,6 +96,11 @@ const char *sign_strings[] = {
  	"Nordahl"	// VSA 7
 };
 
+int db_opt_vsa_trig_list [] = {
+	DB_OPT_VSA_TRIGGER_VAR
+};
+int num_opt_vsa_triggers = sizeof(db_opt_vsa_trig_list)/sizeof(int);
+
 int main(int argc, char *argv[])
 {
 	timestamp_t ts;
@@ -104,19 +108,19 @@ int main(int argc, char *argv[])
 	static int init_sw=1;
 	int i;
 	int j;
-	int temp;
 	loop_data_t lds[NUM_LDS][NUM_LOOPNAMES] = {0}; 	// Row (NUM_LDS) = controller index, 
 							// column (NUM_LOOPNAMES) = loop index
 							// Each lds element has speed, occupancy, 
 							// flow, and error status (see loop_data_t definition)
 	db_vsa_ctl_t db_vsa_ctl;
+	db_locinfo_t db_locinfo[NUM_SIGNS];
+	trig_info_typ trig_info;
+	int recv_type;
 
 	int option;
 	int exitsig;
 	db_clt_typ *pclt;
 	char hostname[MAXHOSTNAMELEN+1];
-	posix_timer_typ *ptimer;       /* Timing proxy */
-	int interval = 30000;      /// Number of milliseconds between saves
 	int cycle_index = 0;
 	char *domain = DEFAULT_SERVICE; // usually no need to change this
 	int xport = COMM_OS_XPORT;      // set correct for OS in sys_os.h
@@ -132,7 +136,6 @@ int main(int argc, char *argv[])
 	float float_temp;
     //float ML_flow_ratio = 0.0; // current most upstream flow to historical most upstream flow
     //float current_most_upstream_flow = 0.0;
-	int debug = 0;
 	int num_controller_vars = NUM_LDS; //See warning at top of file
 	struct confidence confidence[num_controller_vars][3]; 
 	char strtmp[100];
@@ -161,13 +164,9 @@ int main(int argc, char *argv[])
 	while ((option = getopt(argc, argv, "di:r")) != EOF) {
 		switch(option) {
 			case 'd':
-				debug = 1;
-				break;
-			case 'i':
-				interval = atoi(optarg);
 				break;
 			default:
-				printf("\nUsage: %s %s\n", argv[0], usage);
+				printf("\nUsage: %s\n", argv[0]);
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -176,14 +175,8 @@ int main(int argc, char *argv[])
 
 	get_local_name(hostname, MAXHOSTNAMELEN);
 
-	if ( (pclt = db_list_init(argv[0], hostname, domain, xport,
-		NULL, 0, NULL, 0)) == NULL) {
+	if ( (pclt = db_list_init(argv[0], hostname, domain, xport, NULL, 0, db_opt_vsa_trig_list, num_opt_vsa_triggers)) == NULL) {
 		printf("Database initialization error in %s.\n", argv[0]);
-		exit(EXIT_FAILURE);
-	}
-	/* Setup a timer for every 'interval' msec. */
-	if ( ((ptimer = timer_init(interval, DB_CHANNEL(pclt) )) == NULL)) {
-		printf("Unable to initialize wrfiles timer\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -200,8 +193,6 @@ int main(int argc, char *argv[])
 		Init_sim_data_io();
 		init_sw=0;
 	}
-	if(debug)
-		num_controller_vars = 2; //Use just the first two controllers in the list, i.e. 10.29.248.108 and 10.254.25.113.
 
 	for (i = 0; i < NUM_LDS; i++){   //See warning at top of file
 		db_clt_read(pclt, db_vars_list[i].id, db_vars_list[i].size, &lds[i][0]);
@@ -211,11 +202,20 @@ int main(int argc, char *argv[])
 	for(;;)	
 	{
 
+	recv_type= clt_ipc_receive(pclt, &trig_info, sizeof(trig_info));
+printf("opt_vsa: received trigger\n");
+	if(DB_TRIG_VAR(&trig_info) ==  DB_OPT_VSA_TRIGGER_VAR) {
 	cycle_index++;
 	cycle_index = cycle_index % NUM_CYCLE_BUFFS;
 	for (i = 0; i < NUM_LDS; i++){  //See warning at top of file
 		db_clt_read(pclt, db_vars_list[i].id, db_vars_list[i].size, &lds[i][0]);
 	}
+	printf("Sign output ");
+	for (i = 0; i < NUM_SIGNS; i++){  //See warning at top of file
+		db_clt_read(pclt, db_vsa_sign_ids[i].id, db_vsa_sign_ids[i].size, &db_locinfo[i]);
+		printf("ID %d speed limit %d ", db_locinfo[i].name, db_locinfo[i].stats.speed_limit);
+	}
+	printf("\n");
 
 /*#################################################################################################################
 ###################################################################################################################*/
@@ -409,7 +409,8 @@ int main(int argc, char *argv[])
 		for(j=0; j<NUM_SIGNS; j++){
             // round VSA speed into five base numbers (VSA value is multiple of five)
 			suggested_speed_int = (((char)(rint(suggested_speed[j+1])))/5)*5; //NOTE to Chengju: Assign variable speeds here, remember to convert to kph
-			db_vsa_ctl.vsa[j] = (char)suggested_speed_int * 1.609344;
+//			db_vsa_ctl.vsa[j] = (char)(suggested_speed_int * 1.609344);
+			db_vsa_ctl.vsa[j] = (char)(suggested_speed_int * 1.0);
 			fprintf(dbg_st_file_out,"%.2f %d %d ", suggested_speed[j+1], suggested_speed_int, db_vsa_ctl.vsa[j]);
 			memset(&datafilename[0], 0, 1000);
 			sprintf(datafilename, "%s%d", pathname, sign_ids[j]);
@@ -427,7 +428,7 @@ int main(int argc, char *argv[])
 			);
 */
 
-			if(j == 0) {
+			if(j == 0)
 			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d",
 				sign_strings[j],
 				controller_mainline_data[5].agg_speed,
@@ -435,15 +436,6 @@ int main(int argc, char *argv[])
 				controller_mainline_data[5].agg_occ,
 				suggested_speed_int
 			);
-			printf("j %d controller_mainline_data[5].agg_speed %.1f sign_ids_mapped[%d] %d controller_mainline_data[sign_ids_mapped[%d]].agg_speed %.1f\n",
-				j,
-				controller_mainline_data[5].agg_speed,
-				j,
-				sign_ids_mapped[i],
-				j,
-				controller_mainline_data[sign_ids_mapped[j]].agg_speed
-			);
-			}
 
 			if(j == 1)
 			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d",
@@ -505,8 +497,9 @@ int main(int argc, char *argv[])
 
 	fprintf(dbg_st_file_out,"\n");
 		db_clt_write(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
-		    TIMER_WAIT(ptimer);	
+printf("opt_vsa: Wrote DB_ALL_SIGNS_VAR\n");
 	
+	}
 	}
 
 	Finish_sim_data_io();

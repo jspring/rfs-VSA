@@ -4,6 +4,7 @@
 
 #pragma once
 #include "xml_parser.h"
+#include "radar_xml_parser.h"
 //#include <urms.h>
 
 // define the array size of look up table here

@@ -1,0 +1,40 @@
+1. xml_parser
+####	printf("xml_parser: Calling safepace_retrieve_radar_all.sh\n");
+        system("/var/www/html/VSA/scripts/safepace_retrieve_radar_all.sh");
+
+2. safepace_retrieve_radar_all.sh
+	/var/www/html/VSA/scripts/safepace_retrieve_radar_single.php for all signs
+####	echo "safepace_retrieve_radar_all.sh: Calling radar_xml_parser"
+	radar_xml_parser -f radar.out >radar.out.parsed
+
+3. radar_xml_parser
+	db_clt_write(pclt, DB_OPT_VSA_TRIGGER_VAR, sizeof(db_opt_vsa_trigger_t), &db_opt_vsa_trigger);
+####	printf("radar_xml_parser: sending db_opt_vsa_trigger\n");
+
+4. opt_vsa
+	recv_type= clt_ipc_receive(pclt, &trig_info, sizeof(trig_info));
+####	printf("opt_vsa: received trigger\n");
+	if(DB_TRIG_VAR(&trig_info) ==  DB_OPT_VSA_TRIGGER_VAR) {
+		db_clt_write(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
+####		printf("opt_vsa: Wrote DB_ALL_SIGNS_VAR\n");
+
+	}
+
+5. sign_control
+	recv_type= clt_ipc_receive(pclt, &trig_info, sizeof(trig_info));
+	if(DB_TRIG_VAR(&trig_info) ==  DB_ALL_SIGNS_VAR) {
+		db_clt_read(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
+		sprintf(str, "/var/www/html/VSA/scripts/safepace_set_speed_single.php %d %d", vsa_sign_ids[i], db_vsa_ctl.vsa[i]);
+		printf("%s\n", str);
+//		system(str);
+####		printf("sign_control: Executing safepace_set_speed.php\n");
+	}
+####	printf("sign_control: Executing sign_control loop\n");
+
+6. safepace_set_speed_single.php
+####	echo "safepace_set_speed_single.php: Location ID ".$location." speed ".$myspeed." kph ".$SPEED." mph\n";
+	$request_url = 'https://api.streetsoncloud.com/sv1/set-speed-limit/location/'.$location.'/speed-limit/'.$myspeed;
+	$xml_string = file_get_contents($request_url, false, $context);
+	var_dump($xml_string);
+
+  

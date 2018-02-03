@@ -32,8 +32,6 @@ int main(int argc, char *argv[]) {
         int exitsig;
         db_clt_typ *pclt;
         char hostname[MAXHOSTNAMELEN+1];
-        posix_timer_typ *ptimer;       /* Timing proxy */
-        int interval = 30000;      /// Number of milliseconds between saves
         char *domain = DEFAULT_SERVICE; // usually no need to change this
         int xport = COMM_OS_XPORT;      // set correct for OS in sys_os.h
 
@@ -79,11 +77,6 @@ int main(int argc, char *argv[]) {
 		printf("Database initialization error in %s.\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
-        /* Setup a timer for every 'interval' msec. */
-        if ( ((ptimer = timer_init(interval, DB_CHANNEL(pclt) )) == NULL)) {
-                printf("Unable to initialize wrfiles timer\n");
-                exit(EXIT_FAILURE);
-        }
 
         if(( exitsig = setjmp(exit_env)) != 0) {
 			db_list_done(pclt, NULL, 0, NULL, 0);
@@ -172,8 +165,8 @@ int main(int argc, char *argv[]) {
 
 	    }
 	}
-//	db_trig_retrieve_radar = 1;
-//	db_clt_write(pclt, DB_TRIG_RETRIEVE_RADAR_VAR, sizeof(db_trig_retrieve_radar_t), &db_trig_retrieve_radar);
+printf("xml_parser: Calling safepace_retrieve_radar_all.sh\n");
+	system("/var/www/html/VSA/scripts/safepace_retrieve_radar_all.sh");
 
 	longjmp(exit_env, SIGTERM);
 

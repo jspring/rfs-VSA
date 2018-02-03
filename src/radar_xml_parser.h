@@ -4,33 +4,58 @@
 
 #define NUM_SIGNS		7
 typedef struct {
+	char name[255];
+	char address[255];
+	char city[255];
+	char state[255];
+	char country[255];
+	char zip[255];
+	char geocode[255];
+} location_t;
+typedef struct {
 	unsigned char max_speed;
 	unsigned char min_speed;
 	unsigned char avg_speed;
 	unsigned char avg_speed85;
 	unsigned char speed_limit;
 	unsigned short count;
-} stats;
+} stats_t;
 
 typedef struct {
 	unsigned char minutes;
 	char speed_type[10];
-} params;
+} params_t;
 
 
 typedef struct {
 	char datetime[100];
 	unsigned char count;
 	unsigned char speed;
-} raw_record;
+} raw_record_t;
 
 typedef struct {
-	stats stats;
-	params params;
-	raw_record raw_record[50];
+	location_t location;
+	stats_t stats;
+	params_t params;
+	raw_record_t raw_record[50];
 	float weighted_speed_average;
 
-}locinfo;
+}locinfo_t;
+
+typedef struct {
+	char name;
+	stats_t stats;
+	float weighted_speed_average;
+	int total_targets;
+	int speed_count;
+}db_locinfo_t;
+
+extern db_id_t db_vsa_sign_ids[NUM_SIGNS];
+
+typedef struct{
+	char trigger;
+} db_opt_vsa_trigger_t;
+
 /*
 <?xml version="1.0" encoding="utf-8"?>
 <LocInfo>
@@ -84,6 +109,7 @@ typedef struct {
 #define DB_TWIN_OAKS_TYPE		5200
 #define	DB_BARHAM_TYPE			5400
 #define DB_NORDAHL_TYPE			5600
+#define DB_OPT_VSA_TRIGGER_TYPE		5800
 
 #define DB_ALL_SIGNS_VAR		DB_ALL_SIGNS_TYPE
 #define DB_LDS_BASE_VAR		DB_JEFFERSON_TYPE
@@ -102,3 +128,4 @@ typedef struct {
 #define DB_TWIN_OAKS_VAR	DB_TWIN_OAKS_TYPE
 #define	DB_BARHAM_VAR		DB_BARHAM_TYPE
 #define DB_NORDAHL_VAR		DB_NORDAHL_TYPE
+#define DB_OPT_VSA_TRIGGER_VAR	DB_OPT_VSA_TRIGGER_TYPE

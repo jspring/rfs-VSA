@@ -8,7 +8,7 @@ PATH_LIBS += -lmxml
 
 PATH_CFLAGS += -I../mxml-release-2.10 -I$(ATSC_INC_DIR) -Wall
 PATH_LDFLAGS += -L./lnx -L../mxml-release-2.10
-PATH_OBJS += $(OBJDIR)/resource.o $(OBJDIR)/nrutil2.o
+PATH_OBJS += $(OBJDIR)/resource.o $(OBJDIR)/nrutil2.o $(OBJDIR)/sign_lib.o
 DATADIR = Out_Data
 
 EXEC = $(OBJDIR)/sign_control $(OBJDIR)/clt_vars  $(OBJDIR)/xml_parser $(OBJDIR)/radar_xml_parser $(OBJDIR)/opt_vsa 
