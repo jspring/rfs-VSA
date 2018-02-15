@@ -107,7 +107,8 @@ db_id_t db_vars_list[] =  {
 	{DB_BARHAM_VAR	, sizeof(loop_data_t)*12},
 	{DB_NORDAHL_VAR, sizeof(loop_data_t)*12},
 	{DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t)},
-	{DB_OPT_VSA_TRIGGER_VAR, sizeof(db_opt_vsa_trigger_t)}
+	{DB_OPT_VSA_TRIGGER_VAR, sizeof(db_opt_vsa_trigger_t)},
+	{DB_SIGN_CONTROL_TRIGGER_VAR, sizeof(db_sign_control_trigger_t)}
 };
 
 #define NUM_DB_VARS (sizeof(db_vars_list)/sizeof(db_id_t))
@@ -231,13 +232,13 @@ float flow_aggregation_mainline(loop_data_t lds[], struct confidence *confidence
 	}else{
 	    flow = NUM_LANES * (flow * 120); // convert 30 second data into hour data
 	}
-	printf("FLOW_AGGREGATION_MAINLINE: flow_temp ");
-	for(i=0; i<NUM_LANES;i++)
-		printf("%d:%2.2f ",i, flow_temp[i]);
-	printf("num_lane %d mean_flow %f var_flow %f calculated flow %4.2f max flow %4.2f min flow %d ", confidence->num_good_vals, mean_flow, var_flow, flow, MAX_FLOW_PER_LANE*NUM_LANES, 600*NUM_LANES);
+//	printf("FLOW_AGGREGATION_MAINLINE: flow_temp ");
+//	for(i=0; i<NUM_LANES;i++)
+//		printf("%d:%2.2f ",i, flow_temp[i]);
+//	printf("num_lane %d mean_flow %f var_flow %f calculated flow %4.2f max flow %4.2f min flow %d ", confidence->num_good_vals, mean_flow, var_flow, flow, MAX_FLOW_PER_LANE*NUM_LANES, 600*NUM_LANES);
 	flow = maxd(flow,MIN_FLOW*NUM_LANES); //factor 600 is veh/hr/lane in free flow
 	flow = mind(MAX_FLOW_PER_LANE*NUM_LANES,flow);
-	printf("returned flow %4.2f\n", flow);
+//	printf("returned flow %4.2f\n", flow);
 	return flow;
 }
 
@@ -287,10 +288,10 @@ float flow_aggregation_onramp(loop_data_t lds[], struct confidence *confidence){
 	}
 	//printf("OR-flow_agg %4.2f num_meter %d\n",	flow, controller_data->num_meter);
 	flow = maxd(flow,MIN_OR_RAMP_FLOW_PER_LANE); //factor 200 is veh/hr/lane in free flow
-	printf("FLOW_AGGREGATION_ONRAMP: flow_temp ");
-	for(i=0; i<MAX_METERED_LANES;i++)
-		printf("%d:%2.2f ",i, flow_temp[i]);
-	    printf("num_lane %d mean_flow %f var_flow %f flow %4.2f\n", confidence->num_good_vals, mean_flow, var_flow, flow);
+//	printf("FLOW_AGGREGATION_ONRAMP: flow_temp ");
+//	for(i=0; i<MAX_METERED_LANES;i++)
+//		printf("%d:%2.2f ",i, flow_temp[i]);
+//	    printf("num_lane %d mean_flow %f var_flow %f flow %4.2f\n", confidence->num_good_vals, mean_flow, var_flow, flow);
 	return mind(MAX_METERED_LANES * MAX_OR_RAMP_FLOW_PER_LANE,flow); 
 }
 
@@ -342,10 +343,10 @@ float flow_aggregation_offramp(loop_data_t lds[], struct confidence *confidence)
 	}
 	//printf("FR-flow_agg %4.2f num_addl_det %d\n", flow, controller_data->num_addl_det );
 	flow = maxd(flow,MAX_OFFRAMPS * MIN_FR_RAMP_FLOW_PER_LANE); //factor 200 is veh/hr/lane in free flow
-	printf("FLOW_AGGREGATION_OFFRAMP: flow_temp ");
-	for(i=0; i<MAX_OFFRAMPS;i++)
-		printf("%d:%2.2f ",i, flow_temp[i]);
-	    printf("num_lane %d mean_flow %f var_flow %f flow %4.2f\n", confidence->num_good_vals, mean_flow, var_flow, flow);
+//	printf("FLOW_AGGREGATION_OFFRAMP: flow_temp ");
+//	for(i=0; i<MAX_OFFRAMPS;i++)
+//		printf("%d:%2.2f ",i, flow_temp[i]);
+//	    printf("num_lane %d mean_flow %f var_flow %f flow %4.2f\n", confidence->num_good_vals, mean_flow, var_flow, flow);
 	return mind(MAX_OFFRAMPS * MAX_FR_RAMP_FLOW_PER_LANE,flow); 
 }
 
@@ -391,10 +392,10 @@ float occupancy_aggregation_mainline(loop_data_t lds[], struct confidence *confi
 	if(isnan(occupancy)){
 		occupancy = NAN_ERROR;
 	}
-	printf("OCCUPANCY_AGGREGATION_MAINLINE: occ_temp ");
-	for(i=0; i<NUM_LANES;i++)
-		printf("%d:%2.2f error status %d rawvolume %d rawoccupancy %f ",i, occ_temp[i], lds[i].rawlooperrorstatus, lds[i].rawvolume, lds[i].rawoccupancy/10.0);
-	printf("num_lane %d mean_occupancy %f var_occupancy %f occupancy %4.2f\n", confidence->num_good_vals, mean_occ, var_occ, occupancy);
+//	printf("OCCUPANCY_AGGREGATION_MAINLINE: occ_temp ");
+//	for(i=0; i<NUM_LANES;i++)
+//		printf("%d:%2.2f error status %d rawvolume %d rawoccupancy %f ",i, occ_temp[i], lds[i].rawlooperrorstatus, lds[i].rawvolume, lds[i].rawoccupancy/10.0);
+//	printf("num_lane %d mean_occupancy %f var_occupancy %f occupancy %4.2f\n", confidence->num_good_vals, mean_occ, var_occ, occupancy);
 	return  mind(MAX_OCCUPANCY, occupancy);
 }
 
@@ -443,10 +444,10 @@ float occupancy_aggregation_onramp(loop_data_t lds[], struct confidence *confide
 
 	//printf("Occ_agg %4.2f num_meter %d\n", occupancy, controller_data->num_meter);
 	occupancy = maxd(occupancy,MIN_OCCUPANCY); 
-	printf("OCCUPANCY_AGGREGATION_ONRAMP: occ_temp ");
-	for(i=0; i<MAX_METERED_LANES;i++)
-		printf("%d:%2.2f ",i, occ_temp[i]);
-	printf("num_lane %d mean_occupancy %f var_occupancy %f occupancy %4.2f\n", confidence->num_good_vals, mean_occ, var_occ, occupancy);
+//	printf("OCCUPANCY_AGGREGATION_ONRAMP: occ_temp ");
+//	for(i=0; i<MAX_METERED_LANES;i++)
+//		printf("%d:%2.2f ",i, occ_temp[i]);
+//	printf("num_lane %d mean_occupancy %f var_occupancy %f occupancy %4.2f\n", confidence->num_good_vals, mean_occ, var_occ, occupancy);
 	return  mind(MAX_OCCUPANCY, occupancy);
 }
 
@@ -496,10 +497,10 @@ float occupancy_aggregation_offramp(loop_data_t lds[], struct confidence *confid
 
 	//printf("Occ_agg %4.2f num_addl_det %d\n", occupancy, controller_data->num_addl_det);
 	occupancy = maxd(occupancy,MIN_OCCUPANCY); 
-	printf("OCCUPANCY_AGGREGATION_OFFRAMP: occ_temp ");
-	for(i=0; i<MAX_OFFRAMPS;i++)
-		printf("%d:%2.2f ",i, occ_temp[i]);
-	printf("num_lane %d mean_occupancy %f var_occupancy %f occupancy %4.2f\n", confidence->num_good_vals, mean_occ, var_occ, occupancy);
+//	printf("OCCUPANCY_AGGREGATION_OFFRAMP: occ_temp ");
+//	for(i=0; i<MAX_OFFRAMPS;i++)
+//		printf("%d:%2.2f ",i, occ_temp[i]);
+//	printf("num_lane %d mean_occupancy %f var_occupancy %f occupancy %4.2f\n", confidence->num_good_vals, mean_occ, var_occ, occupancy);
 	return  mind(MAX_OCCUPANCY, occupancy);
 }
 
@@ -569,18 +570,18 @@ float hm_speed_aggregation_mainline(loop_data_t lds[], float hm_speed_prev, stru
 		return RANGE_ERROR;
 	}
 	
-	printf("speed_agg %4.2f num_good_vals %d\n", speed, confidence->num_good_vals);
-	
-	printf("HARMONIC_SPEED_AGGREGATION: speed_temp ");
-	for(i=0; i<NUM_LANES;i++)
-		printf("%d:%2.2f ",i, speed_temp[i]);
-	printf("occupancy ");
-	for(i=0; i<NUM_LANES;i++)
-		printf("%d:%2.2f ",i, occupancy[i]);
-	printf("flow ");
-	for(i=0; i<NUM_LANES;i++)
-		printf("%d:%2.2f ",i, flow[i]);
-	printf("num_lane %d mean_speed %f var_speed %f speed %4.2f\n", NUM_LANES, mean_speed, var_speed, speed);
+//	printf("speed_agg %4.2f num_good_vals %d\n", speed, confidence->num_good_vals);
+//	
+//	printf("HARMONIC_SPEED_AGGREGATION: speed_temp ");
+//	for(i=0; i<NUM_LANES;i++)
+//		printf("%d:%2.2f ",i, speed_temp[i]);
+//	printf("occupancy ");
+//	for(i=0; i<NUM_LANES;i++)
+//		printf("%d:%2.2f ",i, occupancy[i]);
+//	printf("flow ");
+//	for(i=0; i<NUM_LANES;i++)
+//		printf("%d:%2.2f ",i, flow[i]);
+//	printf("num_lane %d mean_speed %f var_speed %f speed %4.2f\n", NUM_LANES, mean_speed, var_speed, speed);
 	return mind(MAX_HARMONIC_SPEED, speed); // speed is in km/hr
 }
 
@@ -652,17 +653,17 @@ float mean_speed_aggregation_mainline(loop_data_t lds[], float mean_speed_prev, 
 	}
 	
 
-	printf("mean_speed_agg %4.2f num_good_vals %d\n", speed, confidence->num_good_vals);
-	printf("MEAN_SPEED_AGGREGATION: speed_temp ");
-	for(i=0; i<NUM_LANES;i++)
-		printf("%d:%2.2f ",i, speed_temp[i]);
-	printf("occupancy ");
-	for(i=0; i<NUM_LANES;i++)
-		printf("%d:%2.2f ",i, occupancy[i]);
-	printf("flow ");
-	for(i=0; i<NUM_LANES;i++)
-		printf("%d:%2.2f ",i, flow[i]);
-	printf("num_lane %d mean_speed %f var_speed %f speed %4.2f\n", NUM_LANES, mean_speed, var_speed, speed);
+//	printf("mean_speed_agg %4.2f num_good_vals %d\n", speed, confidence->num_good_vals);
+//	printf("MEAN_SPEED_AGGREGATION: speed_temp ");
+//	for(i=0; i<NUM_LANES;i++)
+//		printf("%d:%2.2f ",i, speed_temp[i]);
+//	printf("occupancy ");
+//	for(i=0; i<NUM_LANES;i++)
+//		printf("%d:%2.2f ",i, occupancy[i]);
+//	printf("flow ");
+//	for(i=0; i<NUM_LANES;i++)
+//		printf("%d:%2.2f ",i, flow[i]);
+//	printf("num_lane %d mean_speed %f var_speed %f speed %4.2f\n", NUM_LANES, mean_speed, var_speed, speed);
 	return mind(MAX_MEAN_SPEED, speed); // speed is in km/hr
 }
 /*
@@ -772,18 +773,18 @@ float density_aggregation_mainline(float flow, float hm_speed, float density_pre
 	   density = density_prev;
 	}
 	
-	printf("DENSITY_AGGREGATION_MAINLINE: flow: %4.2f max %4.2f min %4.2f speed: %3.2f max %3.2f min %3.2f density: %3.2f max %3.2f min %3.2f previous %3.2f\n",
-		flow,
-		MAX_FLOW_PER_LANE,
-		MIN_FLOW,
-		hm_speed,
-		MAX_HARMONIC_SPEED,
-		MIN_HARMONIC_SPEED,
-		density,
-		MAX_DENSITY,
-		MIN_DENSITY,
-		density_prev
-	);
+//	printf("DENSITY_AGGREGATION_MAINLINE: flow: %4.2f max %4.2f min %4.2f speed: %3.2f max %3.2f min %3.2f density: %3.2f max %3.2f min %3.2f previous %3.2f\n",
+//		flow,
+//		MAX_FLOW_PER_LANE,
+//		MIN_FLOW,
+//		hm_speed,
+//		MAX_HARMONIC_SPEED,
+//		MIN_HARMONIC_SPEED,
+//		density,
+//		MAX_DENSITY,
+//		MIN_DENSITY,
+//		density_prev
+//	);
 	return mind(MAX_DENSITY, maxd(density,MIN_DENSITY));
 }
 /*
