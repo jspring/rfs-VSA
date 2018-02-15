@@ -332,6 +332,7 @@ int main(int argc, char *argv[])
 	 //int num_VSA_device = 8; // number of VSA devices
 	 double suggested_speed[8]= {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // the first entry is the suggested speed of FMS, so seven VSA puls one FMS is eight units in total.
 	int suggested_speed_int = 0;
+	 double speed_linear_VSA = 0.0;
 	 suggested_speed[0]= 60; // first FMS1 is always 60 mph (free flow speed), where is the starting point of VSA test site 
      int i = 0;
      double slope = 0.0;
@@ -343,9 +344,16 @@ int main(int argc, char *argv[])
 	 //double last_flow = 0.0;
 	 double last_speed = 0.0;
 	 //double up_last_speed = 0;
-     
+     double local_speed = 0.0;
 	 // VSA control parameters
      double last_occ_threshold = 12; // occupancy threshold in last VDS (suggested 10 to 12.5)
+	 double occ_gain1 = 0.6;
+	 double occ_gain2 = 0.6;
+     double occ_gain3 = 0.6;
+	 double occ_gain4 = 0.6;
+	 double occ_gain5 = 0.6;
+	 double occ_gain6 = 0.6;
+
 	 //double gamma = 0.0; 
      //double Q_b = 1200;
 	 //double rho_c = 80;
@@ -367,44 +375,59 @@ int main(int argc, char *argv[])
 	 last_speed = controller_mainline_data[NUM_LDS-1].agg_speed;      // harmonic mean speed
      
 	 // get speed information from the immediately upstream of the most downstream VSA
-	 //up_last_speed = controller_mainline_data[NUM_LDS-2].agg_speed;
-	 // VSA speed is a value between 20 mph to 65 mph
+	 // up_last_speed = controller_mainline_data[NUM_LDS-2].agg_speed;
+	 // VSA speed is a value between 5 mph to 65 mph
 	 // speed based VSA 
 	 if (speed_based_VSA){
          // VSA at bottleneck section
-         suggested_speed[7] = mind(65, maxd(20,alpha*last_speed));
-		 suggested_speed[6] = mind(65, maxd(20,beta*last_speed)); // reduce VSA at immediate bottleneck section if occupancy too high
-
+         suggested_speed[7] = mind(65, maxd(5,alpha*last_speed));
 		 if(last_occ>last_occ_threshold){
-		 // do linear interpolation to usstream VSA
+			suggested_speed[6] = mind(65, maxd(5,beta*last_speed)); // reduce VSA at immediate bottleneck section if occupancy too high 
+		 }else{
+			suggested_speed[6] = last_speed;
+		 }
+	     // do linear interpolation to usstream VSA
 	     slope = (suggested_speed[6]-suggested_speed[0])/(device_location[6]-device_location[0]);
 		 interception =  (suggested_speed[0]*device_location[6]-suggested_speed[6]*device_location[0])/(device_location[6]-device_location[0]);
 		 for (i=1; i<NUM_SIGNS-1; i++){
-		      suggested_speed[i]= mind(65, maxd(20,(slope*device_location[i]+interception)) ); // if occupancy in the most downstream is high, then use linear interpolation
-		 } 
-		 }else{
-		  for (i=1; i<NUM_SIGNS+1; i++){
-		        suggested_speed[i] =  suggested_speed[0]; // if occupancy in the most downstream is low, then use free flow speed
-		  }
-		  }
-	     }
-
-      	 // check local speed of VSA
-	     // check downstream speed of VSA 1
-     	 if(controller_mainline_data[6].agg_speed<20){ // if local speed is less than 20 mph (very low speed), then use local speed.
-			 suggested_speed[1]= mind(65,maxd(20,controller_mainline_data[6].agg_speed)); 
+             speed_linear_VSA = mind(65, maxd(5,(slope*device_location[i]+interception)) );
+			 // local occupancy differenct as a speed compensate 
+			 if(i==1){
+				 local_speed = controller_mainline_data[5].agg_speed; 
+			     suggested_speed[i]= speed_linear_VSA - occ_gain1*(controller_mainline_data[7].agg_occ - controller_mainline_data[5].agg_occ);
+			 } 
+			 if(i==2){
+				 local_speed = controller_mainline_data[7].agg_speed; 
+				 suggested_speed[i]= speed_linear_VSA - occ_gain2*(controller_mainline_data[9].agg_occ - controller_mainline_data[7].agg_occ);
+			 }
+			 if(i==3){
+				 local_speed = controller_mainline_data[9].agg_speed; 
+				 suggested_speed[i]= speed_linear_VSA - occ_gain3*(controller_mainline_data[10].agg_occ - controller_mainline_data[9].agg_occ);
+			 }
+			 if(i==4){
+				 local_speed = controller_mainline_data[10].agg_speed; 
+				 suggested_speed[i]= speed_linear_VSA - occ_gain4*(controller_mainline_data[11].agg_occ - controller_mainline_data[10].agg_occ);
+			 }
+			 if(i==5){
+				 local_speed = controller_mainline_data[11].agg_speed; 
+				 suggested_speed[i]= speed_linear_VSA - occ_gain5*(controller_mainline_data[12].agg_occ - controller_mainline_data[11].agg_occ);
+			 }
+			 if(i==6){
+				 local_speed = controller_mainline_data[12].agg_speed; 
+				 suggested_speed[i]= speed_linear_VSA - occ_gain6*(controller_mainline_data[13].agg_occ - controller_mainline_data[12].agg_occ);
+			 }
+			 if(i==7){
+				 local_speed = controller_mainline_data[13].agg_speed; 
+				 suggested_speed[i]= speed_linear_VSA;
+			 }
+              // check local speed of VSA
+              // if local speed is less than 20 mph (very low speed), then use local speed.
+			  if(local_speed<20){
+			     suggested_speed[i]= local_speed-5;
+			  }
 		 }
-		 
-	     if(controller_mainline_data[8].agg_speed<20){ // if local speed is less than 20 mph (very low speed), then use local speed.
-			 suggested_speed[2]= mind(65,maxd(20,controller_mainline_data[8].agg_speed)); 
-		 }
-
-		 for(i=3; i<6; i++){
-		   if(controller_mainline_data[i+7].agg_speed<20){ // if local speed is less than 20 mph (very low speed), then use local speed.
-			 suggested_speed[i]= mind(65,maxd(20,controller_mainline_data[i+7].agg_speed)); 
-		  }
-		 }
-
+	 }
+      	  
 		webdatafp = fopen("/var/www/html/VSA/scripts/VSA_performance_plot.txt", "w");
 		fprintf(webdatafp, "Intersection Name,speed(mph),volume(VPH/100),occupancy(%%),VSA(mph)");
 
@@ -492,8 +515,6 @@ int main(int argc, char *argv[])
 				controller_mainline_data[13].agg_occ,
 				suggested_speed_int
 			);
-
-
 	    	} 
 		fclose(webdatafp);
 
