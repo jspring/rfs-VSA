@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 	db_locinfo_t db_locinfo[NUM_SIGNS];
 	trig_info_typ trig_info;
 	int recv_type;
-
+	db_sign_control_trigger_t db_sign_control_trigger;
 	int option;
 	int exitsig;
 	db_clt_typ *pclt;
@@ -171,6 +171,9 @@ int main(int argc, char *argv[])
 				break;
 		}
 	}
+
+	db_sign_control_trigger.trigger = 1;
+
 	memset(lds, 0, NUM_LDS * NUM_LOOPNAMES * (sizeof(loop_data_t)));
 
 	get_local_name(hostname, MAXHOSTNAMELEN);
@@ -203,14 +206,13 @@ int main(int argc, char *argv[])
 	{
 
 	recv_type= clt_ipc_receive(pclt, &trig_info, sizeof(trig_info));
-printf("opt_vsa: received trigger\n");
 	if(DB_TRIG_VAR(&trig_info) ==  DB_OPT_VSA_TRIGGER_VAR) {
 	cycle_index++;
 	cycle_index = cycle_index % NUM_CYCLE_BUFFS;
 	for (i = 0; i < NUM_LDS; i++){  //See warning at top of file
 		db_clt_read(pclt, db_vars_list[i].id, db_vars_list[i].size, &lds[i][0]);
 	}
-	printf("Sign output ");
+	printf("opt_vsa: Sign output ");
 	for (i = 0; i < NUM_SIGNS; i++){  //See warning at top of file
 		db_clt_read(pclt, db_vsa_sign_ids[i].id, db_vsa_sign_ids[i].size, &db_locinfo[i]);
 		printf("ID %d speed limit %d ", db_locinfo[i].name, db_locinfo[i].stats.speed_limit);
@@ -240,7 +242,7 @@ printf("opt_vsa: received trigger\n");
 			);
 		}
 		
-		printf("\n\nBeginning aggregation for %s\n", controller_strings[i][2]);
+//		printf("\n\nBeginning aggregation for %s\n", controller_strings[i][2]);
 		// min max function bound the data range and exclude nans.
         controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
 		controller_mainline_data[i].agg_occ = mind(90.0, maxd( 1.0, occupancy_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
@@ -259,8 +261,8 @@ printf("opt_vsa: received trigger\n");
 		}
 		controller_mainline_data[i].agg_mean_speed = mind(150.0, maxd( 1.0, float_temp) );
 
-		if(confidence[i][0].num_total_vals > 0)
-			printf("Confidence for controller %s mainline %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][0].num_good_vals/confidence[i][0].num_total_vals, (float)confidence[i][0].num_total_vals, (float)confidence[i][0].num_good_vals);
+//		if(confidence[i][0].num_total_vals > 0)
+//			printf("Confidence for controller %s mainline %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][0].num_good_vals/confidence[i][0].num_total_vals, (float)confidence[i][0].num_total_vals, (float)confidence[i][0].num_good_vals);
         
         controller_mainline_data[i].agg_density = mind(125.0,maxd( 1.0,  density_aggregation_mainline(controller_mainline_data[i].agg_vol, controller_mainline_data[i].agg_speed, density_prev[i]) ) );
 		
@@ -291,8 +293,8 @@ printf("opt_vsa: received trigger\n");
 		controller_offramp_data[i].agg_vol =  mind(6000.0, maxd( 0, flow_aggregation_offramp(&lds[i][P1_e], &confidence[i][2]) ) );
         controller_offramp_data[i].agg_occ =  mind(100.0, maxd( 0, occupancy_aggregation_offramp(&lds[i][P1_e], &confidence[i][2]) ) );            
 		controller_offramp_data[i].turning_ratio = 0.0; //turning_ratio_offramp(controller_offramp_data[i].agg_vol,controller_mainline_data[i-1].agg_vol);
-		if(confidence[i][2].num_total_vals > 0)
-			printf("Confidence for controller %s offramp %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][2].num_good_vals/confidence[i][2].num_total_vals, (float)confidence[i][2].num_total_vals, (float)confidence[i][2].num_good_vals);
+//		if(confidence[i][2].num_total_vals > 0)
+//			printf("Confidence for controller %s offramp %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][2].num_good_vals/confidence[i][2].num_total_vals, (float)confidence[i][2].num_total_vals, (float)confidence[i][2].num_good_vals);
 		
 		//fprintf(dbg_st_file_out,"FR%d ", i); //controller index 
         fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].agg_vol); //67
@@ -303,15 +305,15 @@ printf("opt_vsa: received trigger\n");
         
 		// assign on-ramp data to array
 		controller_onramp_data[i].agg_vol = mind(6000.0, maxd( 0, flow_aggregation_onramp(&lds[i][P1_e], &confidence[i][1]) ) );
-		if(confidence[i][1].num_total_vals > 0)
-			printf("Confidence for controller %s onramp flow %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);
+//		if(confidence[i][1].num_total_vals > 0)
+//			printf("Confidence for controller %s onramp flow %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);
 		controller_onramp_data[i].agg_occ = mind(100.0, maxd( 0, occupancy_aggregation_onramp(&lds[i][P1_e], &confidence[i][1]) ) );
 		// data from on-ramp queue detector
 		controller_onramp_queue_detector_data[i].agg_vol = 0.0;//mind(6000.0, maxd( 0, flow_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
         controller_onramp_queue_detector_data[i].agg_occ = 0.0;//mind(100.0, maxd( 0, occupancy_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
 
-		if(confidence[i][1].num_total_vals > 0)
-			printf("Confidence for controller %s onramp occupancy (queue) %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);
+//		if(confidence[i][1].num_total_vals > 0)
+//			printf("Confidence for controller %s onramp occupancy (queue) %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);
  
 		//fprintf(dbg_st_file_out,"OR%d ", i); //controller index 
 		fprintf(dbg_st_file_out,"%f ", controller_onramp_data[i].agg_vol); //70
@@ -497,7 +499,9 @@ printf("opt_vsa: received trigger\n");
 
 	fprintf(dbg_st_file_out,"\n");
 		db_clt_write(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
-printf("opt_vsa: Wrote DB_ALL_SIGNS_VAR\n");
+		db_sign_control_trigger.trigger += 1;
+		db_clt_write(pclt, DB_SIGN_CONTROL_TRIGGER_VAR, sizeof(db_sign_control_trigger_t), &db_sign_control_trigger);
+printf("opt_vsa: Wrote DB_SIGN_CONTROL_TRIGGER_VAR db_sign_control_trigger %d\n", db_sign_control_trigger.trigger);
 	
 	}
 	}
