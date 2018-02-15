@@ -56,6 +56,10 @@ typedef struct{
 	char trigger;
 } db_opt_vsa_trigger_t;
 
+typedef struct{
+	char trigger;
+} db_sign_control_trigger_t;
+
 /*
 <?xml version="1.0" encoding="utf-8"?>
 <LocInfo>
@@ -110,6 +114,7 @@ typedef struct{
 #define	DB_BARHAM_TYPE			5400
 #define DB_NORDAHL_TYPE			5600
 #define DB_OPT_VSA_TRIGGER_TYPE		5800
+#define DB_SIGN_CONTROL_TRIGGER_TYPE	5801
 
 #define DB_ALL_SIGNS_VAR		DB_ALL_SIGNS_TYPE
 #define DB_LDS_BASE_VAR		DB_JEFFERSON_TYPE
@@ -129,3 +134,4 @@ typedef struct{
 #define	DB_BARHAM_VAR		DB_BARHAM_TYPE
 #define DB_NORDAHL_VAR		DB_NORDAHL_TYPE
 #define DB_OPT_VSA_TRIGGER_VAR	DB_OPT_VSA_TRIGGER_TYPE
+#define DB_SIGN_CONTROL_TRIGGER_VAR	DB_SIGN_CONTROL_TRIGGER_TYPE
