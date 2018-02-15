@@ -48,7 +48,8 @@ db_id_t db_sign_vars [] = {
 int num_sign_variables = sizeof(db_sign_vars)/sizeof(db_id_t);
 
 int db_trig_list[] =  {
-        DB_ALL_SIGNS_VAR
+//	DB_ALL_SIGNS_VAR
+	DB_SIGN_CONTROL_TRIGGER_VAR
 };
 
 int num_trig_variables = sizeof(db_trig_list)/sizeof(int);
@@ -66,18 +67,26 @@ int main(int argc, char *argv[])
 	trig_info_typ trig_info;
 	int i;
 	char str[200];
+	double start_time;
+	double last_time;
+	double diff_time;
+	struct timespec now;
+	int var_sleep = 0;
 
 //      int verbose = 0;
 	db_vsa_ctl_t db_vsa_ctl;
 	char *outfilename = "/var/www/html/VSA/webdata/speed.txt";
-/*
+
         while ((option = getopt(argc, argv, "i:")) != EOF) {
                 switch(option) {
+			case 'i':
+				var_sleep = atoi(optarg);
+				break;
                         default:
 				printf("Usage1: %s %s \n", argv[0], usage);
 		}
 	}
-*/
+
         get_local_name(hostname, MAXHOSTNAMELEN);
 
         if ( (pclt = db_list_init(argv[0], hostname, domain, xport, NULL, 0, db_trig_list, num_trig_variables)) == NULL) {
@@ -91,23 +100,33 @@ int main(int argc, char *argv[])
         } else 
                 sig_ign(sig_list, sig_hand);
 
+	clock_gettime( CLOCK_REALTIME, &now );
+	start_time = now.tv_sec + ((double) now.tv_nsec/ 1000000000L);
+	last_time = start_time;
+
 	while(1) {
 		recv_type= clt_ipc_receive(pclt, &trig_info, sizeof(trig_info));
-		if(DB_TRIG_VAR(&trig_info) ==  DB_ALL_SIGNS_VAR) {
+
+		clock_gettime( CLOCK_REALTIME, &now );
+		start_time = now.tv_sec + ((double) now.tv_nsec/ 1000000000L);
+		diff_time = start_time - last_time;
+
+		if( (DB_TRIG_VAR(&trig_info) ==  DB_SIGN_CONTROL_TRIGGER_VAR) && (diff_time >= 28.0) ){
+			printf("sign_control: start_time %lf last_time %lf\n", start_time, last_time);
+			last_time = start_time;
 			db_clt_read(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
 			send_vsa(&db_vsa_ctl, outfilename);
 			memset(str, 0, 200);
-			sleep(2);
 			for(i=0; i<NUM_SIGNS; i++) {
-			sprintf(str, "/var/www/html/VSA/scripts/safepace_set_speed_single.php %d %d", vsa_sign_ids[i], db_vsa_ctl.vsa[i]);
-			printf("%s\n", str);
-			system(str);
-			sleep(1);
+				sprintf(str, "/var/www/html/VSA/scripts/safepace_set_speed_single.php %d %d\n", vsa_sign_ids[i], db_vsa_ctl.vsa[i]);
+				printf("\nsign_control: executing: %s", str);
+				system(str);
+				sleep(var_sleep);
 			}
 //			system("/var/www/html/VSA/scripts/safepace_set_speed.php");
-			printf("sign_control: Executing safepace_set_speed.php\n");
+//			printf("sign_control: Executing safepace_set_speed.php\n");
                 }
-		printf("sign_control: Executing sign_control loop\n");
+//		printf("sign_control: Executing sign_control loop\n");
 	}
 }
 
