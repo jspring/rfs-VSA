@@ -38,9 +38,9 @@ sleep 1
 /home/rfs-VSA/src/lnx/clt_vars &
 sleep 1
 cd /home/rfs-VSA/src
-./lnx/sign_control &
+./lnx/sign_control >>/var/log/vsa/vsa.out &
 sleep 1
-./lnx/opt_vsa &
+./lnx/opt_vsa >>/var/log/vsa/vsa.out &
 
 sleep 1
 while [[ 1 ]]
@@ -72,6 +72,10 @@ do
 		exit 0
 	fi
 	
-	/home/rfs-VSA/src/lnx/xml_parser -f $LATESTFILE 2>>/var/log/vsa/run_vsa.err
+	echo "" >>/var/log/vsa/vsa.out
+	echo "" >>/var/log/vsa/vsa.out
+	echo "" >>/var/log/vsa/vsa.out
+	date >>/var/log/vsa/vsa.out
+	/home/rfs-VSA/src/lnx/xml_parser -f $LATESTFILE >>/var/log/vsa/vsa.out 2>>/var/log/vsa/run_vsa.err
 	sleep 30
 done
