@@ -425,6 +425,7 @@ int main(int argc, char *argv[])
 			  if(local_speed<20){
 			     suggested_speed[i]= local_speed-5;
 			  }
+         suggested_speed[i] = mind(65, maxd(5, suggested_speed[i])); // restrict the VSA speed between 5 mph and 65 mph
 		 }
 	 }
       	  
