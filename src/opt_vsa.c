@@ -370,7 +370,7 @@ int main(int argc, char *argv[])
 	 //double v_m_down = 0.0;
 	 //double rho_M_down = 0.0;
 
-     double beta = 0.85; // speed based VSA gain 0.7-0.9
+     double beta = 0.95; // speed based VSA gain 0.7-0.9
 	 double alpha = 1.05; // speed based VSA gain 1.1-1.5
 	 
      //double xi = 0.5;    // occupancy based VSA gain
