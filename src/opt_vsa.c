@@ -356,8 +356,8 @@ int main(int argc, char *argv[])
 	 double occ_threshold_6 = 12;
 	 double occ_threshold_7 = 12;
 	 double occ_gain1 = 0.6;
-	 double occ_gain2 = 0.6;
-     double occ_gain3 = 0.6;
+	 double occ_gain2 = 0.65;
+     double occ_gain3 = 0.7;
 	 double occ_gain4 = 0.6;
 	 double occ_gain5 = 0.6;
 	 double occ_gain6 = 0.6;
