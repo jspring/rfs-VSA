@@ -389,7 +389,6 @@ int main(int argc, char *argv[])
 	 // speed based VSA 
 	 if (speed_based_VSA_use_loop_detector){
          // VSA at bottleneck section
-         
 		 if(last_occ>last_occ_threshold){
 		    suggested_speed[6] = mind(65, maxd(5,beta*last_speed)); // reduce VSA at immediate bottleneck section if occupancy too high
 			suggested_speed[7] = mind(65, maxd(5,alpha*last_speed));
@@ -408,15 +407,23 @@ int main(int argc, char *argv[])
 				 local_occupancy = controller_mainline_data[5].agg_occ;
 				 if(local_occupancy>occ_threshold_1){
 			        suggested_speed[i]= speed_linear_VSA - occ_gain1*(controller_mainline_data[7].agg_occ - controller_mainline_data[5].agg_occ);
-				 }else{
-			        suggested_speed[i] = local_speed; 
-			     }
+					// check local speed of VSA
+                    // if local speed is less than 20 mph (very low speed), then use local speed.
+			            if(local_speed<20){
+			               suggested_speed[i]= local_speed-5;
+			             }
+				    }else{
+			         suggested_speed[i] = local_speed; 
+			        }
 			 } 
 			 if(i==2){
 				 local_speed = controller_mainline_data[7].agg_speed;
 				 local_occupancy = controller_mainline_data[7].agg_occ;
                  if(local_occupancy>occ_threshold_2){
 				 suggested_speed[i]= speed_linear_VSA - occ_gain2*(controller_mainline_data[9].agg_occ - controller_mainline_data[7].agg_occ);
+			            if(local_speed<20){
+			               suggested_speed[i]= local_speed-5;
+			             }
 				 }else{
                  suggested_speed[i] = local_speed; 
 				 }
@@ -426,6 +433,9 @@ int main(int argc, char *argv[])
 				 local_occupancy = controller_mainline_data[9].agg_occ;
 				 if(local_occupancy>occ_threshold_3){
 				    suggested_speed[i]= speed_linear_VSA - occ_gain3*(controller_mainline_data[10].agg_occ - controller_mainline_data[9].agg_occ);
+						 if(local_speed<20){
+			               suggested_speed[i]= local_speed-5;
+			             }
 				 }else{
 				    suggested_speed[i] = local_speed; 
 				 }
@@ -435,6 +445,9 @@ int main(int argc, char *argv[])
 				 local_occupancy = controller_mainline_data[10].agg_occ;
                  if(local_occupancy>occ_threshold_4){
 				   suggested_speed[i]= speed_linear_VSA - occ_gain4*(controller_mainline_data[11].agg_occ - controller_mainline_data[10].agg_occ);
+				   		 if(local_speed<20){
+			               suggested_speed[i]= local_speed-5;
+			             }
 				 }else{
 				   suggested_speed[i] = local_speed;     
 				 }
@@ -444,6 +457,9 @@ int main(int argc, char *argv[])
 				 local_occupancy = controller_mainline_data[11].agg_occ;
                  if(local_occupancy>occ_threshold_5){ 
 				  suggested_speed[i]= speed_linear_VSA - occ_gain5*(controller_mainline_data[12].agg_occ - controller_mainline_data[11].agg_occ);
+				  		if(local_speed<20){
+			               suggested_speed[i]= local_speed-5;
+			             }
 				 }else{
 				  suggested_speed[i] = local_speed;     
 				 }
@@ -453,6 +469,9 @@ int main(int argc, char *argv[])
 				 local_occupancy = controller_mainline_data[12].agg_occ;
 				 if(local_occupancy>occ_threshold_6){ 
 				   suggested_speed[i]= speed_linear_VSA - occ_gain6*(controller_mainline_data[13].agg_occ - controller_mainline_data[12].agg_occ);
+				   		if(local_speed<20){
+			               suggested_speed[i]= local_speed-5;
+			            }
 				 }else{
                    suggested_speed[i] = local_speed; 
 				 }
@@ -462,15 +481,13 @@ int main(int argc, char *argv[])
 				 local_occupancy = controller_mainline_data[13].agg_occ;
 				 if(local_occupancy>occ_threshold_7){
 				 suggested_speed[i]= speed_linear_VSA;
+				 		 if(local_speed<20){
+			               suggested_speed[i]= local_speed-5;
+			             }
 				 }else{
 				   suggested_speed[i] = local_speed; 
 				 }
-			 }
-              // check local speed of VSA
-              // if local speed is less than 20 mph (very low speed), then use local speed.
-			  if(local_speed<20){
-			     suggested_speed[i]= local_speed-5;
-			  }
+			 }  
          suggested_speed[i] = mind(65, maxd(5, suggested_speed[i])); // restrict the VSA speed between 5 mph and 65 mph
 		 }
 	 }
