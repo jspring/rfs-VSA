@@ -378,10 +378,10 @@ int main(int argc, char *argv[])
      int speed_based_VSA_use_radar = 0;         //activate speed based VSA control with radar speed data 
        
 	 // get feedback information from the most downstream VSA
-	 last_occ = controller_mainline_data[13].agg_occ; //controller_mainline_data[NUM_LDS-1].agg_occ;           // occupancy
+	 last_occ = controller_mainline_data[NUM_LDS-1].agg_occ;           // occupancy
 	 //last_density = controller_mainline_data[NUM_LDS-1].agg_density;   // density
 	 //last_flow = controller_mainline_data[NUM_LDS-1].agg_vol;          // flow
-	 last_speed = controller_mainline_data[13].agg_speed; // controller_mainline_data[NUM_LDS-1].agg_speed;      // harmonic mean speed
+	 last_speed = controller_mainline_data[NUM_LDS-1].agg_speed;      // harmonic mean speed
      
 	 // get speed information from the immediately upstream of the most downstream VSA
 	 // up_last_speed = controller_mainline_data[NUM_LDS-2].agg_speed;
