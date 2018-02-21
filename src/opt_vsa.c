@@ -370,8 +370,8 @@ int main(int argc, char *argv[])
 	 //double v_m_down = 0.0;
 	 //double rho_M_down = 0.0;
      
-	 double alpha = 1.2; // speed based VSA gain 1.1-1.5
-	 double beta = 0.8; // speed based VSA gain 0.7-0.9
+	 double alpha = 1.1; // speed based VSA gain 1.1-1.5
+	 double beta = 0.75; // speed based VSA gain 0.7-0.9
      //double xi = 0.5;    // occupancy based VSA gain
 
 	 int speed_based_VSA_use_loop_detector = 1; //activate speed based VSA control with loop detector speed data
