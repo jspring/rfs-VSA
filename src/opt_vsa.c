@@ -360,7 +360,7 @@ int main(int argc, char *argv[])
      double occ_gain3 = 0.7;
 	 double occ_gain4 = 0.6;
 	 double occ_gain5 = 0.6;
-	 double occ_gain6 = 0.6;
+	 double occ_gain6 = 0.5;
 
 	 //double gamma = 0.0; 
      //double Q_b = 1200;
