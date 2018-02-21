@@ -378,10 +378,10 @@ int main(int argc, char *argv[])
      int speed_based_VSA_use_radar = 0;         //activate speed based VSA control with radar speed data 
        
 	 // get feedback information from the most downstream VSA
-	 last_occ = controller_mainline_data[NUM_LDS-1].agg_occ;           // occupancy
+	 last_occ = controller_mainline_data[13].agg_occ; //controller_mainline_data[NUM_LDS-1].agg_occ;           // occupancy
 	 //last_density = controller_mainline_data[NUM_LDS-1].agg_density;   // density
 	 //last_flow = controller_mainline_data[NUM_LDS-1].agg_vol;          // flow
-	 last_speed = controller_mainline_data[NUM_LDS-1].agg_speed;      // harmonic mean speed
+	 last_speed = controller_mainline_data[13].agg_speed; // controller_mainline_data[NUM_LDS-1].agg_speed;      // harmonic mean speed
      
 	 // get speed information from the immediately upstream of the most downstream VSA
 	 // up_last_speed = controller_mainline_data[NUM_LDS-2].agg_speed;
@@ -389,13 +389,15 @@ int main(int argc, char *argv[])
 	 // speed based VSA 
 	 if (speed_based_VSA_use_loop_detector){
          // VSA at bottleneck section
-         suggested_speed[7] = mind(65, maxd(5,alpha*last_speed));
+         
 		 if(last_occ>last_occ_threshold){
-		    suggested_speed[6] = mind(65, maxd(5,beta*last_speed)); // reduce VSA at immediate bottleneck section if occupancy too high 
+		    suggested_speed[6] = mind(65, maxd(5,beta*last_speed)); // reduce VSA at immediate bottleneck section if occupancy too high
+			suggested_speed[7] = mind(65, maxd(5,alpha*last_speed));
 		 }else{
-			suggested_speed[6] = last_speed;
+            suggested_speed[6] = mind(65, maxd(5,controller_mainline_data[12].agg_speed));
+			suggested_speed[7] = mind(65, maxd(5,controller_mainline_data[13].agg_speed));
 		 }
-	     // do linear interpolation to usstream VSA
+	     // do linear interpolation to upstream VSA
 	     slope = (suggested_speed[6]-suggested_speed[0])/(device_location[6]-device_location[0]);
 		 interception =  (suggested_speed[0]*device_location[6]-suggested_speed[6]*device_location[0])/(device_location[6]-device_location[0]);
 		 for (i=1; i<NUM_SIGNS-1; i++){
