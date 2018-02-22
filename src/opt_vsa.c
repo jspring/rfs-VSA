@@ -494,6 +494,7 @@ int main(int argc, char *argv[])
 	 }
 	 if(speed_based_VSA_use_radar){
 		 // add new code here
+//		db_locinfo[i].weighted_speed_average;
 	 }
       	  
 		webdatafp = fopen("/var/www/html/VSA/scripts/VSA_performance_plot.txt", "w");
