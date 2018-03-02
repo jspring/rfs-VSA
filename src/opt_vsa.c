@@ -611,7 +611,7 @@ int main(int argc, char *argv[])
 			suggested_speed_int = (((char)(rint(suggested_speed[j+1])))/5)*5; //NOTE to Chengju: Assign variable speeds here, remember to convert to kph
 //			db_vsa_ctl.vsa[j] = (char)(suggested_speed_int * 1.609344);
 			db_vsa_ctl.vsa[j] = (char)(suggested_speed_int * 1.0);
-			fprintf(dbg_st_file_out,"%.2f %d %d ", suggested_speed[j+1], suggested_speed_int, db_vsa_ctl.vsa[j]);
+			fprintf(dbg_st_file_out,"%.2f %d %d %.2f ", suggested_speed[j+1], suggested_speed_int, db_vsa_ctl.vsa[j], db_locinfo[j].weighted_speed_average);
 			memset(&datafilename[0], 0, 1000);
 			sprintf(datafilename, "%s%d", pathname, sign_ids[j]);
 			datafp = fopen(datafilename, "a");
