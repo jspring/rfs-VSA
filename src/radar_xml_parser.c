@@ -191,12 +191,6 @@ int main(int argc, char *argv[]) {
 		i++;
 	}
 	locinfo.weighted_speed_average = total_targets > 0 ? (float)(speed_count)/total_targets : 0;
-
-	printf("Weighted speed average %.2f total_targets %d speed_count %d\n", 
-		locinfo.weighted_speed_average,
-		total_targets,
-		speed_count
-	);
 	db_locinfo.stats.max_speed = locinfo.stats.max_speed;
 	db_locinfo.stats.min_speed  = locinfo.stats.min_speed ;
 	db_locinfo.stats.avg_speed = locinfo.stats.avg_speed;
@@ -208,6 +202,14 @@ int main(int argc, char *argv[]) {
 	db_locinfo.speed_count = speed_count;
 	db_locinfo.name = atoi(locinfo.location.name);
 	db_locinfo.weighted_speed_average = locinfo.weighted_speed_average;
+
+	printf("Location %d Weighted speed average %.2f kph %.2f mph total_targets %d speed_count %d\n", 
+		db_locinfo.name,
+		db_locinfo.weighted_speed_average,
+		db_locinfo.weighted_speed_average * 0.621371,
+		total_targets,
+		speed_count
+	);
 	if( (db_locinfo.name < 7) && (db_locinfo.name > 0) )
 		db_clt_write(pclt, db_vsa_sign_ids[db_locinfo.name - 1].id, sizeof(db_locinfo_t), &db_locinfo);
 	}
