@@ -161,9 +161,133 @@ int main(int argc, char *argv[])
     //int FR_flow_zero_counter[NumOnRamp] = {0};
     //int FR_occ_zero_counter[NumOnRamp] = {0};
 
-	while ((option = getopt(argc, argv, "di:r")) != EOF) {
+	 double suggested_speed[8]= {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // the first entry is the suggested speed of FMS, so seven VSA puls one FMS is eight units in total.
+	int suggested_speed_int = 0;
+	 double speed_linear_VSA = 0.0;
+	 suggested_speed[0]= 60; // first FMS1 is always 60 mph (free flow speed), where is the starting point of VSA test site 
+     double slope = 0.0;
+     double interception = 0.0;
+	 double device_location[8] = {0.9,1.5,3.7,5.9,6.6,7.4,8.5,10}; // absolute distance in miles of each VSA device 
+     //double speed_increment = 5;
+	 double last_occ = 0.0;
+     //double last_density = 0.0;
+	 //double last_flow = 0.0;
+	 double last_speed = 0.0;
+	 //double up_last_speed = 0;
+     double local_speed = 0.0;
+	 double local_occupancy = 0.0;
+	 // VSA control parameters
+     double last_occ_threshold = 12; // occupancy threshold in last VDS (suggested 10 to 12.5)
+	 double occ_threshold_1 = 12;
+	 double occ_threshold_2 = 12;
+	 double occ_threshold_3 = 12;
+	 double occ_threshold_4 = 12;
+	 double occ_threshold_5 = 12;
+	 double occ_threshold_6 = 12;
+	 double occ_threshold_7 = 12;
+	 double occ_gain1 = 0.6;
+	 double occ_gain2 = 0.65;
+     double occ_gain3 = 0.7;
+	 double occ_gain4 = 0.6;
+	 double occ_gain5 = 0.6;
+	 double local_weighted_occupancy = 1.0;
+	 double local_weighted_speed = 5.0;
+
+	 //double gamma = 0.0; 
+     //double Q_b = 1200;
+	 //double rho_c = 80;
+
+	 //double q_m_up = 0.0;
+	 //double v_m_down = 0.0;
+	 //double rho_M_down = 0.0;
+
+     double beta = 0.95; // speed based VSA gain 0.7-0.9
+	 double alpha = 1.05; // speed based VSA gain 1.1-1.5
+	 
+     //double xi = 0.5;    // occupancy based VSA gain
+
+	 // parameters for weighted occupancy based VSA
+	 double w11 = 0.6;
+     double w12 = 0.3;
+	 double w13 = 0.1;
+	 double w21 = 0.6; 
+	 double w22 = 0.3; 
+	 double w23 = 0.1;
+     double w31 = 0.6;
+	 double w32 = 0.3; 
+	 double w33 = 0.1;
+	 double w41 = 0.6; 
+	 double w42 = 0.3; 
+	 double w43 = 0.1;
+     double w51 = 0.6; 
+	 double w52 = 0.3;
+	 double w53 = 0.1;
+     double w61 = 0.7;
+	 double w62 = 0.3;
+     double w71 = 1.0;
+
+	 // parameters for weighted speed based VSA
+	 double p11 = 0.6;
+     double p12 = 0.3;
+	 double p13 = 0.1;
+	 double p21 = 0.6; 
+	 double p22 = 0.3; 
+	 double p23 = 0.1;
+     double p31 = 0.6;
+	 double p32 = 0.3; 
+	 double p33 = 0.1;
+	 double p41 = 0.6; 
+	 double p42 = 0.3; 
+	 double p43 = 0.1;
+     double p51 = 0.6; 
+	 double p52 = 0.3;
+	 double p53 = 0.1;
+     double p61 = 0.7;
+	 double p62 = 0.3;
+     double p71 = 1.0;
+
+     // suppose max flow is 1800 vehicles per mile per lane, we want to operate flow at 0.8 times 1800
+	 // suppose density can be estimated by 1.6 times occupancy 
+	 // the gain computed as 1800 times 0.8 divided by 1.6
+	 double weighted_occ_gain1 = 937.5;
+     double weighted_occ_gain2 = 937.5;
+     double weighted_occ_gain3 = 937.5;
+     double weighted_occ_gain4 = 937.5;
+     double weighted_occ_gain5 = 937.5;
+     double weighted_occ_gain6 = 937.5;
+	 double weighted_occ_gain7 = 937.5;
+
+	 double weighted_speed_gain1 = 1.0;
+     double weighted_speed_gain2 = 1.0;
+     double weighted_speed_gain3 = 1.0;
+     double weighted_speed_gain4 = 1.0;
+     double weighted_speed_gain5 = 1.0;
+     double weighted_speed_gain6 = 1.0;
+	 double weighted_speed_gain7 = 1.0;
+
+	 // controller options is here. 0 is deactivate and 1 is activate. 
+	 int speed_based_VSA_use_loop_detector = 1; //activate speed based VSA control with loop detector speed data
+     int speed_based_VSA_use_radar = 0;         //activate speed based VSA control with radar speed data 
+     int weighted_occupancy_based_VSA = 0;       //activate weighted occupancy based VSA control with loop detector occupancy data
+	 int weighted_speed_based_VSA = 0;           //activate weighted speed based VSA control with loop detector occupancy data
+
+	while ((option = getopt(argc, argv, "lros")) != EOF) {
 		switch(option) {
-			case 'd':
+			case 'l':
+				speed_based_VSA_use_loop_detector = 1;
+				speed_based_VSA_use_radar = 0;
+				break;
+			case 'r':
+				speed_based_VSA_use_loop_detector = 0;
+				speed_based_VSA_use_radar = 1;
+				break;
+			case 'o':
+				weighted_occupancy_based_VSA = 1;
+				weighted_speed_based_VSA = 0;
+				break;
+			case 's':
+				weighted_occupancy_based_VSA = 0;
+				weighted_speed_based_VSA = 1;
 				break;
 			default:
 				printf("\nUsage: %s\n", argv[0]);
@@ -330,117 +454,6 @@ int main(int argc, char *argv[])
 //		det_data_4_contr(time);	
 //		get_meas(time);
 	 //int num_VSA_device = 8; // number of VSA devices
-	 double suggested_speed[8]= {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // the first entry is the suggested speed of FMS, so seven VSA puls one FMS is eight units in total.
-	int suggested_speed_int = 0;
-	 double speed_linear_VSA = 0.0;
-	 suggested_speed[0]= 60; // first FMS1 is always 60 mph (free flow speed), where is the starting point of VSA test site 
-     int i = 0;
-     double slope = 0.0;
-     double interception = 0.0;
-	 double device_location[8] = {0.9,1.5,3.7,5.9,6.6,7.4,8.5,10}; // absolute distance in miles of each VSA device 
-     //double speed_increment = 5;
-	 double last_occ = 0.0;
-     //double last_density = 0.0;
-	 //double last_flow = 0.0;
-	 double last_speed = 0.0;
-	 //double up_last_speed = 0;
-     double local_speed = 0.0;
-	 double local_occupancy = 0.0;
-	 // VSA control parameters
-     double last_occ_threshold = 12; // occupancy threshold in last VDS (suggested 10 to 12.5)
-	 double occ_threshold_1 = 12;
-	 double occ_threshold_2 = 12;
-	 double occ_threshold_3 = 12;
-	 double occ_threshold_4 = 12;
-	 double occ_threshold_5 = 12;
-	 double occ_threshold_6 = 12;
-	 double occ_threshold_7 = 12;
-	 double occ_gain1 = 0.6;
-	 double occ_gain2 = 0.65;
-     double occ_gain3 = 0.7;
-	 double occ_gain4 = 0.6;
-	 double occ_gain5 = 0.6;
-	 double occ_gain6 = 0.3;
-	 double local_weighted_occupancy = 1.0;
-	 double local_weighted_speed = 5.0;
-
-	 //double gamma = 0.0; 
-     //double Q_b = 1200;
-	 //double rho_c = 80;
-
-	 //double q_m_up = 0.0;
-	 //double v_m_down = 0.0;
-	 //double rho_M_down = 0.0;
-
-     double beta = 0.95; // speed based VSA gain 0.7-0.9
-	 double alpha = 1.05; // speed based VSA gain 1.1-1.5
-	 
-     //double xi = 0.5;    // occupancy based VSA gain
-
-	 // parameters for weighted occupancy based VSA
-	 double w11 = 0.6;
-     double w12 = 0.3;
-	 double w13 = 0.1;
-	 double w21 = 0.6; 
-	 double w22 = 0.3; 
-	 double w23 = 0.1;
-     double w31 = 0.6;
-	 double w32 = 0.3; 
-	 double w33 = 0.1;
-	 double w41 = 0.6; 
-	 double w42 = 0.3; 
-	 double w43 = 0.1;
-     double w51 = 0.6; 
-	 double w52 = 0.3;
-	 double w53 = 0.1;
-     double w61 = 0.7;
-	 double w62 = 0.3;
-     double w71 = 1.0;
-
-	 // parameters for weighted speed based VSA
-	 double p11 = 0.6;
-     double p12 = 0.3;
-	 double p13 = 0.1;
-	 double p21 = 0.6; 
-	 double p22 = 0.3; 
-	 double p23 = 0.1;
-     double p31 = 0.6;
-	 double p32 = 0.3; 
-	 double p33 = 0.1;
-	 double p41 = 0.6; 
-	 double p42 = 0.3; 
-	 double p43 = 0.1;
-     double p51 = 0.6; 
-	 double p52 = 0.3;
-	 double p53 = 0.1;
-     double p61 = 0.7;
-	 double p62 = 0.3;
-     double p71 = 1.0;
-
-     // suppose max flow is 1800 vehicles per mile per lane, we want to operate flow at 0.8 times 1800
-	 // suppose density can be estimated by 1.6 times occupancy 
-	 // the gain computed as 1800 times 0.8 divided by 1.6
-	 double weighted_occ_gain1 = 937.5;
-     double weighted_occ_gain2 = 937.5;
-     double weighted_occ_gain3 = 937.5;
-     double weighted_occ_gain4 = 937.5;
-     double weighted_occ_gain5 = 937.5;
-     double weighted_occ_gain6 = 937.5;
-	 double weighted_occ_gain7 = 937.5;
-
-	 double weighted_speed_gain1 = 1.0;
-     double weighted_speed_gain2 = 1.0;
-     double weighted_speed_gain3 = 1.0;
-     double weighted_speed_gain4 = 1.0;
-     double weighted_speed_gain5 = 1.0;
-     double weighted_speed_gain6 = 1.0;
-	 double weighted_speed_gain7 = 1.0;
-
-	 // controller options is here. 0 is deactivate and 1 is activate. 
-	 int speed_based_VSA_use_loop_detector = 1; //activate speed based VSA control with loop detector speed data
-     int speed_based_VSA_use_radar = 0;         //activate speed based VSA control with radar speed data 
-     int weighed_occupancy_based_VSA = 0;       //activate weighted occupancy based VSA control with loop detector occupancy data
-	 int weighed_speed_based_VSA = 0;           //activate weighted speed based VSA control with loop detector occupancy data
 	 
 	 //last_density = controller_mainline_data[NUM_LDS-1].agg_density;   // density
 	 //last_flow = controller_mainline_data[NUM_LDS-1].agg_vol;          // flow
@@ -559,7 +572,7 @@ int main(int argc, char *argv[])
 		 }
 	 }
 
-	 if (weighed_occupancy_based_VSA){
+	 if (weighted_occupancy_based_VSA){
 		 // suppose the steady state density is 12–30 vehicles per mile per lane
 		 // suppose the max steady state flow is 1800 vehicles per hour per lane
 		 for (i=1; i<NUM_SIGNS-1; i++){
@@ -662,7 +675,7 @@ int main(int argc, char *argv[])
 		 }
 	 }
 
-	 if (weighed_speed_based_VSA){
+	 if (weighted_speed_based_VSA){
 		 // suppose the steady state density is 12–30 vehicles per mile per lane
 		 // suppose the max steady state flow is 1800 vehicles per hour per lane
 		 for (i=1; i<NUM_SIGNS-1; i++){
