@@ -368,7 +368,7 @@ int main(int argc, char *argv[])
 		
 //		printf("\n\nBeginning aggregation for %s\n", controller_strings[i][2]);
 		// min max function bound the data range and exclude nans.
-	controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
+		controller_mainline_data[i].agg_vol = mind(12000.0, maxd( 1.0, flow_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
 		controller_mainline_data[i].agg_occ = mind(90.0, maxd( 1.0, occupancy_aggregation_mainline(&lds[i][MLE1_e], &confidence[i][0]) ) );
 		 
 		float_temp = hm_speed_aggregation_mainline(&lds[i][MLE1_e], hm_speed_prev[i], &confidence[i][0]);
@@ -388,19 +388,19 @@ int main(int argc, char *argv[])
 //		if(confidence[i][0].num_total_vals > 0)
 //			printf("Confidence for controller %s mainline %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][0].num_good_vals/confidence[i][0].num_total_vals, (float)confidence[i][0].num_total_vals, (float)confidence[i][0].num_good_vals);
 	
-	controller_mainline_data[i].agg_density = mind(125.0,maxd( 1.0,  density_aggregation_mainline(controller_mainline_data[i].agg_vol, controller_mainline_data[i].agg_speed, density_prev[i]) ) );
+		controller_mainline_data[i].agg_density = mind(125.0,maxd( 1.0,  density_aggregation_mainline(controller_mainline_data[i].agg_vol, controller_mainline_data[i].agg_speed, density_prev[i]) ) );
 		
 		hm_speed_prev[i] = controller_mainline_data[i].agg_speed;
-	mean_speed_prev[i] = controller_mainline_data[i].agg_mean_speed;
-	density_prev[i] = controller_mainline_data[i].agg_density;
+		mean_speed_prev[i] = controller_mainline_data[i].agg_mean_speed;
+		density_prev[i] = controller_mainline_data[i].agg_density;
 
-	//fprintf(dbg_st_file_out,"C%d ", i); //controller index 
+		//fprintf(dbg_st_file_out,"C%d ", i); //controller index 
 		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_vol); //62
 		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_occ); //63,136,209,282,355,428,501,574,647,720,793,866,939,1012
 		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_speed); //64
 		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_density); //65
 		fprintf(dbg_st_file_out,"%f ", controller_mainline_data[i].agg_mean_speed);//66
-	//fprintf(dbg_st_file_out,"\n");
+		//fprintf(dbg_st_file_out,"\n");
 		memset(&datafilename[0], 0, 1000);
 		sprintf(datafilename, "%s%d", pathname, LdsId_onramp_int[i]);
 		datafp = fopen(datafilename, "w");
@@ -415,35 +415,35 @@ int main(int argc, char *argv[])
 	
 		// assign off-ramp data to array
 		controller_offramp_data[i].agg_vol =  mind(6000.0, maxd( 0, flow_aggregation_offramp(&lds[i][P1_e], &confidence[i][2]) ) );
-	controller_offramp_data[i].agg_occ =  mind(100.0, maxd( 0, occupancy_aggregation_offramp(&lds[i][P1_e], &confidence[i][2]) ) );            
+		controller_offramp_data[i].agg_occ =  mind(100.0, maxd( 0, occupancy_aggregation_offramp(&lds[i][P1_e], &confidence[i][2]) ) );            
 		controller_offramp_data[i].turning_ratio = 0.0; //turning_ratio_offramp(controller_offramp_data[i].agg_vol,controller_mainline_data[i-1].agg_vol);
 //		if(confidence[i][2].num_total_vals > 0)
 //			printf("Confidence for controller %s offramp %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][2].num_good_vals/confidence[i][2].num_total_vals, (float)confidence[i][2].num_total_vals, (float)confidence[i][2].num_good_vals);
 		
 		//fprintf(dbg_st_file_out,"FR%d ", i); //controller index 
-	fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].agg_vol); //67
+		fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].agg_vol); //67
 		fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].agg_occ); //68
 		fprintf(dbg_st_file_out,"%f ", controller_offramp_data[i].turning_ratio);//69
 
-	//fprintf(dbg_st_file_out,"\n");
+		//fprintf(dbg_st_file_out,"\n");
 	
 		// assign on-ramp data to array
 		controller_onramp_data[i].agg_vol = mind(6000.0, maxd( 0, flow_aggregation_onramp(&lds[i][P1_e], &confidence[i][1]) ) );
 //		if(confidence[i][1].num_total_vals > 0)
-//			printf("Confidence for controller %s onramp flow %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);
+//		printf("Confidence for controller %s onramp flow %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);
 		controller_onramp_data[i].agg_occ = mind(100.0, maxd( 0, occupancy_aggregation_onramp(&lds[i][P1_e], &confidence[i][1]) ) );
 		// data from on-ramp queue detector
 		controller_onramp_queue_detector_data[i].agg_vol = 0.0;//mind(6000.0, maxd( 0, flow_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
-	controller_onramp_queue_detector_data[i].agg_occ = 0.0;//mind(100.0, maxd( 0, occupancy_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
+		controller_onramp_queue_detector_data[i].agg_occ = 0.0;//mind(100.0, maxd( 0, occupancy_aggregation_onramp_queue(&controller_data[i], &controller_data2[i], &confidence[i][1]) ));
 
 //		if(confidence[i][1].num_total_vals > 0)
 //			printf("Confidence for controller %s onramp occupancy (queue) %f total_vals %f good vals %f\n", controller_strings[i][2], (float)confidence[i][1].num_good_vals/confidence[i][1].num_total_vals, (float)confidence[i][1].num_total_vals, (float)confidence[i][1].num_good_vals);
  
 		//fprintf(dbg_st_file_out,"OR%d ", i); //controller index 
 		fprintf(dbg_st_file_out,"%f ", controller_onramp_data[i].agg_vol); //70
-	fprintf(dbg_st_file_out,"%f ", controller_onramp_data[i].agg_occ);//71
+		fprintf(dbg_st_file_out,"%f ", controller_onramp_data[i].agg_occ);//71
 		fprintf(dbg_st_file_out,"%f ", controller_onramp_queue_detector_data[i].agg_vol); //72
-	fprintf(dbg_st_file_out,"%f ", controller_onramp_queue_detector_data[i].agg_occ);//73
+		fprintf(dbg_st_file_out,"%f ", controller_onramp_queue_detector_data[i].agg_occ);//73
 
 		 
 		//fprintf(dbg_st_file_out,"\n");
@@ -467,55 +467,55 @@ int main(int argc, char *argv[])
 	 if (speed_based_VSA_use_loop_detector){
 	 // VSA at bottleneck section
 		 // get feedback information from the most downstream VSA
-	     last_occ = controller_mainline_data[NUM_LDS-1].agg_occ;           // occupancy
-		 last_speed = controller_mainline_data[NUM_LDS-1].agg_speed;      // harmonic mean speed
-		 if(last_occ>last_occ_threshold){
-		    suggested_speed[6] = mind(65, maxd(5,beta*last_speed)); // reduce VSA at immediate bottleneck section if occupancy too high
+		last_occ = controller_mainline_data[NUM_LDS-1].agg_occ;           // occupancy
+		last_speed = controller_mainline_data[NUM_LDS-1].agg_speed;      // harmonic mean speed
+		if(last_occ>last_occ_threshold){
+			suggested_speed[6] = mind(65, maxd(5,beta*last_speed)); // reduce VSA at immediate bottleneck section if occupancy too high
 			suggested_speed[7] = mind(65, maxd(5,alpha*last_speed));
 		 }else{
-	    suggested_speed[6] = mind(65, maxd(5,controller_mainline_data[12].agg_speed));
+			suggested_speed[6] = mind(65, maxd(5,controller_mainline_data[12].agg_speed));
 			suggested_speed[7] = mind(65, maxd(5,controller_mainline_data[13].agg_speed));
 		 }
 	     // do linear interpolation to upstream VSA
-	     slope = (suggested_speed[6]-suggested_speed[0])/(device_location[6]-device_location[0]);
-		 interception =  (suggested_speed[0]*device_location[6]-suggested_speed[6]*device_location[0])/(device_location[6]-device_location[0]);
-		 for (i=1; i<NUM_SIGNS-1; i++){
-	     speed_linear_VSA = mind(65, maxd(5,(slope*device_location[i]+interception)) );
+		slope = (suggested_speed[6]-suggested_speed[0])/(device_location[6]-device_location[0]);
+		interception =  (suggested_speed[0]*device_location[6]-suggested_speed[6]*device_location[0])/(device_location[6]-device_location[0]);
+		for (i=1; i<NUM_SIGNS-1; i++){
+			speed_linear_VSA = mind(65, maxd(5,(slope*device_location[i]+interception)) );
 			 // local occupancy differenct as a speed compensate 
 			 if(i==1){
 				 local_speed = controller_mainline_data[5].agg_speed;
 				 local_occupancy = controller_mainline_data[5].agg_occ;
 				 if(local_occupancy>occ_threshold_1){
-			        suggested_speed[i]= speed_linear_VSA - occ_gain1*(controller_mainline_data[7].agg_occ - controller_mainline_data[5].agg_occ);
+					suggested_speed[i]= speed_linear_VSA - occ_gain1*(controller_mainline_data[7].agg_occ - controller_mainline_data[5].agg_occ);
 					// check local speed of VSA
 		    // if local speed is less than 20 mph (very low speed), then use local speed.
-			            if(local_speed<20){
-			               suggested_speed[i]= maxd(local_speed-5,5);
-			             }
-				    }else{
-			         suggested_speed[i] = local_speed; 
+					if(local_speed<20){
+						suggested_speed[i]= maxd(local_speed-5,5);
+					}
+				}else{
+			        	suggested_speed[i] = local_speed; 
 			        }
 			 } 
 			 if(i==2){
 				 local_speed = controller_mainline_data[7].agg_speed;
 				 local_occupancy = controller_mainline_data[7].agg_occ;
-		 if(local_occupancy>occ_threshold_2){
-				 suggested_speed[i]= speed_linear_VSA - occ_gain2*(controller_mainline_data[9].agg_occ - controller_mainline_data[7].agg_occ);
-			            if(local_speed<20){
-			               suggested_speed[i]=  maxd(local_speed-5,5);
-			             }
+				 if(local_occupancy>occ_threshold_2){
+					suggested_speed[i]= speed_linear_VSA - occ_gain2*(controller_mainline_data[9].agg_occ - controller_mainline_data[7].agg_occ);
+					if(local_speed<20){
+						suggested_speed[i]=  maxd(local_speed-5,5);
+					}
 				 }else{
-		 suggested_speed[i] = local_speed; 
+				 suggested_speed[i] = local_speed; 
 				 }
 			 }
 			 if(i==3){
 				 local_speed = controller_mainline_data[9].agg_speed;
 				 local_occupancy = controller_mainline_data[9].agg_occ;
 				 if(local_occupancy>occ_threshold_3){
-				    suggested_speed[i]= speed_linear_VSA - occ_gain3*(controller_mainline_data[10].agg_occ - controller_mainline_data[9].agg_occ);
-						 if(local_speed<20){
-			               suggested_speed[i]= maxd(local_speed-5,5);
-			             }
+					suggested_speed[i]= speed_linear_VSA - occ_gain3*(controller_mainline_data[10].agg_occ - controller_mainline_data[9].agg_occ);
+					if(local_speed<20){
+						suggested_speed[i]= maxd(local_speed-5,5);
+					}
 				 }else{
 				    suggested_speed[i] = local_speed; 
 				 }
@@ -523,47 +523,47 @@ int main(int argc, char *argv[])
 			 if(i==4){
 				 local_speed = controller_mainline_data[10].agg_speed;
 				 local_occupancy = controller_mainline_data[10].agg_occ;
-		 if(local_occupancy>occ_threshold_4){
-				   suggested_speed[i]= speed_linear_VSA - occ_gain4*(controller_mainline_data[11].agg_occ - controller_mainline_data[10].agg_occ);
-				   		 if(local_speed<20){
-			               suggested_speed[i]= maxd(local_speed-5,5);
-			             }
+				 if(local_occupancy>occ_threshold_4){
+					suggested_speed[i]= speed_linear_VSA - occ_gain4*(controller_mainline_data[11].agg_occ - controller_mainline_data[10].agg_occ);
+				   	if(local_speed<20){
+						suggested_speed[i]= maxd(local_speed-5,5);
+					}
 				 }else{
-				   suggested_speed[i] = local_speed;     
+					suggested_speed[i] = local_speed;     
 				 }
 			 }
 			 if(i==5){
 				 local_speed = controller_mainline_data[11].agg_speed;
 				 local_occupancy = controller_mainline_data[11].agg_occ;
-		 if(local_occupancy>occ_threshold_5){ 
-				  suggested_speed[i]= speed_linear_VSA - occ_gain5*(controller_mainline_data[12].agg_occ - controller_mainline_data[11].agg_occ);
-				  		if(local_speed<20){
-			               suggested_speed[i]= maxd(local_speed-5,5);
-			             }
+				 if(local_occupancy>occ_threshold_5){ 
+				 	 suggested_speed[i]= speed_linear_VSA - occ_gain5*(controller_mainline_data[12].agg_occ - controller_mainline_data[11].agg_occ);
+				  	if(local_speed<20){
+			               		suggested_speed[i]= maxd(local_speed-5,5);
+			             	}
 				 }else{
-				  suggested_speed[i] = local_speed;     
+				 	suggested_speed[i] = local_speed;     
 				 }
 			 }
 			 if(i==6){
 				 local_speed = controller_mainline_data[12].agg_speed;
 				 local_occupancy = controller_mainline_data[12].agg_occ;
 				 if(local_occupancy>occ_threshold_6){ 
-				   suggested_speed[i]=  mind(65, maxd(5,beta*last_speed)); //speed_linear_VSA - occ_gain6*(controller_mainline_data[13].agg_occ - controller_mainline_data[12].agg_occ);
-				   		if(local_speed<20){
-			               suggested_speed[i]= maxd(local_speed-5,5);
-			            }
+					suggested_speed[i]=  mind(65, maxd(5,beta*last_speed)); //speed_linear_VSA - occ_gain6*(controller_mainline_data[13].agg_occ - controller_mainline_data[12].agg_occ);
+				   	if(local_speed<20){
+						suggested_speed[i]= maxd(local_speed-5,5);
+			            	}
 				 }else{
-		   suggested_speed[i] = local_speed; 
+					suggested_speed[i] = local_speed; 
 				 }
-		     }
-			 if(i==7){
+		     	}
+			if(i==7){
 				 local_speed = controller_mainline_data[13].agg_speed;
 				 local_occupancy = controller_mainline_data[13].agg_occ;
 				 if(local_occupancy>occ_threshold_7){
-				 suggested_speed[i]= mind(65, maxd(5,alpha*last_speed)); //speed_linear_VSA;
-				 		 if(local_speed<20){
-			               suggested_speed[i]= maxd(local_speed-5,5);
-			             }
+				 	suggested_speed[i]= mind(65, maxd(5,alpha*last_speed)); //speed_linear_VSA;
+					if(local_speed<20){
+			               		suggested_speed[i]= maxd(local_speed-5,5);
+			             	}
 				 }else{
 				   suggested_speed[i] = local_speed; 
 				 }
@@ -576,18 +576,18 @@ int main(int argc, char *argv[])
 		 // suppose the steady state density is 12–30 vehicles per mile per lane
 		 // suppose the max steady state flow is 1800 vehicles per hour per lane
 		 for (i=1; i<NUM_SIGNS-1; i++){
-		     if(i==1){
-				 local_speed = controller_mainline_data[5].agg_speed;
-				 local_occupancy = controller_mainline_data[5].agg_occ;
-				 local_weighted_occupancy = w11*controller_mainline_data[5].agg_occ + w12*controller_mainline_data[7].agg_occ + w13*controller_mainline_data[9].agg_occ;
-				 if(local_occupancy>occ_threshold_1){
-			        suggested_speed[i]= mind( weighted_occ_gain1/maxd(local_weighted_occupancy,5), 65); 
+			if(i==1){
+				local_speed = controller_mainline_data[5].agg_speed;
+				local_occupancy = controller_mainline_data[5].agg_occ;
+				local_weighted_occupancy = w11*controller_mainline_data[5].agg_occ + w12*controller_mainline_data[7].agg_occ + w13*controller_mainline_data[9].agg_occ;
+				if(local_occupancy>occ_threshold_1){
+			        	suggested_speed[i]= mind( weighted_occ_gain1/maxd(local_weighted_occupancy,5), 65); 
 					// check local speed of VSA
 		    // if local speed is less than 20 mph (very low speed), then use local speed.
-			        if(local_speed<20){
-			               suggested_speed[i]= maxd(local_speed-5,5);
-			             }
-				    }else{
+					if(local_speed<20){
+						suggested_speed[i]= maxd(local_speed-5,5);
+					}
+				}else{
 			         suggested_speed[i] = local_speed; 
 			        }
 			 } 
