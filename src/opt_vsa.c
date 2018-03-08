@@ -437,10 +437,10 @@ int main(int argc, char *argv[])
 	 double weighted_speed_gain7 = 1.0;
 
 	 // controller options is here. 0 is deactivate and 1 is activate. 
-	 int speed_based_VSA_use_loop_detector = 0; //activate speed based VSA control with loop detector speed data
+	 int speed_based_VSA_use_loop_detector = 1; //activate speed based VSA control with loop detector speed data
      int speed_based_VSA_use_radar = 0;         //activate speed based VSA control with radar speed data 
      int weighed_occupancy_based_VSA = 0;       //activate weighted occupancy based VSA control with loop detector occupancy data
-	 int weighed_speed_based_VSA = 1;           //activate weighted speed based VSA control with loop detector occupancy data
+	 int weighed_speed_based_VSA = 0;           //activate weighted speed based VSA control with loop detector occupancy data
 	 
 	 //last_density = controller_mainline_data[NUM_LDS-1].agg_density;   // density
 	 //last_flow = controller_mainline_data[NUM_LDS-1].agg_vol;          // flow
