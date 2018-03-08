@@ -117,12 +117,49 @@ int main(int argc, char *argv[])
 			db_clt_read(pclt, DB_ALL_SIGNS_VAR, sizeof(db_vsa_ctl_t), &db_vsa_ctl);
 			send_vsa(&db_vsa_ctl, outfilename);
 			memset(str, 0, 200);
+/*
 			for(i=0; i<NUM_SIGNS; i++) {
 				sprintf(str, "/var/www/html/VSA/scripts/safepace_set_speed_single.php %d %d\n", vsa_sign_ids[i], db_vsa_ctl.vsa[i]);
 				printf("\nsign_control: executing: %s", str);
 				system(str);
 				sleep(var_sleep);
 			}
+*/
+			sprintf(str, "/var/www/html/VSA/scripts/safepace_set_speed_single.php %d %d\n", vsa_sign_ids[0], db_vsa_ctl.vsa[0]);
+			printf("\nsign_control: executing: %s", str);
+			system(str);
+			sleep(var_sleep);
+
+			sprintf(str, "/var/www/html/VSA/scripts/safepace_set_speed_single.php %d %d\n", vsa_sign_ids[1], db_vsa_ctl.vsa[1]);
+			printf("\nsign_control: executing: %s", str);
+			system(str);
+			sleep(var_sleep);
+
+			sprintf(str, "/var/www/html/VSA/scripts/safepace_set_speed_single.php %d %d\n", vsa_sign_ids[2], db_vsa_ctl.vsa[2]);
+			printf("\nsign_control: executing: %s", str);
+			system(str);
+			sleep(var_sleep);
+
+			sprintf(str, "/var/www/html/VSA/scripts/safepace_set_speed_single.php %d %d\n", vsa_sign_ids[3], db_vsa_ctl.vsa[3]);
+			printf("\nsign_control: executing: %s", str);
+			system(str);
+			sleep(var_sleep);
+
+			sprintf(str, "/var/www/html/VSA/scripts/safepace_set_speed_single.php %d %d\n", vsa_sign_ids[4], db_vsa_ctl.vsa[4]);
+			printf("\nsign_control: executing: %s", str);
+			system(str);
+			sleep(var_sleep);
+
+			sprintf(str, "/var/www/html/VSA/scripts/safepace_set_speed_single.php %d %d\n", vsa_sign_ids[5], db_vsa_ctl.vsa[5]);
+			printf("\nsign_control: executing: %s", str);
+			system(str);
+			sleep(var_sleep);
+
+			sprintf(str, "/var/www/html/VSA/scripts/safepace_set_speed_single.php %d %d\n", vsa_sign_ids[6], db_vsa_ctl.vsa[6]);
+			printf("\nsign_control: executing: %s", str);
+			system(str);
+			sleep(var_sleep);
+
 //			system("/var/www/html/VSA/scripts/safepace_set_speed.php");
 //			printf("sign_control: Executing safepace_set_speed.php\n");
                 }
