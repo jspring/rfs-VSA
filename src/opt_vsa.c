@@ -270,6 +270,8 @@ int main(int argc, char *argv[])
 	 int speed_based_VSA_use_radar = 0;         //activate speed based VSA control with radar speed data 
 	 int weighted_occupancy_based_VSA = 0;       //activate weighted occupancy based VSA control with loop detector occupancy data
 	 int weighted_speed_based_VSA = 0;           //activate weighted speed based VSA control with loop detector occupancy data
+	 int weighted_occupancy_based_VSA_use_radar = 0; // use loop detector occupancy and radar speed
+	 int weighted_speed_based_VSA_use_radar = 0;     // use radar speed only
 
 	while ((option = getopt(argc, argv, "lros")) != EOF) {
 		switch(option) {
@@ -288,6 +290,14 @@ int main(int argc, char *argv[])
 			case 's':
 				weighted_occupancy_based_VSA = 0;
 				weighted_speed_based_VSA = 1;
+				break;
+			case 't':
+				weighted_occupancy_based_VSA_use_radar = 0;
+				weighted_speed_based_VSA_use_radar = 1;
+				break;
+			case 'u':
+				weighted_occupancy_based_VSA_use_radar = 1;
+				weighted_speed_based_VSA_use_radar = 0;
 				break;
 			default:
 				printf("\nUsage: %s\n", argv[0]);
@@ -449,19 +459,12 @@ int main(int argc, char *argv[])
 		//fprintf(dbg_st_file_out,"\n");
 	}
 
-	// VSA control code start from here
+	 // VSA control code start from here
 	 	
-//		det_data_4_contr(time);	
-//		get_meas(time);
 	 //int num_VSA_device = 8; // number of VSA devices
-	 
 	 //last_density = controller_mainline_data[NUM_LDS-1].agg_density;   // density
 	 //last_flow = controller_mainline_data[NUM_LDS-1].agg_vol;          // flow
 	
-	 
-	 // get speed information from the immediately upstream of the most downstream VSA
-	 // up_last_speed = controller_mainline_data[NUM_LDS-2].agg_speed;
-
 	 // VSA speed is a value between 5 mph to 65 mph
 	 // speed based VSA 
 	 if (speed_based_VSA_use_loop_detector){
@@ -883,6 +886,220 @@ int main(int argc, char *argv[])
 	 suggested_speed[i] = mind(65, maxd(5, suggested_speed[i])); // restrict the VSA speed between 5 mph and 65 mph
 		 }
 	 }
+
+	 if (weighted_occupancy_based_VSA_use_radar){
+		 // suppose the steady state density is 12–30 vehicles per mile per lane
+		 // suppose the max steady state flow is 1800 vehicles per hour per lane
+		 for (i=1; i<NUM_SIGNS-1; i++){
+			if(i==1){
+				local_speed =  db_locinfo[0].weighted_speed_average; // radar speed of VSA 1
+				local_occupancy = controller_mainline_data[5].agg_occ;
+				local_weighted_occupancy = w11*controller_mainline_data[5].agg_occ + w12*controller_mainline_data[7].agg_occ + w13*controller_mainline_data[9].agg_occ;
+				if(local_occupancy>occ_threshold_1){
+			        	suggested_speed[i]= mind( weighted_occ_gain1/maxd(local_weighted_occupancy,5), 65); 
+					// check local speed of VSA
+		    // if local speed is less than 20 mph (very low speed), then use local speed.
+					if(local_speed<20){
+						suggested_speed[i]= maxd(local_speed-5,5);
+					}
+				}else{
+			         suggested_speed[i] = local_speed; 
+			        }
+			 } 
+			 if(i==2){
+				 local_speed =  db_locinfo[1].weighted_speed_average; // radar speed of VSA 2
+				 local_occupancy = controller_mainline_data[7].agg_occ;
+				 local_weighted_occupancy = w21*controller_mainline_data[7].agg_occ + w22*controller_mainline_data[9].agg_occ + w23*controller_mainline_data[10].agg_occ;
+		 if(local_occupancy>occ_threshold_2){
+				 suggested_speed[i]= mind( weighted_occ_gain2/maxd(local_weighted_occupancy,5), 65); 
+			            if(local_speed<20){
+			               suggested_speed[i]=  maxd(local_speed-5,5);
+			             }
+				 }else{
+		 suggested_speed[i] = local_speed; 
+				 }
+			 }
+			 if(i==3){
+				 local_speed =  db_locinfo[2].weighted_speed_average; // radar speed of VSA 3
+				 local_occupancy = controller_mainline_data[9].agg_occ;
+	 			 local_weighted_occupancy = w31*controller_mainline_data[9].agg_occ + w32*controller_mainline_data[10].agg_occ + w33*controller_mainline_data[11].agg_occ;
+
+				 if(local_occupancy>occ_threshold_3){
+				    suggested_speed[i]= mind( weighted_occ_gain3/maxd(local_weighted_occupancy,5), 65); 
+						 if(local_speed<20){
+			               suggested_speed[i]= maxd(local_speed-5,5);
+			             }
+				 }else{
+				    suggested_speed[i] = local_speed; 
+				 }
+			 }
+			 if(i==4){
+				 local_speed = db_locinfo[3].weighted_speed_average; // radar speed of VSA 4
+				 local_occupancy = controller_mainline_data[10].agg_occ;
+				 local_weighted_occupancy = w41*controller_mainline_data[10].agg_occ + w42*controller_mainline_data[11].agg_occ + w43*controller_mainline_data[12].agg_occ;
+
+				if(local_occupancy>occ_threshold_4){
+				   suggested_speed[i]= mind( weighted_occ_gain4/maxd(local_weighted_occupancy,5), 65); 
+				   		 if(local_speed<20){
+			               suggested_speed[i]= maxd(local_speed-5,5);
+			             }
+				 }else{
+				   suggested_speed[i] = local_speed;     
+				 }
+			 }
+			 if(i==5){
+				 local_speed = db_locinfo[4].weighted_speed_average; // radar speed of VSA 5
+				 local_occupancy = controller_mainline_data[11].agg_occ;
+				 local_weighted_occupancy = w51*controller_mainline_data[11].agg_occ + w52*controller_mainline_data[12].agg_occ + w53*controller_mainline_data[13].agg_occ;
+				if(local_occupancy>occ_threshold_5){ 
+				  suggested_speed[i]= mind( weighted_occ_gain5/maxd(local_weighted_occupancy,5), 65); 
+				  		if(local_speed<20){
+			               suggested_speed[i]= maxd(local_speed-5,5);
+			             }
+				 }else{
+				  suggested_speed[i] = local_speed;     
+				 }
+			 }
+			 if(i==6){
+				 local_speed = db_locinfo[5].weighted_speed_average; // radar speed of VSA 6
+				 local_occupancy = controller_mainline_data[12].agg_occ;
+				 local_weighted_occupancy = w61*controller_mainline_data[12].agg_occ + w62*controller_mainline_data[13].agg_occ;
+				 if(local_occupancy>occ_threshold_6){ 
+				   suggested_speed[i]= mind( weighted_occ_gain6/maxd(local_weighted_occupancy,5), 65); 
+				   		if(local_speed<20){
+			               suggested_speed[i]= maxd(local_speed-5,5);
+			            }
+				 }else{
+		   suggested_speed[i] = local_speed; 
+				 }
+		     }
+			 if(i==7){
+				 local_speed = db_locinfo[6].weighted_speed_average; // radar speed of VSA 7
+				 local_occupancy = controller_mainline_data[13].agg_occ;
+				 local_weighted_occupancy = w71*controller_mainline_data[13].agg_occ;
+				 if(local_occupancy>occ_threshold_7){
+				 suggested_speed[i]= mind( weighted_occ_gain7/maxd(local_weighted_occupancy,5), 65); 
+				 		 if(local_speed<20){
+			               suggested_speed[i]= maxd(local_speed-5,5);
+			             }
+				 }else{
+				   suggested_speed[i] = local_speed; 
+				 }
+			 }  
+	 suggested_speed[i] = mind(65, maxd(5, suggested_speed[i])); // restrict the VSA speed between 5 mph and 65 mph
+		 }
+	 }
+
+	 if (weighted_speed_based_VSA_use_radar){
+		 // suppose the steady state density is 12–30 vehicles per mile per lane
+		 // suppose the max steady state flow is 1800 vehicles per hour per lane
+		 for (i=1; i<NUM_SIGNS-1; i++){
+		     if(i==1){
+				 local_speed = db_locinfo[0].weighted_speed_average; // radar speed of VSA 1
+				 local_weighted_speed = p11*db_locinfo[0].weighted_speed_average+ p12*db_locinfo[1].weighted_speed_average+ p13*db_locinfo[2].weighted_speed_average;
+				 if(local_occupancy>occ_threshold_1){
+			        suggested_speed[i]= mind( weighted_speed_gain1*maxd(local_weighted_speed,5), 65); 
+					// check local speed of VSA
+		            // if local speed is less than 20 mph (very low speed), then use local speed.
+			        if(local_speed<20){
+			               suggested_speed[i]= maxd(local_speed-5,5);
+			             }
+				    }else{
+			         suggested_speed[i] = local_speed; 
+			        }
+			 } 
+			 if(i==2){
+				 local_speed = db_locinfo[1].weighted_speed_average; // radar speed of VSA 2
+				 local_weighted_speed = p21*db_locinfo[1].weighted_speed_average + p22*db_locinfo[2].weighted_speed_average + p23*db_locinfo[3].weighted_speed_average;
+				if(local_occupancy>occ_threshold_2){
+				 suggested_speed[i]= mind( weighted_speed_gain2*maxd(local_weighted_speed,5), 65);  
+			            if(local_speed<20){
+			               suggested_speed[i]=  maxd(local_speed-5,5);
+			             }
+				 }else{
+					suggested_speed[i] = local_speed; 
+				 }
+			 }
+			 if(i==3){
+				 local_speed = db_locinfo[2].weighted_speed_average; // radar speed of VSA 3
+	 			 local_weighted_speed = p31*db_locinfo[2].weighted_speed_average + p32*db_locinfo[3].weighted_speed_average + p33*db_locinfo[4].weighted_speed_average;
+				 if(local_occupancy>occ_threshold_3){
+				    suggested_speed[i]= mind( weighted_speed_gain3*maxd(local_weighted_speed,5), 65); 
+						 if(local_speed<20){
+			               suggested_speed[i]= maxd(local_speed-5,5);
+			             }
+				 }else{
+				    suggested_speed[i] = local_speed; 
+				 }
+			 }
+			 if(i==4){
+				 local_speed = db_locinfo[3].weighted_speed_average; // radar speed of VSA 4
+				 local_weighted_speed = p41*db_locinfo[3].weighted_speed_average + p42*db_locinfo[4].weighted_speed_average + p43*db_locinfo[5].weighted_speed_average;
+				if(local_occupancy>occ_threshold_4){
+				   suggested_speed[i]= mind( weighted_speed_gain4*maxd(local_weighted_speed,5), 65);
+				   		 if(local_speed<20){
+			               suggested_speed[i]= maxd(local_speed-5,5);
+			             }
+				 }else{
+				   suggested_speed[i] = local_speed;     
+				 }
+			 }
+			 if(i==5){
+				 local_speed = db_locinfo[4].weighted_speed_average; // radar speed of VSA 5
+				 local_weighted_speed = p51*db_locinfo[4].weighted_speed_average + p52*db_locinfo[5].weighted_speed_average + p53*db_locinfo[6].weighted_speed_average;
+				if(local_occupancy>occ_threshold_5){
+				  suggested_speed[i]= mind( weighted_speed_gain5*maxd(local_weighted_speed,5), 65); 
+				  		if(local_speed<20){
+			               suggested_speed[i]= maxd(local_speed-5,5);
+			             }
+				 }else{
+				  suggested_speed[i] = local_speed;     
+				 }
+			 }
+			 if(i==6){
+				 local_speed = db_locinfo[5].weighted_speed_average; // radar speed of VSA 6
+				 local_weighted_speed = p61*db_locinfo[5].weighted_speed_average + p62*db_locinfo[6].weighted_speed_average;
+				 if(local_occupancy>occ_threshold_6){ 
+				   suggested_speed[i]= mind( weighted_speed_gain6*maxd(local_weighted_speed,5), 65); 
+				   		if(local_speed<20){
+			               suggested_speed[i]= maxd(local_speed-5,5);
+			            }
+				 }else{
+					suggested_speed[i] = local_speed; 
+				 }
+		     }
+			 if(i==7){
+				 local_speed = db_locinfo[6].weighted_speed_average; // radar speed of VSA 7
+				 local_weighted_speed = p71*db_locinfo[6].weighted_speed_average;
+				 if(local_occupancy>occ_threshold_7){
+				 suggested_speed[i]= mind( weighted_speed_gain7*maxd(local_weighted_speed,5), 65); 
+				 		 if(local_speed<20){
+			               suggested_speed[i]= maxd(local_speed-5,5);
+			             }
+				 }else{
+				   suggested_speed[i] = local_speed; 
+				 }
+			 }  
+	 suggested_speed[i] = mind(65, maxd(5, suggested_speed[i])); // restrict the VSA speed between 5 mph and 65 mph
+		 }
+	 }
+
+	// add speed variation limit conditions
+	for (i=1; i<NUM_SIGNS-1-1; i++){
+		if(suggested_speed[i]-suggested_speed[i+1]>20){
+			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-10));
+		}else if(suggested_speed[i]-suggested_speed[i+1]>30){
+			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-20));
+		}else if(suggested_speed[i]-suggested_speed[i+1]>40){
+			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-30));
+		}else if(suggested_speed[i]-suggested_speed[i+1]>50){
+			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-40));
+		}else if(suggested_speed[i]-suggested_speed[i+1]>60){
+			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-50));
+		}else{
+			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-0));
+		}
+	}
 	  	  
 		webdatafp = fopen("/var/www/html/VSA/scripts/VSA_performance_plot.txt", "w");
 		fprintf(webdatafp, "Intersection Name,speed(mph),volume(VPH/100),occupancy(%%),VSA(mph)");
