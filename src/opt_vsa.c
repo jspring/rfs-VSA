@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
 	 int weighted_occupancy_based_VSA_use_radar = 0; // use loop detector occupancy and radar speed
 	 int weighted_speed_based_VSA_use_radar = 0;     // use radar speed only
 
-	while ((option = getopt(argc, argv, "lros")) != EOF) {
+	while ((option = getopt(argc, argv, "lrostu")) != EOF) {
 		switch(option) {
 			case 'l':
 				speed_based_VSA_use_loop_detector = 1;
