@@ -496,7 +496,11 @@ int main(int argc, char *argv[])
 						suggested_speed[i]= maxd(local_speed-5,5);
 					}
 				}else{
-			        	suggested_speed[i] = local_speed; 
+			        	if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 			        }
 			 } 
 			 if(i==2){
@@ -508,7 +512,11 @@ int main(int argc, char *argv[])
 						suggested_speed[i]=  maxd(local_speed-5,5);
 					}
 				 }else{
-				 suggested_speed[i] = local_speed; 
+				 if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }
 			 if(i==3){
@@ -520,7 +528,11 @@ int main(int argc, char *argv[])
 						suggested_speed[i]= maxd(local_speed-5,5);
 					}
 				 }else{
-				    suggested_speed[i] = local_speed; 
+				    if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }
 			 if(i==4){
@@ -532,7 +544,11 @@ int main(int argc, char *argv[])
 						suggested_speed[i]= maxd(local_speed-5,5);
 					}
 				 }else{
-					suggested_speed[i] = local_speed;     
+					if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}    
 				 }
 			 }
 			 if(i==5){
@@ -544,7 +560,11 @@ int main(int argc, char *argv[])
 			               		suggested_speed[i]= maxd(local_speed-5,5);
 			             	}
 				 }else{
-				 	suggested_speed[i] = local_speed;     
+				 	if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}    
 				 }
 			 }
 			 if(i==6){
@@ -556,7 +576,11 @@ int main(int argc, char *argv[])
 						suggested_speed[i]= maxd(local_speed-5,5);
 			            	}
 				 }else{
-					suggested_speed[i] = local_speed; 
+					if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					} 
 				 }
 		     	}
 			if(i==7){
@@ -568,7 +592,11 @@ int main(int argc, char *argv[])
 			               		suggested_speed[i]= maxd(local_speed-5,5);
 			             	}
 				 }else{
-				   suggested_speed[i] = local_speed; 
+				   if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					} 
 				 }
 			 }  
 	 suggested_speed[i] = mind(65, maxd(5, suggested_speed[i])); // restrict the VSA speed between 5 mph and 65 mph
@@ -591,8 +619,12 @@ int main(int argc, char *argv[])
 						suggested_speed[i]= maxd(local_speed-5,5);
 					}
 				}else{
-			         suggested_speed[i] = local_speed; 
-			        }
+					if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
+			    }
 			 } 
 			 if(i==2){
 				 local_speed = controller_mainline_data[7].agg_speed;
@@ -604,7 +636,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]=  maxd(local_speed-5,5);
 			             }
 				 }else{
-		 suggested_speed[i] = local_speed; 
+					if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }
 			 if(i==3){
@@ -618,7 +654,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				    suggested_speed[i] = local_speed; 
+				    if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					} 
 				 }
 			 }
 			 if(i==4){
@@ -632,7 +672,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				   suggested_speed[i] = local_speed;     
+				   if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}    
 				 }
 			 }
 			 if(i==5){
@@ -645,7 +689,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				  suggested_speed[i] = local_speed;     
+				  if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}     
 				 }
 			 }
 			 if(i==6){
@@ -658,7 +706,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			            }
 				 }else{
-		   suggested_speed[i] = local_speed; 
+		              if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 		     }
 			 if(i==7){
@@ -671,7 +723,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				   suggested_speed[i] = local_speed; 
+				   if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }  
 	 suggested_speed[i] = mind(65, maxd(5, suggested_speed[i])); // restrict the VSA speed between 5 mph and 65 mph
@@ -692,9 +748,13 @@ int main(int argc, char *argv[])
 		    // if local speed is less than 20 mph (very low speed), then use local speed.
 			        if(local_speed<20){
 			               suggested_speed[i]= maxd(local_speed-5,5);
-			             }
+			        }
 				    }else{
-			         suggested_speed[i] = local_speed; 
+			         if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 			        }
 			 } 
 			 if(i==2){
@@ -707,7 +767,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]=  maxd(local_speed-5,5);
 			             }
 				 }else{
-		 suggested_speed[i] = local_speed; 
+		              if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }
 			 if(i==3){
@@ -720,7 +784,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				    suggested_speed[i] = local_speed; 
+				    if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }
 			 if(i==4){
@@ -733,7 +801,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				   suggested_speed[i] = local_speed;     
+				   if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}    
 				 }
 			 }
 			 if(i==5){
@@ -746,7 +818,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				  suggested_speed[i] = local_speed;     
+				   if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}    
 				 }
 			 }
 			 if(i==6){
@@ -759,7 +835,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			            }
 				 }else{
-		   suggested_speed[i] = local_speed; 
+		             if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}    
 				 }
 		     }
 			 if(i==7){
@@ -772,7 +852,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				   suggested_speed[i] = local_speed; 
+				   if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }  
 	 suggested_speed[i] = mind(65, maxd(5, suggested_speed[i])); // restrict the VSA speed between 5 mph and 65 mph
@@ -808,7 +892,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				    }else{
-			         suggested_speed[i] = local_speed; 
+			         if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					} 
 			        }
 			 } 
 			 if(i==2){
@@ -820,7 +908,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]=  maxd(local_speed-5,5);
 			             }
 				 }else{
-		 suggested_speed[i] = local_speed; 
+		             if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }
 			 if(i==3){
@@ -832,7 +924,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				    suggested_speed[i] = local_speed; 
+				    if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }
 			 if(i==4){
@@ -844,7 +940,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				   suggested_speed[i] = local_speed;     
+				   if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}    
 				 }
 			 }
 			 if(i==5){
@@ -856,7 +956,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				  suggested_speed[i] = local_speed;     
+				   if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}     
 				 }
 			 }
 			 if(i==6){
@@ -868,7 +972,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			            }
 				 }else{
-		   suggested_speed[i] = local_speed; 
+		             if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 		     }
 			 if(i==7){
@@ -880,7 +988,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				   suggested_speed[i] = local_speed; 
+				   if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }  
 	 suggested_speed[i] = mind(65, maxd(5, suggested_speed[i])); // restrict the VSA speed between 5 mph and 65 mph
@@ -903,7 +1015,11 @@ int main(int argc, char *argv[])
 						suggested_speed[i]= maxd(local_speed-5,5);
 					}
 				}else{
-			         suggested_speed[i] = local_speed; 
+			         if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 			        }
 			 } 
 			 if(i==2){
@@ -916,7 +1032,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]=  maxd(local_speed-5,5);
 			             }
 				 }else{
-		 suggested_speed[i] = local_speed; 
+		              if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }
 			 if(i==3){
@@ -930,7 +1050,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				    suggested_speed[i] = local_speed; 
+				    if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }
 			 if(i==4){
@@ -944,7 +1068,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				   suggested_speed[i] = local_speed;     
+				   if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}   
 				 }
 			 }
 			 if(i==5){
@@ -957,7 +1085,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				  suggested_speed[i] = local_speed;     
+				  if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}    
 				 }
 			 }
 			 if(i==6){
@@ -970,7 +1102,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			            }
 				 }else{
-		   suggested_speed[i] = local_speed; 
+		          if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 		     }
 			 if(i==7){
@@ -983,7 +1119,11 @@ int main(int argc, char *argv[])
 			               suggested_speed[i]= maxd(local_speed-5,5);
 			             }
 				 }else{
-				   suggested_speed[i] = local_speed; 
+				   if(local_occupancy<2 && local_speed<2 ){
+                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+					}else{
+			            suggested_speed[i] = local_speed;
+					}
 				 }
 			 }  
 	 suggested_speed[i] = mind(65, maxd(5, suggested_speed[i])); // restrict the VSA speed between 5 mph and 65 mph
