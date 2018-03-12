@@ -1258,7 +1258,51 @@ int main(int argc, char *argv[])
 			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-0));
 		}
 	}
-	  	  
+	
+	// check downstream occupancy. if all downstream occupancy is low, then activate free flow speed 65 mph 
+	if(controller_mainline_data[7].agg_occ<occ_threshold_2 && 
+		controller_mainline_data[9].agg_occ<occ_threshold_3 && 
+		controller_mainline_data[10].agg_occ<occ_threshold_4 && 
+		controller_mainline_data[11].agg_occ<occ_threshold_5 && 
+		controller_mainline_data[12].agg_occ<occ_threshold_6 && 
+		controller_mainline_data[13].agg_occ<occ_threshold_7){
+		suggested_speed[1] = 65;
+	}
+
+	if(controller_mainline_data[9].agg_occ<occ_threshold_3 && 
+		controller_mainline_data[10].agg_occ<occ_threshold_4 &&
+		controller_mainline_data[11].agg_occ<occ_threshold_5 &&
+		controller_mainline_data[12].agg_occ<occ_threshold_6 &&
+		controller_mainline_data[13].agg_occ<occ_threshold_7){
+		suggested_speed[2] = 65;
+	}
+
+	if(controller_mainline_data[10].agg_occ<occ_threshold_4 &&
+		controller_mainline_data[11].agg_occ<occ_threshold_5 &&
+		controller_mainline_data[12].agg_occ<occ_threshold_6 &&
+		controller_mainline_data[13].agg_occ<occ_threshold_7){
+		suggested_speed[3] = 65;
+	}
+
+	if(controller_mainline_data[11].agg_occ<occ_threshold_5 &&
+		controller_mainline_data[12].agg_occ<occ_threshold_6 &&
+		controller_mainline_data[13].agg_occ<occ_threshold_7){
+		suggested_speed[4] = 65;
+	}
+
+	if(controller_mainline_data[12].agg_occ<occ_threshold_6 &&
+		controller_mainline_data[13].agg_occ<occ_threshold_7){
+		suggested_speed[5] = 65;
+	}
+
+	if(controller_mainline_data[12].agg_occ<occ_threshold_6 &&
+		controller_mainline_data[13].agg_occ<occ_threshold_7){
+		suggested_speed[6] = 65;
+	}
+
+	if(controller_mainline_data[13].agg_occ<occ_threshold_7){
+		suggested_speed[7] = 65;
+	}
 		webdatafp = fopen("/var/www/html/VSA/scripts/VSA_performance_plot.txt", "w");
 		fprintf(webdatafp, "Intersection Name,speed(mph),volume(VPH/100),occupancy(%%),VSA(mph)");
 
