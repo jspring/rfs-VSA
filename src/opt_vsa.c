@@ -497,7 +497,7 @@ int main(int argc, char *argv[])
 					}
 				}else{
 			        	if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[7].agg_speed+controller_mainline_data[9].agg_speed+controller_mainline_data[10].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}
@@ -513,7 +513,7 @@ int main(int argc, char *argv[])
 					}
 				 }else{
 				 if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[5].agg_speed+controller_mainline_data[9].agg_speed+controller_mainline_data[10].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}
@@ -529,7 +529,7 @@ int main(int argc, char *argv[])
 					}
 				 }else{
 				    if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[7].agg_speed+controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}
@@ -545,7 +545,7 @@ int main(int argc, char *argv[])
 					}
 				 }else{
 					if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[9].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[12].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}    
@@ -561,7 +561,7 @@ int main(int argc, char *argv[])
 			             	}
 				 }else{
 				 	if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[12].agg_speed+controller_mainline_data[13].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}    
@@ -577,7 +577,7 @@ int main(int argc, char *argv[])
 			            	}
 				 }else{
 					if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[13].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					} 
@@ -593,7 +593,7 @@ int main(int argc, char *argv[])
 			             	}
 				 }else{
 				   if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[12].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					} 
@@ -620,7 +620,7 @@ int main(int argc, char *argv[])
 					}
 				}else{
 					if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[7].agg_speed+controller_mainline_data[9].agg_speed+controller_mainline_data[10].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}
@@ -637,7 +637,7 @@ int main(int argc, char *argv[])
 			             }
 				 }else{
 					if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[5].agg_speed+controller_mainline_data[9].agg_speed+controller_mainline_data[10].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}
@@ -655,7 +655,7 @@ int main(int argc, char *argv[])
 			             }
 				 }else{
 				    if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[7].agg_speed+controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					} 
@@ -673,7 +673,7 @@ int main(int argc, char *argv[])
 			             }
 				 }else{
 				   if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[9].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[12].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}    
@@ -690,7 +690,7 @@ int main(int argc, char *argv[])
 			             }
 				 }else{
 				  if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[12].agg_speed+controller_mainline_data[13].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}     
@@ -707,7 +707,7 @@ int main(int argc, char *argv[])
 			            }
 				 }else{
 		              if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[13].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}
@@ -724,7 +724,7 @@ int main(int argc, char *argv[])
 			             }
 				 }else{
 				   if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[12].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}
@@ -751,7 +751,7 @@ int main(int argc, char *argv[])
 			        }
 				    }else{
 			         if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[7].agg_speed+controller_mainline_data[9].agg_speed+controller_mainline_data[10].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}
@@ -768,7 +768,7 @@ int main(int argc, char *argv[])
 			             }
 				 }else{
 		              if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[5].agg_speed+controller_mainline_data[9].agg_speed+controller_mainline_data[10].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}
@@ -785,7 +785,7 @@ int main(int argc, char *argv[])
 			             }
 				 }else{
 				    if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[7].agg_speed+controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}
@@ -802,7 +802,7 @@ int main(int argc, char *argv[])
 			             }
 				 }else{
 				   if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[9].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[12].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}    
@@ -819,7 +819,7 @@ int main(int argc, char *argv[])
 			             }
 				 }else{
 				   if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[12].agg_speed+controller_mainline_data[13].agg_speed);   // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}    
@@ -836,7 +836,7 @@ int main(int argc, char *argv[])
 			            }
 				 }else{
 		             if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[13].agg_speed); // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}    
@@ -853,7 +853,7 @@ int main(int argc, char *argv[])
 			             }
 				 }else{
 				   if(local_occupancy<2 && local_speed<2 ){
-                        suggested_speed[i] = 45;  // this is the case if sensor don't receive correct data
+                        suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[12].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
 			            suggested_speed[i] = local_speed;
 					}
