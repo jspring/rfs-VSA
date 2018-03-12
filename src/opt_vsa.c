@@ -387,6 +387,24 @@ int main(int argc, char *argv[])
 			float_temp = hm_speed_prev[i];
 		}
 		controller_mainline_data[i].agg_speed = mind(150.0, maxd( 1.0, float_temp) );
+
+		// fix abnormal mainline data by interpolation 
+		if(controller_mainline_data[i].agg_occ<2 && controller_mainline_data[i].agg_speed<2){
+			if(i==0){
+				controller_mainline_data[0].agg_vol = controller_mainline_data[1].agg_vol;
+				controller_mainline_data[0].agg_occ = controller_mainline_data[1].agg_occ;
+				controller_mainline_data[0].agg_speed =controller_mainline_data[1].agg_speed;
+			}else if(i==NUM_LDS-1){
+				controller_mainline_data[NUM_LDS-1].agg_vol = controller_mainline_data[NUM_LDS-2].agg_vol;
+				controller_mainline_data[NUM_LDS-1].agg_occ = controller_mainline_data[NUM_LDS-2].agg_occ;
+				controller_mainline_data[NUM_LDS-1].agg_speed =controller_mainline_data[NUM_LDS-2].agg_speed;
+			}else{
+				controller_mainline_data[i].agg_vol = 0.5*(controller_mainline_data[i-1].agg_vol+controller_mainline_data[i+1].agg_vol);
+				controller_mainline_data[i].agg_occ =0.5*(controller_mainline_data[i-1].agg_occ+controller_mainline_data[i+1].agg_occ);
+				controller_mainline_data[i].agg_speed =0.5*(controller_mainline_data[i-1].agg_speed+controller_mainline_data[i+1].agg_speed);
+			}
+		}
+
 		 
 		float_temp = mean_speed_aggregation_mainline(&lds[i][MLE1_e], mean_speed_prev[i], &confidence[i][0]);
 		if(float_temp < 0){
