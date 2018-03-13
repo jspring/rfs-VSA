@@ -1259,50 +1259,125 @@ int main(int argc, char *argv[])
 		}
 	}
 	
-	// check downstream occupancy. if all downstream occupancy is low, then activate free flow speed 65 mph 
-	if(controller_mainline_data[7].agg_occ<occ_threshold_2 && 
-		controller_mainline_data[9].agg_occ<occ_threshold_3 && 
-		controller_mainline_data[10].agg_occ<occ_threshold_4 && 
-		controller_mainline_data[11].agg_occ<occ_threshold_5 && 
-		controller_mainline_data[12].agg_occ<occ_threshold_6 && 
-		controller_mainline_data[13].agg_occ<occ_threshold_7){
+	// check downstream occupancy. if all downstream occupancy is low, then activate different speed value by occupancy level  
+	// check VSA 1
+	if(controller_mainline_data[7].agg_occ<0.2 && 
+		controller_mainline_data[9].agg_occ<0.2 && 
+		controller_mainline_data[10].agg_occ<0.2 && 
+		controller_mainline_data[11].agg_occ<0.2 && 
+		controller_mainline_data[12].agg_occ<0.2 && 
+		controller_mainline_data[13].agg_occ<0.2){
+		suggested_speed[1] = 45;
+	}else if (controller_mainline_data[7].agg_occ<0.15 && 
+		controller_mainline_data[9].agg_occ<0.15 && 
+		controller_mainline_data[10].agg_occ<0.15 && 
+		controller_mainline_data[11].agg_occ<0.15 && 
+		controller_mainline_data[12].agg_occ<0.15 && 
+		controller_mainline_data[13].agg_occ<0.15){
+		suggested_speed[1] = 55;
+	}else if (controller_mainline_data[7].agg_occ<0.15 && 
+		controller_mainline_data[9].agg_occ<0.12 && 
+		controller_mainline_data[10].agg_occ<0.12 && 
+		controller_mainline_data[11].agg_occ<0.12 && 
+		controller_mainline_data[12].agg_occ<0.12 && 
+		controller_mainline_data[13].agg_occ<0.12){
 		suggested_speed[1] = 65;
+	}else{
 	}
 
-	if(controller_mainline_data[9].agg_occ<occ_threshold_3 && 
-		controller_mainline_data[10].agg_occ<occ_threshold_4 &&
-		controller_mainline_data[11].agg_occ<occ_threshold_5 &&
-		controller_mainline_data[12].agg_occ<occ_threshold_6 &&
-		controller_mainline_data[13].agg_occ<occ_threshold_7){
+    // check VSA 2
+	if(controller_mainline_data[9].agg_occ<0.2 && 
+		controller_mainline_data[10].agg_occ<0.2 && 
+		controller_mainline_data[11].agg_occ<0.2 && 
+		controller_mainline_data[12].agg_occ<0.2 && 
+		controller_mainline_data[13].agg_occ<0.2){
+		suggested_speed[2] = 45;
+	}else if (controller_mainline_data[9].agg_occ<0.15 && 
+		controller_mainline_data[10].agg_occ<0.15 && 
+		controller_mainline_data[11].agg_occ<0.15 && 
+		controller_mainline_data[12].agg_occ<0.15 && 
+		controller_mainline_data[13].agg_occ<0.15){
+		suggested_speed[2] = 55;
+	}else if (controller_mainline_data[9].agg_occ<0.12 && 
+		controller_mainline_data[10].agg_occ<0.12 && 
+		controller_mainline_data[11].agg_occ<0.12 && 
+		controller_mainline_data[12].agg_occ<0.12 && 
+		controller_mainline_data[13].agg_occ<0.12){
 		suggested_speed[2] = 65;
+	}else{
 	}
-
-	if(controller_mainline_data[10].agg_occ<occ_threshold_4 &&
-		controller_mainline_data[11].agg_occ<occ_threshold_5 &&
-		controller_mainline_data[12].agg_occ<occ_threshold_6 &&
-		controller_mainline_data[13].agg_occ<occ_threshold_7){
+    
+	// check VSA 3 
+	if(controller_mainline_data[10].agg_occ<0.2 && 
+		controller_mainline_data[11].agg_occ<0.2 && 
+		controller_mainline_data[12].agg_occ<0.2 && 
+		controller_mainline_data[13].agg_occ<0.2){
+		suggested_speed[3] = 45;
+	}else if (controller_mainline_data[10].agg_occ<0.15 && 
+		controller_mainline_data[11].agg_occ<0.15 && 
+		controller_mainline_data[12].agg_occ<0.15 && 
+		controller_mainline_data[13].agg_occ<0.15){
+		suggested_speed[3] = 55;
+	}else if (controller_mainline_data[10].agg_occ<0.12 && 
+		controller_mainline_data[11].agg_occ<0.12 && 
+		controller_mainline_data[12].agg_occ<0.12 && 
+		controller_mainline_data[13].agg_occ<0.12){
 		suggested_speed[3] = 65;
+	}else{
 	}
 
-	if(controller_mainline_data[11].agg_occ<occ_threshold_5 &&
-		controller_mainline_data[12].agg_occ<occ_threshold_6 &&
-		controller_mainline_data[13].agg_occ<occ_threshold_7){
+	// check VSA 4
+	if(controller_mainline_data[11].agg_occ<0.2 && 
+		controller_mainline_data[12].agg_occ<0.2 && 
+		controller_mainline_data[13].agg_occ<0.2){
+		suggested_speed[4] = 45;
+	}else if (controller_mainline_data[11].agg_occ<0.15 && 
+		controller_mainline_data[12].agg_occ<0.15 && 
+		controller_mainline_data[13].agg_occ<0.15){
+		suggested_speed[4] = 55;
+	}else if (controller_mainline_data[11].agg_occ<0.12 && 
+		controller_mainline_data[12].agg_occ<0.12 && 
+		controller_mainline_data[13].agg_occ<0.12){
 		suggested_speed[4] = 65;
+	}else{
 	}
 
-	if(controller_mainline_data[12].agg_occ<occ_threshold_6 &&
-		controller_mainline_data[13].agg_occ<occ_threshold_7){
+	// check VSA 5
+	if(controller_mainline_data[12].agg_occ<0.2 && 
+		controller_mainline_data[13].agg_occ<0.2){
+		suggested_speed[5] = 45;
+	}else if (controller_mainline_data[12].agg_occ<0.15 && 
+		controller_mainline_data[13].agg_occ<0.15){
+		suggested_speed[5] = 55;
+	}else if (controller_mainline_data[12].agg_occ<0.12 && 
+		controller_mainline_data[13].agg_occ<0.12){
 		suggested_speed[5] = 65;
+	}else{
 	}
 
-	if(controller_mainline_data[12].agg_occ<occ_threshold_6 &&
-		controller_mainline_data[13].agg_occ<occ_threshold_7){
+	// check VSA 6
+    if(controller_mainline_data[12].agg_occ<0.2 && 
+		controller_mainline_data[13].agg_occ<0.2){
+		suggested_speed[6] = 45;
+	}else if (controller_mainline_data[12].agg_occ<0.15 && 
+		controller_mainline_data[13].agg_occ<0.15){
+		suggested_speed[6] = 55;
+	}else if (controller_mainline_data[12].agg_occ<0.12 && 
+		controller_mainline_data[13].agg_occ<0.12){
 		suggested_speed[6] = 65;
+	}else{
+	}
+    
+	// check VSA 7
+    if(controller_mainline_data[13].agg_occ<0.2){
+		suggested_speed[7] = 45;
+	}else if (controller_mainline_data[13].agg_occ<0.15){
+		suggested_speed[7] = 55;
+	}else if (controller_mainline_data[13].agg_occ<0.12){
+		suggested_speed[7] = 65;
+	}else{
 	}
 
-	if(controller_mainline_data[13].agg_occ<occ_threshold_7){
-		suggested_speed[7] = 65;
-	}
 		webdatafp = fopen("/var/www/html/VSA/scripts/VSA_performance_plot.txt", "w");
 		fprintf(webdatafp, "Intersection Name,speed(mph),volume(VPH/100),occupancy(%%),VSA(mph)");
 
