@@ -1972,66 +1972,73 @@ int main(int argc, char *argv[])
 */
 
 			if(j == 0)
-			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d",
+			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d,%.1f",
 				sign_strings[j],
 				controller_mainline_data[5].agg_speed,
 				controller_mainline_data[5].agg_vol/100.0,
 				controller_mainline_data[5].agg_occ,
-				suggested_speed_int
+				suggested_speed_int,
+				db_locinfo[j].weighted_speed_average * 0.6214
 			);
 
 			if(j == 1)
-			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d",
+			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d,%.1f",
 				sign_strings[j],
 				controller_mainline_data[7].agg_speed,
 				controller_mainline_data[7].agg_vol/100.0,
 				controller_mainline_data[7].agg_occ,
-				suggested_speed_int
+				suggested_speed_int,
+				db_locinfo[j].weighted_speed_average * 0.6214
 			);
 
 			if(j == 2)
-			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d",
+			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d,%.1f",
 				sign_strings[j],
 				controller_mainline_data[9].agg_speed,
 				controller_mainline_data[9].agg_vol/100.0,
 				controller_mainline_data[9].agg_occ,
-				suggested_speed_int
+				suggested_speed_int,
+				db_locinfo[j].weighted_speed_average * 0.6214
 			);
 
 			if(j == 3)
-			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d",
+			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d,%.1f",
 				sign_strings[j],
 				controller_mainline_data[10].agg_speed,
 				controller_mainline_data[10].agg_vol/100.0,
 				controller_mainline_data[10].agg_occ,
-				suggested_speed_int
+				suggested_speed_int,
+				db_locinfo[j].weighted_speed_average * 0.6214
 			);
 
 			if(j == 4)
-			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d",
+			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d,%.1f",
 				sign_strings[j],
 				controller_mainline_data[11].agg_speed,
 				controller_mainline_data[11].agg_vol/100.0,
 				controller_mainline_data[11].agg_occ,
-				suggested_speed_int
+				suggested_speed_int,
+				db_locinfo[j].weighted_speed_average * 0.6214
 			);
 
 			if(j == 5)
-			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d",
+			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d,%.1f",
 				sign_strings[j],
 				controller_mainline_data[12].agg_speed,
 				controller_mainline_data[12].agg_vol/100.0,
 				controller_mainline_data[12].agg_occ,
-				suggested_speed_int
+				suggested_speed_int,
+				db_locinfo[j].weighted_speed_average * 0.6214
 			);
 
 			if(j == 6)
-			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d",
+			fprintf(webdatafp, "\r\n%s,%.1f,%.1f,%.1f,%d,%.1f",
 				sign_strings[j],
 				controller_mainline_data[13].agg_speed,
 				controller_mainline_data[13].agg_vol/100.0,
 				controller_mainline_data[13].agg_occ,
-				suggested_speed_int
+				suggested_speed_int,
+				db_locinfo[j].weighted_speed_average * 0.6214
 			);
 	    	} 
 		fclose(webdatafp);
