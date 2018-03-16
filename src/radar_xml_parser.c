@@ -210,7 +210,7 @@ int main(int argc, char *argv[]) {
 		total_targets,
 		speed_count
 	);
-	if( (db_locinfo.name < 7) && (db_locinfo.name > 0) )
+	if( (db_locinfo.name < 8) && (db_locinfo.name > 0) )
 		db_clt_write(pclt, db_vsa_sign_ids[db_locinfo.name - 1].id, sizeof(db_locinfo_t), &db_locinfo);
 	}
 	db_opt_vsa_trigger.trigger += 1;
