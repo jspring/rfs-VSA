@@ -276,6 +276,16 @@ int main(int argc, char *argv[])
 	 int weighted_speed_based_VSA_use_radar = 0;     // use radar speed only
      int weighted_three_occupancy_based_VSA_use_radar = 0; //use weighted three downstream occupancy based and radar speed
 	 int weighted_all_occupancy_based_VSA_use_radar = 0; //use weighted all downstream occupancy and radar speed
+	const char *usage = "\t-l speed_based_VSA_use_loop_detector\n\t\
+		-r speed_based_VSA_use_radar\n\t\
+		-o weighted_occupancy_based_VSA \n\t\
+		-s weighted_speed_based_VSA \n\t\
+		-t weighted_speed_based_VSA_use_radar \n\t\
+		-u weighted_occupancy_based_VSA_use_radar \n\t\
+		-m weighted_three_occupancy_based_VSA \n\t\
+		-n weighted_all_occupancy_based_VSA \n\t\
+		-p weighted_three_occupancy_based_VSA_use_radar \n\t\
+		-q weighted_all_occupancy_based_VSA_use_radar \n\t";
 
 	while ((option = getopt(argc, argv, "lrostumnpq")) != EOF) {
 		switch(option) {
@@ -303,7 +313,7 @@ int main(int argc, char *argv[])
 				weighted_occupancy_based_VSA_use_radar = 1;
 				weighted_speed_based_VSA_use_radar = 0;
 				break;
-            case 'm':
+			case 'm':
 				weighted_three_occupancy_based_VSA = 1;
 				weighted_all_occupancy_based_VSA = 0; 
 				weighted_three_occupancy_based_VSA_use_radar = 0; 
@@ -328,7 +338,7 @@ int main(int argc, char *argv[])
 				weighted_all_occupancy_based_VSA_use_radar = 1;
 				break;
 			default:
-				printf("\nUsage: %s\n", argv[0]);
+				printf("\nUsage: %s %s\n", argv[0], usage);
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -1947,7 +1957,7 @@ int main(int argc, char *argv[])
 	}
 
 		webdatafp = fopen("/var/www/html/VSA/scripts/VSA_performance_plot.txt", "w");
-		fprintf(webdatafp, "Intersection Name,speed(mph),volume(VPH/100),occupancy(%%),VSA(mph)");
+		fprintf(webdatafp, "Intersection Name,speed(mph),volume(VPH/100),occupancy(%%),VSA(mph),radar speed(mph)");
 
 		for(j=0; j<NUM_SIGNS; j++){
 	    // round VSA speed into five base numbers (VSA value is multiple of five)
