@@ -285,9 +285,10 @@ int main(int argc, char *argv[])
 		-m weighted_three_occupancy_based_VSA \n\t\
 		-n weighted_all_occupancy_based_VSA \n\t\
 		-p weighted_three_occupancy_based_VSA_use_radar \n\t\
-		-q weighted_all_occupancy_based_VSA_use_radar \n\t";
+		-q weighted_all_occupancy_based_VSA_use_radar \n\t\
+		-h this usage message\n\t";
 
-	while ((option = getopt(argc, argv, "lrostumnpq")) != EOF) {
+	while ((option = getopt(argc, argv, "lrostumnpqh")) != EOF) {
 		switch(option) {
 			case 'l':
 				speed_based_VSA_use_loop_detector = 1;
@@ -337,6 +338,7 @@ int main(int argc, char *argv[])
 				weighted_three_occupancy_based_VSA_use_radar = 0; 
 				weighted_all_occupancy_based_VSA_use_radar = 1;
 				break;
+			case 'h':
 			default:
 				printf("\nUsage: %s %s\n", argv[0], usage);
 				exit(EXIT_FAILURE);
