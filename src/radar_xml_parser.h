@@ -37,7 +37,7 @@ typedef struct {
 	location_t location;
 	stats_t stats;
 	params_t params;
-	raw_record_t raw_record[50];
+	raw_record_t raw_record[50][100];
 	float weighted_speed_average;
 
 }locinfo_t;

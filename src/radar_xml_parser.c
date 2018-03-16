@@ -50,6 +50,7 @@ int main(int argc, char *argv[]) {
         int whitespacevalue = '\040';
 	char *textvalue; 
 	int i;
+	int j;
 	int total_targets;
 	int speed_count;
 	const char *usage = "-f <input data file (required)>";
@@ -157,8 +158,6 @@ int main(int argc, char *argv[]) {
 	
 
 	i = 0;
-	total_targets = 0;
-	speed_count = 0;
 
         node2 = mxmlFindElement(node, node, "raw_records", NULL, NULL, MXML_DESCEND);
         for (node3 = mxmlFindElement(node2, node2, "record", NULL, NULL,
@@ -170,24 +169,33 @@ int main(int argc, char *argv[]) {
 
 		textvalue= mxmlElementGetAttr(node3, "datetime");
 		if(textvalue == NULL)
-			strcpy(locinfo.raw_record[i].datetime, "none");
+			strcpy(locinfo.raw_record[i][0].datetime, "none");
 		else
-			strcpy(locinfo.raw_record[i].datetime, textvalue);
+			strcpy(locinfo.raw_record[i][0].datetime, textvalue);
 
-		node4 = mxmlFindElement(node3, node3, "counter", NULL, NULL, MXML_DESCEND);
-		textvalue = (char *)mxmlGetText(node4, &whitespacevalue);
-		locinfo.raw_record[i].count = (textvalue == NULL) ? 0 : atoi(textvalue);
-		textvalue= mxmlElementGetAttr(node4, "speed");
-		locinfo.raw_record[i].speed = (textvalue == NULL) ? 0 : atoi(textvalue);
-		total_targets += locinfo.raw_record[i].count;
-		speed_count += locinfo.raw_record[i].count * locinfo.raw_record[i].speed;
+		j = 0;
+	total_targets = 0;
+	speed_count = 0;
+		for( node4 = mxmlFindElement(node3, node3, "counter", NULL, NULL, MXML_DESCEND);
+			node4 != NULL;
+			node4 = mxmlFindElement(node4, node3, "counter", NULL, NULL,
+                                    MXML_DESCEND))
+		{
+			textvalue = (char *)mxmlGetText(node4, &whitespacevalue);
+			locinfo.raw_record[i][j].count = (textvalue == NULL) ? 0 : atoi(textvalue);
+			textvalue= mxmlElementGetAttr(node4, "speed");
+			locinfo.raw_record[i][j].speed = (textvalue == NULL) ? 0 : atoi(textvalue);
+			total_targets += locinfo.raw_record[i][j].count;
+			speed_count += locinfo.raw_record[i][j].count * locinfo.raw_record[i][j].speed;
 
-		printf("Raw record %d count %d speed %d datetime %s\n",
-			i+1,
-			locinfo.raw_record[i].count,
-			locinfo.raw_record[i].speed,
-			locinfo.raw_record[i].datetime
-		);
+			printf("Raw record %d count %d speed %d datetime %s\n",
+				i+1,
+				locinfo.raw_record[i][j].count,
+				locinfo.raw_record[i][j].speed,
+				locinfo.raw_record[i][0].datetime
+			);
+			j++;
+		}
 		i++;
 	}
 	locinfo.weighted_speed_average = total_targets > 0 ? (float)(speed_count)/total_targets : 0;
