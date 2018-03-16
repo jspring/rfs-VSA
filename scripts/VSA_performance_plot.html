@@ -37,15 +37,13 @@
 				  {
 					  results = results.slice(0, results.length-1);
 				  }
-				  var data = google.visualization.arrayToDataTable(results);
-				          var options = {
-					  title: 'EB SR 78 Current Performance Metric',
-					  curveType: 'function',
-					  legend: { position: 'bottom' }
+					var data = google.visualization.arrayToDataTable(results);
+					var options = {
+							title: 'EB SR 78 Current Performance Metric',
+							curveType: 'none',
+					  		legend: { position: 'bottom' }
 					};
-
 					var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
 					chart.draw(data, options);
 			  }
 		  })
@@ -54,13 +52,10 @@
       }
     </script>
   </head>
-
   <body>
     <div id="curve_chart" style="width: 1300px; height: 400px"></div>
 	<div class="overlay-marker">
-	
   </div>
   </body>
-
 </html>
 </div>
