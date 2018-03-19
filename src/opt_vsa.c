@@ -2133,8 +2133,8 @@ int main(int argc, char *argv[])
 	}
 
 	// for construction area Twin Oaks (VSA 5) and Barham Pkwy (VSA 6), set VSA max speed as 55 mph
-    suggested_speed[5] = maxd(suggested_speed[5],55);
-    suggested_speed[6] = maxd(suggested_speed[6],55);
+    suggested_speed[5] = mind(suggested_speed[5],55);
+    suggested_speed[6] = mind(suggested_speed[6],55);
 
 
 		webdatafp = fopen("/var/www/html/VSA/scripts/VSA_performance_plot.txt", "w");
