@@ -714,7 +714,7 @@ int main(int argc, char *argv[])
 	 if (weighted_occupancy_based_VSA){
 		 // suppose the steady state density is 12–30 vehicles per mile per lane
 		 // suppose the max steady state flow is 1800 vehicles per hour per lane
-		 for (i=1; i<NUM_SIGNS-1; i++){
+		 for (i=1; i<=NUM_SIGNS; i++){
 			if(i==1){
 				local_speed = controller_mainline_data[5].agg_speed;
 				local_occupancy = controller_mainline_data[5].agg_occ;
@@ -874,7 +874,7 @@ int main(int argc, char *argv[])
 	 if (weighted_three_occupancy_based_VSA){
 		 // suppose the steady state density is 12–30 vehicles per mile per lane
 		 // suppose the max steady state flow is 1800 vehicles per hour per lane
-		 for (i=1; i<NUM_SIGNS-1; i++){
+		 for (i=1; i<=NUM_SIGNS; i++){
 			if(i==1){
 				local_speed = controller_mainline_data[5].agg_speed;
 				local_occupancy = controller_mainline_data[5].agg_occ;
@@ -1033,7 +1033,7 @@ int main(int argc, char *argv[])
 	 if (weighted_all_occupancy_based_VSA){
 		 // suppose the steady state density is 12–30 vehicles per mile per lane
 		 // suppose the max steady state flow is 1800 vehicles per hour per lane
-		 for (i=1; i<NUM_SIGNS-1; i++){
+		 for (i=1; i<=NUM_SIGNS; i++){
 			if(i==1){
 				local_speed = controller_mainline_data[5].agg_speed;
 				local_occupancy = controller_mainline_data[5].agg_occ;
@@ -1203,7 +1203,7 @@ int main(int argc, char *argv[])
 	 if (weighted_speed_based_VSA){
 		 // suppose the steady state density is 12–30 vehicles per mile per lane
 		 // suppose the max steady state flow is 1800 vehicles per hour per lane
-		 for (i=1; i<NUM_SIGNS-1; i++){
+		 for (i=1; i<=NUM_SIGNS; i++){
 		     if(i==1){
 				 local_speed = controller_mainline_data[5].agg_speed;
 				 local_occupancy = controller_mainline_data[5].agg_occ;
@@ -1468,7 +1468,7 @@ int main(int argc, char *argv[])
 	 if (weighted_occupancy_based_VSA_use_radar){
 		 // suppose the steady state density is 12–30 vehicles per mile per lane
 		 // suppose the max steady state flow is 1800 vehicles per hour per lane
-		 for (i=1; i<NUM_SIGNS-1; i++){
+		 for (i=1; i<=NUM_SIGNS; i++){
 			if(i==1){
 				local_speed =  db_locinfo[0].weighted_speed_average; // radar speed of VSA 1
 				local_occupancy = controller_mainline_data[5].agg_occ;
@@ -1628,7 +1628,7 @@ int main(int argc, char *argv[])
 	 if (weighted_three_occupancy_based_VSA_use_radar){
 		 // suppose the steady state density is 12–30 vehicles per mile per lane
 		 // suppose the max steady state flow is 1800 vehicles per hour per lane
-		 for (i=1; i<NUM_SIGNS-1; i++){
+		 for (i=1; i<=NUM_SIGNS; i++){
 			if(i==1){
 				local_speed = db_locinfo[0].weighted_speed_average;
 				local_occupancy = controller_mainline_data[5].agg_occ;
@@ -1788,7 +1788,7 @@ int main(int argc, char *argv[])
 	 if (weighted_all_occupancy_based_VSA_use_radar){
 		 // suppose the steady state density is 12–30 vehicles per mile per lane
 		 // suppose the max steady state flow is 1800 vehicles per hour per lane
-		 for (i=1; i<NUM_SIGNS-1; i++){
+		 for (i=1; i<=NUM_SIGNS; i++){
 			if(i==1){
 				local_speed = db_locinfo[0].weighted_speed_average;
 				local_occupancy = controller_mainline_data[5].agg_occ;
@@ -1958,7 +1958,7 @@ int main(int argc, char *argv[])
 	 if (weighted_speed_based_VSA_use_radar){
 		 // suppose the steady state density is 12–30 vehicles per mile per lane
 		 // suppose the max steady state flow is 1800 vehicles per hour per lane
-		 for (i=1; i<NUM_SIGNS-1; i++){
+		 for (i=1; i<=NUM_SIGNS; i++){
 		     if(i==1){
 				 local_speed = db_locinfo[0].weighted_speed_average; // radar speed of VSA 1
 				 local_weighted_speed = p11*db_locinfo[0].weighted_speed_average+ p12*db_locinfo[1].weighted_speed_average+ p13*db_locinfo[2].weighted_speed_average;
