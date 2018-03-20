@@ -324,6 +324,8 @@ int main(int argc, char *argv[])
 	 int weighted_speed_based_VSA_use_radar = 0;     // use radar speed only
      int weighted_three_occupancy_based_VSA_use_radar = 0; //use weighted three downstream occupancy based and radar speed
 	 int weighted_all_occupancy_based_VSA_use_radar = 0; //use weighted all downstream occupancy and radar speed
+
+	 int weighted_average_occupancy_gain = 0; // this equals to 0 means not activate occupancy dependent gain
 	const char *usage = "\t-l speed_based_VSA_use_loop_detector\n\t\
 		-r speed_based_VSA_use_radar\n\t\
 		-o weighted_occupancy_based_VSA \n\t\
@@ -716,9 +718,11 @@ int main(int argc, char *argv[])
 			if(i==1){
 				local_speed = controller_mainline_data[5].agg_speed;
 				local_occupancy = controller_mainline_data[5].agg_occ;
+				if(weighted_average_occupancy_gain){
 				w11 = controller_mainline_data[5].agg_occ/(controller_mainline_data[5].agg_occ+controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ);
 				w12 = controller_mainline_data[7].agg_occ/(controller_mainline_data[5].agg_occ+controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ);
 				w13 = controller_mainline_data[9].agg_occ/(controller_mainline_data[5].agg_occ+controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ);
+				}
 				local_weighted_occupancy = w11*controller_mainline_data[5].agg_occ + w12*controller_mainline_data[7].agg_occ + w13*controller_mainline_data[9].agg_occ;
 				if(local_occupancy>occ_threshold_1){
 			        	suggested_speed[i]= mind( weighted_occ_gain1/maxd(local_weighted_occupancy,5), 65); 
@@ -738,9 +742,11 @@ int main(int argc, char *argv[])
 			 if(i==2){
 				 local_speed = controller_mainline_data[7].agg_speed;
 				 local_occupancy = controller_mainline_data[7].agg_occ;
+				 if(weighted_average_occupancy_gain){
         		 w21 = controller_mainline_data[7].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				 w22 = controller_mainline_data[9].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				 w23 = controller_mainline_data[10].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
+				 }
 				 local_weighted_occupancy = w21*controller_mainline_data[7].agg_occ + w22*controller_mainline_data[9].agg_occ + w23*controller_mainline_data[10].agg_occ;
 		 if(local_occupancy>occ_threshold_2){
 				 suggested_speed[i]= mind( weighted_occ_gain2/maxd(local_weighted_occupancy,5), 65); 
@@ -758,10 +764,12 @@ int main(int argc, char *argv[])
 			 if(i==3){
 				 local_speed = controller_mainline_data[9].agg_speed;
 				 local_occupancy = controller_mainline_data[9].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 w31 = controller_mainline_data[9].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 w32 = controller_mainline_data[10].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 w33 = controller_mainline_data[11].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
-	 			 local_weighted_occupancy = w31*controller_mainline_data[9].agg_occ + w32*controller_mainline_data[10].agg_occ + w33*controller_mainline_data[11].agg_occ;
+				 }
+				 local_weighted_occupancy = w31*controller_mainline_data[9].agg_occ + w32*controller_mainline_data[10].agg_occ + w33*controller_mainline_data[11].agg_occ;
 
 				 if(local_occupancy>occ_threshold_3){
 				    suggested_speed[i]= mind( weighted_occ_gain3/maxd(local_weighted_occupancy,5), 65); 
@@ -779,9 +787,11 @@ int main(int argc, char *argv[])
 			 if(i==4){
 				 local_speed = controller_mainline_data[10].agg_speed;
 				 local_occupancy = controller_mainline_data[10].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 w41 = controller_mainline_data[10].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 w42 = controller_mainline_data[11].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 w43 = controller_mainline_data[12].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
+				 }
 				 local_weighted_occupancy = w41*controller_mainline_data[10].agg_occ + w42*controller_mainline_data[11].agg_occ + w43*controller_mainline_data[12].agg_occ;
 
 		 if(local_occupancy>occ_threshold_4){
@@ -800,9 +810,11 @@ int main(int argc, char *argv[])
 			 if(i==5){
 				 local_speed = controller_mainline_data[11].agg_speed;
 				 local_occupancy = controller_mainline_data[11].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 w51 = controller_mainline_data[11].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 w52 = controller_mainline_data[12].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 w53 = controller_mainline_data[13].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
+				 }
 				 local_weighted_occupancy = w51*controller_mainline_data[11].agg_occ + w52*controller_mainline_data[12].agg_occ + w53*controller_mainline_data[13].agg_occ;
 		 if(local_occupancy>occ_threshold_5){ 
 				  suggested_speed[i]= mind( weighted_occ_gain5/maxd(local_weighted_occupancy,5), 65); 
@@ -820,8 +832,10 @@ int main(int argc, char *argv[])
 			 if(i==6){
 				 local_speed = controller_mainline_data[12].agg_speed;
 				 local_occupancy = controller_mainline_data[12].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 w61 = controller_mainline_data[12].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 w62 = controller_mainline_data[13].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
+				 }
 				 local_weighted_occupancy = w61*controller_mainline_data[12].agg_occ + w62*controller_mainline_data[13].agg_occ;
 				 if(local_occupancy>occ_threshold_6){ 
 				   suggested_speed[i]= mind( weighted_occ_gain6/maxd(local_weighted_occupancy,5), 65); 
@@ -864,9 +878,11 @@ int main(int argc, char *argv[])
 			if(i==1){
 				local_speed = controller_mainline_data[5].agg_speed;
 				local_occupancy = controller_mainline_data[5].agg_occ;
+				if(weighted_average_occupancy_gain){
 				s11 = controller_mainline_data[7].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				s12 = controller_mainline_data[9].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				s13 = controller_mainline_data[10].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
+				}
 				local_weighted_occupancy = 0.5*controller_mainline_data[5].agg_occ + 0.5*(s11*controller_mainline_data[7].agg_occ +s12* controller_mainline_data[9].agg_occ+ s13*controller_mainline_data[10].agg_occ);
 				if(local_occupancy>occ_threshold_1){
 			        	suggested_speed[i]= mind( weighted_occ_gain1/maxd(local_weighted_occupancy,5), 65); 
@@ -886,9 +902,11 @@ int main(int argc, char *argv[])
 			 if(i==2){
 				 local_speed = controller_mainline_data[7].agg_speed;
 				 local_occupancy = controller_mainline_data[7].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 s21 = controller_mainline_data[9].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 s22 = controller_mainline_data[10].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 s23 = controller_mainline_data[11].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
+				 }
 				 local_weighted_occupancy = 0.5*controller_mainline_data[7].agg_occ + 0.5*(s21*controller_mainline_data[9].agg_occ + s22*controller_mainline_data[10].agg_occ+ s23*controller_mainline_data[11].agg_occ);
 		 if(local_occupancy>occ_threshold_2){
 				 suggested_speed[i]= mind( weighted_occ_gain2/maxd(local_weighted_occupancy,5), 65); 
@@ -906,10 +924,12 @@ int main(int argc, char *argv[])
 			 if(i==3){
 				 local_speed = controller_mainline_data[9].agg_speed;
 				 local_occupancy = controller_mainline_data[9].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 s31 = controller_mainline_data[10].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 s32 = controller_mainline_data[11].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 s33 = controller_mainline_data[12].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
-	 			 local_weighted_occupancy = 0.5*controller_mainline_data[9].agg_occ + 0.5*(s31*controller_mainline_data[10].agg_occ + s32*controller_mainline_data[11].agg_occ+ s33*controller_mainline_data[12].agg_occ);
+				 }
+				 local_weighted_occupancy = 0.5*controller_mainline_data[9].agg_occ + 0.5*(s31*controller_mainline_data[10].agg_occ + s32*controller_mainline_data[11].agg_occ+ s33*controller_mainline_data[12].agg_occ);
 
 				 if(local_occupancy>occ_threshold_3){
 				    suggested_speed[i]= mind( weighted_occ_gain3/maxd(local_weighted_occupancy,5), 65); 
@@ -927,9 +947,11 @@ int main(int argc, char *argv[])
 			 if(i==4){
 				 local_speed = controller_mainline_data[10].agg_speed;
 				 local_occupancy = controller_mainline_data[10].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 s41 = controller_mainline_data[11].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s42 =controller_mainline_data[12].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s43 = controller_mainline_data[12].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
+				 }
 				 local_weighted_occupancy = 0.5*controller_mainline_data[10].agg_occ + 0.5*(s41*controller_mainline_data[11].agg_occ + s42*controller_mainline_data[12].agg_occ+ s43*controller_mainline_data[13].agg_occ);
 
 		 if(local_occupancy>occ_threshold_4){
@@ -948,8 +970,10 @@ int main(int argc, char *argv[])
 			 if(i==5){
 				 local_speed = controller_mainline_data[11].agg_speed;
 				 local_occupancy = controller_mainline_data[11].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 s51 = controller_mainline_data[12].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s52 = controller_mainline_data[13].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
+				 }
 				 local_weighted_occupancy = 0.5*controller_mainline_data[11].agg_occ + 0.5*(s51*controller_mainline_data[12].agg_occ + s52*controller_mainline_data[13].agg_occ);
 		 if(local_occupancy>occ_threshold_5){ 
 				  suggested_speed[i]= mind( weighted_occ_gain5/maxd(local_weighted_occupancy,5), 65); 
@@ -967,8 +991,10 @@ int main(int argc, char *argv[])
 			 if(i==6){
 				 local_speed = controller_mainline_data[12].agg_speed;
 				 local_occupancy = controller_mainline_data[12].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 s61 = controller_mainline_data[12].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s62 = controller_mainline_data[13].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
+				 }
 				 local_weighted_occupancy = s61*controller_mainline_data[12].agg_occ + s62*controller_mainline_data[13].agg_occ;
 				 if(local_occupancy>occ_threshold_6){ 
 				   suggested_speed[i]= mind( weighted_occ_gain6/maxd(local_weighted_occupancy,5), 65); 
@@ -1011,6 +1037,7 @@ int main(int argc, char *argv[])
 			if(i==1){
 				local_speed = controller_mainline_data[5].agg_speed;
 				local_occupancy = controller_mainline_data[5].agg_occ;
+				if(weighted_average_occupancy_gain){
 				ww11 = controller_mainline_data[5].agg_occ/(controller_mainline_data[5].agg_occ + controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                 ww12 = controller_mainline_data[7].agg_occ/(controller_mainline_data[5].agg_occ + controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                 ww13 = controller_mainline_data[9].agg_occ/(controller_mainline_data[5].agg_occ + controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
@@ -1018,6 +1045,7 @@ int main(int argc, char *argv[])
                 ww15 = controller_mainline_data[11].agg_occ/(controller_mainline_data[5].agg_occ + controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                 ww16 = controller_mainline_data[12].agg_occ/(controller_mainline_data[5].agg_occ + controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                 ww17 = controller_mainline_data[13].agg_occ/(controller_mainline_data[5].agg_occ + controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
+				}
 				local_weighted_occupancy = ww11*controller_mainline_data[5].agg_occ + ww12*controller_mainline_data[7].agg_occ + ww13*controller_mainline_data[9].agg_occ+ ww14*controller_mainline_data[10].agg_occ+ ww15*controller_mainline_data[11].agg_occ+ ww16*controller_mainline_data[12].agg_occ+ ww17*controller_mainline_data[13].agg_occ;
 				if(local_occupancy>occ_threshold_1){
 			        	suggested_speed[i]= mind( weighted_occ_gain1/maxd(local_weighted_occupancy,5), 65); 
@@ -1037,13 +1065,14 @@ int main(int argc, char *argv[])
 			 if(i==2){
 				 local_speed = controller_mainline_data[7].agg_speed;
 				 local_occupancy = controller_mainline_data[7].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 ww21 = controller_mainline_data[7].agg_occ/(controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww22 = controller_mainline_data[9].agg_occ/(controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                  ww23 = controller_mainline_data[10].agg_occ/(controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                  ww24 = controller_mainline_data[11].agg_occ/(controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                  ww25 = controller_mainline_data[12].agg_occ/(controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                  ww26 = controller_mainline_data[13].agg_occ/(controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
-                 
+				 }
 				 local_weighted_occupancy = ww21*controller_mainline_data[7].agg_occ + ww22*controller_mainline_data[9].agg_occ+ ww23*controller_mainline_data[10].agg_occ+ ww24*controller_mainline_data[11].agg_occ+ ww25*controller_mainline_data[12].agg_occ+ ww26*controller_mainline_data[13].agg_occ;
 		 if(local_occupancy>occ_threshold_2){
 				 suggested_speed[i]= mind( weighted_occ_gain2/maxd(local_weighted_occupancy,5), 65); 
@@ -1061,12 +1090,13 @@ int main(int argc, char *argv[])
 			 if(i==3){
 				 local_speed = controller_mainline_data[9].agg_speed;
 				 local_occupancy = controller_mainline_data[9].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 ww31 = controller_mainline_data[9].agg_occ/(controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww32 = controller_mainline_data[10].agg_occ/(controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww33 = controller_mainline_data[11].agg_occ/(controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww34 = controller_mainline_data[12].agg_occ/(controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww35 = controller_mainline_data[13].agg_occ/(controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
-         
+				 }
 	 			 local_weighted_occupancy = ww31*controller_mainline_data[9].agg_occ + ww32*controller_mainline_data[10].agg_occ + ww33*controller_mainline_data[11].agg_occ+ww34*controller_mainline_data[12].agg_occ+ww35*controller_mainline_data[13].agg_occ;
 
 				 if(local_occupancy>occ_threshold_3){
@@ -1085,11 +1115,12 @@ int main(int argc, char *argv[])
 			 if(i==4){
 				 local_speed = controller_mainline_data[10].agg_speed;
 				 local_occupancy = controller_mainline_data[10].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 ww41 = controller_mainline_data[10].agg_occ/(controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);  
                  ww42 = controller_mainline_data[11].agg_occ/(controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww43 = controller_mainline_data[12].agg_occ/(controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww44 = controller_mainline_data[13].agg_occ/(controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
-
+				 }
 				 local_weighted_occupancy = ww41*controller_mainline_data[10].agg_occ+ ww42*controller_mainline_data[11].agg_occ + ww43*controller_mainline_data[12].agg_occ+ww44*controller_mainline_data[13].agg_occ;
 
 		 if(local_occupancy>occ_threshold_4){
@@ -1108,9 +1139,11 @@ int main(int argc, char *argv[])
 			 if(i==5){
 				 local_speed = controller_mainline_data[11].agg_speed;
 				 local_occupancy = controller_mainline_data[11].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 ww51 = controller_mainline_data[11].agg_occ/(controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);  
                  ww52 = controller_mainline_data[12].agg_occ/(controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww53 = controller_mainline_data[13].agg_occ/(controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
+				 }
 				 local_weighted_occupancy = ww51*controller_mainline_data[11].agg_occ + ww52*controller_mainline_data[12].agg_occ + ww53*controller_mainline_data[13].agg_occ;
 		 if(local_occupancy>occ_threshold_5){ 
 				  suggested_speed[i]= mind( weighted_occ_gain5/maxd(local_weighted_occupancy,5), 65); 
@@ -1128,9 +1161,10 @@ int main(int argc, char *argv[])
 			 if(i==6){
 				 local_speed = controller_mainline_data[12].agg_speed;
 				 local_occupancy = controller_mainline_data[12].agg_occ;
+				 if(weighted_average_occupancy_gain){
                  ww61 = controller_mainline_data[12].agg_occ/(controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);  
                  ww62 = controller_mainline_data[13].agg_occ/(controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
-
+				 }
 				 local_weighted_occupancy = ww61*controller_mainline_data[12].agg_occ + ww62*controller_mainline_data[13].agg_occ;
 				 if(local_occupancy>occ_threshold_6){ 
 				   suggested_speed[i]= mind( weighted_occ_gain6/maxd(local_weighted_occupancy,5), 65); 
@@ -1304,7 +1338,7 @@ int main(int argc, char *argv[])
 		    suggested_speed[6] = mind(65, maxd(5,beta*last_speed)); // reduce VSA at immediate bottleneck section if occupancy too high
 			suggested_speed[7] = mind(65, maxd(5,alpha*last_speed));
 		 }else{
-	    suggested_speed[6] = mind(65, maxd(5,db_locinfo[5].weighted_speed_average)); // radar speed
+	        suggested_speed[6] = mind(65, maxd(5,db_locinfo[5].weighted_speed_average)); // radar speed
 			suggested_speed[7] = mind(65, maxd(5,db_locinfo[6].weighted_speed_average)); // radar speed
 		 }
 	     // do linear interpolation to upstream VSA
@@ -1438,9 +1472,11 @@ int main(int argc, char *argv[])
 			if(i==1){
 				local_speed =  db_locinfo[0].weighted_speed_average; // radar speed of VSA 1
 				local_occupancy = controller_mainline_data[5].agg_occ;
+				if(weighted_average_occupancy_gain){
 				w11 = controller_mainline_data[5].agg_occ/(controller_mainline_data[5].agg_occ+controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ);
 				w12 = controller_mainline_data[7].agg_occ/(controller_mainline_data[5].agg_occ+controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ);
 				w13 = controller_mainline_data[9].agg_occ/(controller_mainline_data[5].agg_occ+controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ);
+				}
 				local_weighted_occupancy = w11*controller_mainline_data[5].agg_occ + w12*controller_mainline_data[7].agg_occ + w13*controller_mainline_data[9].agg_occ;
 				if(local_occupancy>occ_threshold_1){
 			        	suggested_speed[i]= mind( weighted_occ_gain1/maxd(local_weighted_occupancy,5), 65); 
@@ -1460,9 +1496,11 @@ int main(int argc, char *argv[])
 			 if(i==2){
 				 local_speed =  db_locinfo[1].weighted_speed_average; // radar speed of VSA 2
 				 local_occupancy = controller_mainline_data[7].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 w21 = controller_mainline_data[7].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				 w22 = controller_mainline_data[9].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				 w23 = controller_mainline_data[10].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
+				 }
 				 local_weighted_occupancy = w21*controller_mainline_data[7].agg_occ + w22*controller_mainline_data[9].agg_occ + w23*controller_mainline_data[10].agg_occ;
 		 if(local_occupancy>occ_threshold_2){
 				 suggested_speed[i]= mind( weighted_occ_gain2/maxd(local_weighted_occupancy,5), 65); 
@@ -1480,10 +1518,12 @@ int main(int argc, char *argv[])
 			 if(i==3){
 				 local_speed =  db_locinfo[2].weighted_speed_average; // radar speed of VSA 3
 				 local_occupancy = controller_mainline_data[9].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 w31 = controller_mainline_data[9].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 w32 = controller_mainline_data[10].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 w33 = controller_mainline_data[11].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
-	 			 local_weighted_occupancy = w31*controller_mainline_data[9].agg_occ + w32*controller_mainline_data[10].agg_occ + w33*controller_mainline_data[11].agg_occ;
+				 }
+				 local_weighted_occupancy = w31*controller_mainline_data[9].agg_occ + w32*controller_mainline_data[10].agg_occ + w33*controller_mainline_data[11].agg_occ;
 
 				 if(local_occupancy>occ_threshold_3){
 				    suggested_speed[i]= mind( weighted_occ_gain3/maxd(local_weighted_occupancy,5), 65); 
@@ -1501,9 +1541,11 @@ int main(int argc, char *argv[])
 			 if(i==4){
 				 local_speed = db_locinfo[3].weighted_speed_average; // radar speed of VSA 4
 				 local_occupancy = controller_mainline_data[10].agg_occ;
+				 if(weighted_average_occupancy_gain){
                  w41 = controller_mainline_data[10].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 w42 = controller_mainline_data[11].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 w43 = controller_mainline_data[12].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
+				 }
 				 local_weighted_occupancy = w41*controller_mainline_data[10].agg_occ + w42*controller_mainline_data[11].agg_occ + w43*controller_mainline_data[12].agg_occ;
 
 				if(local_occupancy>occ_threshold_4){
@@ -1522,9 +1564,11 @@ int main(int argc, char *argv[])
 			 if(i==5){
 				 local_speed = db_locinfo[4].weighted_speed_average; // radar speed of VSA 5
 				 local_occupancy = controller_mainline_data[11].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 w51 = controller_mainline_data[11].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 w52 = controller_mainline_data[12].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 w53 = controller_mainline_data[13].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
+				 }
 				 local_weighted_occupancy = w51*controller_mainline_data[11].agg_occ + w52*controller_mainline_data[12].agg_occ + w53*controller_mainline_data[13].agg_occ;
 				if(local_occupancy>occ_threshold_5){ 
 				  suggested_speed[i]= mind( weighted_occ_gain5/maxd(local_weighted_occupancy,5), 65); 
@@ -1542,8 +1586,10 @@ int main(int argc, char *argv[])
 			 if(i==6){
 				 local_speed = db_locinfo[5].weighted_speed_average; // radar speed of VSA 6
 				 local_occupancy = controller_mainline_data[12].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 w61 = controller_mainline_data[12].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 w62 = controller_mainline_data[13].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
+				 }
 				 local_weighted_occupancy = w61*controller_mainline_data[12].agg_occ + w62*controller_mainline_data[13].agg_occ;
 				 if(local_occupancy>occ_threshold_6){ 
 				   suggested_speed[i]= mind( weighted_occ_gain6/maxd(local_weighted_occupancy,5), 65); 
@@ -1586,9 +1632,11 @@ int main(int argc, char *argv[])
 			if(i==1){
 				local_speed = db_locinfo[0].weighted_speed_average;
 				local_occupancy = controller_mainline_data[5].agg_occ;
+				if(weighted_average_occupancy_gain){
                 s11 = controller_mainline_data[7].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				s12 = controller_mainline_data[9].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				s13 = controller_mainline_data[10].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
+				}
 				local_weighted_occupancy = 0.5*controller_mainline_data[5].agg_occ + 0.5*(s11*controller_mainline_data[7].agg_occ +s12* controller_mainline_data[9].agg_occ+ s13*controller_mainline_data[10].agg_occ);
 				if(local_occupancy>occ_threshold_1){
 			        	suggested_speed[i]= mind( weighted_occ_gain1/maxd(local_weighted_occupancy,5), 65); 
@@ -1608,10 +1656,11 @@ int main(int argc, char *argv[])
 			 if(i==2){
 				 local_speed = db_locinfo[1].weighted_speed_average;
 				 local_occupancy = controller_mainline_data[7].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 s21 = controller_mainline_data[9].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 s22 = controller_mainline_data[10].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 s23 = controller_mainline_data[11].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
-		
+				 }
 				 local_weighted_occupancy = 0.5*controller_mainline_data[7].agg_occ + 0.5*(s21*controller_mainline_data[9].agg_occ + s22*controller_mainline_data[10].agg_occ+s23*controller_mainline_data[11].agg_occ);
 		 if(local_occupancy>occ_threshold_2){
 				 suggested_speed[i]= mind( weighted_occ_gain2/maxd(local_weighted_occupancy,5), 65); 
@@ -1629,10 +1678,12 @@ int main(int argc, char *argv[])
 			 if(i==3){
 				 local_speed = db_locinfo[2].weighted_speed_average;
 				 local_occupancy = controller_mainline_data[9].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 s31 = controller_mainline_data[10].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 s32 = controller_mainline_data[11].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 s33 = controller_mainline_data[12].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
-	 			 local_weighted_occupancy = 0.5*controller_mainline_data[9].agg_occ + 0.5*(s31*controller_mainline_data[10].agg_occ + s32*controller_mainline_data[11].agg_occ+s33*controller_mainline_data[12].agg_occ);
+				 }
+				 local_weighted_occupancy = 0.5*controller_mainline_data[9].agg_occ + 0.5*(s31*controller_mainline_data[10].agg_occ + s32*controller_mainline_data[11].agg_occ+s33*controller_mainline_data[12].agg_occ);
 
 				 if(local_occupancy>occ_threshold_3){
 				    suggested_speed[i]= mind( weighted_occ_gain3/maxd(local_weighted_occupancy,5), 65); 
@@ -1650,9 +1701,11 @@ int main(int argc, char *argv[])
 			 if(i==4){
 				 local_speed = db_locinfo[3].weighted_speed_average;
 				 local_occupancy = controller_mainline_data[10].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 s41 = controller_mainline_data[11].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s42 =controller_mainline_data[12].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s43 = controller_mainline_data[12].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
+				 }
 				 local_weighted_occupancy = 0.5*controller_mainline_data[10].agg_occ + 0.5*(s41*controller_mainline_data[11].agg_occ + s42*controller_mainline_data[12].agg_occ+s43*controller_mainline_data[13].agg_occ);
 
 		 if(local_occupancy>occ_threshold_4){
@@ -1671,8 +1724,10 @@ int main(int argc, char *argv[])
 			 if(i==5){
 				 local_speed = db_locinfo[4].weighted_speed_average;
 				 local_occupancy = controller_mainline_data[11].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 s51 = controller_mainline_data[12].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s52 = controller_mainline_data[13].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
+				 }
 				 local_weighted_occupancy = 0.5*controller_mainline_data[11].agg_occ + 0.5*(s51*controller_mainline_data[12].agg_occ + s52*controller_mainline_data[13].agg_occ);
 		 if(local_occupancy>occ_threshold_5){ 
 				  suggested_speed[i]= mind( weighted_occ_gain5/maxd(local_weighted_occupancy,5), 65); 
@@ -1690,8 +1745,10 @@ int main(int argc, char *argv[])
 			 if(i==6){
 				 local_speed = db_locinfo[5].weighted_speed_average;
 				 local_occupancy = controller_mainline_data[12].agg_occ;
+				 if(weighted_average_occupancy_gain){
                  s61 = controller_mainline_data[12].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s62 = controller_mainline_data[13].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
+				 }
 				 local_weighted_occupancy = s61*controller_mainline_data[12].agg_occ + s62*controller_mainline_data[13].agg_occ;
 				 if(local_occupancy>occ_threshold_6){ 
 				   suggested_speed[i]= mind( weighted_occ_gain6/maxd(local_weighted_occupancy,5), 65); 
@@ -1735,6 +1792,7 @@ int main(int argc, char *argv[])
 			if(i==1){
 				local_speed = db_locinfo[0].weighted_speed_average;
 				local_occupancy = controller_mainline_data[5].agg_occ;
+				if(weighted_average_occupancy_gain){
 				ww11 = controller_mainline_data[5].agg_occ/(controller_mainline_data[5].agg_occ + controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                 ww12 = controller_mainline_data[7].agg_occ/(controller_mainline_data[5].agg_occ + controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                 ww13 = controller_mainline_data[9].agg_occ/(controller_mainline_data[5].agg_occ + controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
@@ -1742,6 +1800,7 @@ int main(int argc, char *argv[])
                 ww15 = controller_mainline_data[11].agg_occ/(controller_mainline_data[5].agg_occ + controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                 ww16 = controller_mainline_data[12].agg_occ/(controller_mainline_data[5].agg_occ + controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                 ww17 = controller_mainline_data[13].agg_occ/(controller_mainline_data[5].agg_occ + controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
+				}
 				local_weighted_occupancy = ww11*controller_mainline_data[5].agg_occ + ww12*controller_mainline_data[7].agg_occ + ww13*controller_mainline_data[9].agg_occ+ ww14*controller_mainline_data[10].agg_occ+ ww15*controller_mainline_data[11].agg_occ+ ww16*controller_mainline_data[12].agg_occ+ ww17*controller_mainline_data[13].agg_occ;
 				if(local_occupancy>occ_threshold_1){
 			        	suggested_speed[i]= mind( weighted_occ_gain1/maxd(local_weighted_occupancy,5), 65); 
@@ -1761,13 +1820,14 @@ int main(int argc, char *argv[])
 			 if(i==2){
 				 local_speed = db_locinfo[1].weighted_speed_average;
 				 local_occupancy = controller_mainline_data[7].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 ww21 = controller_mainline_data[7].agg_occ/(controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww22 = controller_mainline_data[9].agg_occ/(controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                  ww23 = controller_mainline_data[10].agg_occ/(controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                  ww24 = controller_mainline_data[11].agg_occ/(controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                  ww25 = controller_mainline_data[12].agg_occ/(controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
                  ww26 = controller_mainline_data[13].agg_occ/(controller_mainline_data[7].agg_occ + controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
-
+				 }
 				 local_weighted_occupancy = ww21*controller_mainline_data[7].agg_occ + ww22*controller_mainline_data[9].agg_occ+ ww23*controller_mainline_data[10].agg_occ+ ww24*controller_mainline_data[11].agg_occ+  ww25*controller_mainline_data[12].agg_occ+ ww26*controller_mainline_data[13].agg_occ;
 		 if(local_occupancy>occ_threshold_2){
 				 suggested_speed[i]= mind( weighted_occ_gain2/maxd(local_weighted_occupancy,5), 65); 
@@ -1785,12 +1845,14 @@ int main(int argc, char *argv[])
 			 if(i==3){
 				 local_speed = db_locinfo[2].weighted_speed_average;
 				 local_occupancy = controller_mainline_data[9].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 ww31 = controller_mainline_data[9].agg_occ/(controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww32 = controller_mainline_data[10].agg_occ/(controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww33 = controller_mainline_data[11].agg_occ/(controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww34 = controller_mainline_data[12].agg_occ/(controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww35 = controller_mainline_data[13].agg_occ/(controller_mainline_data[9].agg_occ+ controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
-	 			 local_weighted_occupancy = ww31*controller_mainline_data[9].agg_occ + ww32*controller_mainline_data[10].agg_occ + ww33*controller_mainline_data[11].agg_occ+ ww34*controller_mainline_data[12].agg_occ+ ww35*controller_mainline_data[13].agg_occ;
+				 }
+				 local_weighted_occupancy = ww31*controller_mainline_data[9].agg_occ + ww32*controller_mainline_data[10].agg_occ + ww33*controller_mainline_data[11].agg_occ+ ww34*controller_mainline_data[12].agg_occ+ ww35*controller_mainline_data[13].agg_occ;
 
 				 if(local_occupancy>occ_threshold_3){
 				    suggested_speed[i]= mind( weighted_occ_gain3/maxd(local_weighted_occupancy,5), 65); 
@@ -1808,10 +1870,12 @@ int main(int argc, char *argv[])
 			 if(i==4){
 				 local_speed = db_locinfo[3].weighted_speed_average;
 				 local_occupancy = controller_mainline_data[10].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 ww41 = controller_mainline_data[10].agg_occ/(controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);  
                  ww42 = controller_mainline_data[11].agg_occ/(controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww43 = controller_mainline_data[12].agg_occ/(controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww44 = controller_mainline_data[13].agg_occ/(controller_mainline_data[10].agg_occ+ controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
+				 }
 				 local_weighted_occupancy = ww41*controller_mainline_data[10].agg_occ+ ww42*controller_mainline_data[11].agg_occ + ww43*controller_mainline_data[12].agg_occ+ww44*controller_mainline_data[13].agg_occ;
 
 		 if(local_occupancy>occ_threshold_4){
@@ -1830,9 +1894,11 @@ int main(int argc, char *argv[])
 			 if(i==5){
 				 local_speed = db_locinfo[4].weighted_speed_average;
 				 local_occupancy = controller_mainline_data[11].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 ww51 = controller_mainline_data[11].agg_occ/(controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);  
                  ww52 = controller_mainline_data[12].agg_occ/(controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
                  ww53 = controller_mainline_data[13].agg_occ/(controller_mainline_data[11].agg_occ+ controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
+				 }
 				 local_weighted_occupancy = ww51*controller_mainline_data[11].agg_occ + ww52*controller_mainline_data[12].agg_occ + ww53*controller_mainline_data[13].agg_occ;
 		 if(local_occupancy>occ_threshold_5){ 
 				  suggested_speed[i]= mind( weighted_occ_gain5/maxd(local_weighted_occupancy,5), 65); 
@@ -1850,8 +1916,10 @@ int main(int argc, char *argv[])
 			 if(i==6){
 				 local_speed = db_locinfo[5].weighted_speed_average;
 				 local_occupancy = controller_mainline_data[12].agg_occ;
+				 if(weighted_average_occupancy_gain){
 				 ww61 = controller_mainline_data[12].agg_occ/(controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);  
-                 ww62 = controller_mainline_data[13].agg_occ/(controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ); 
+                 ww62 = controller_mainline_data[13].agg_occ/(controller_mainline_data[12].agg_occ+ controller_mainline_data[13].agg_occ);
+				 }
 				 local_weighted_occupancy = ww61*controller_mainline_data[12].agg_occ + ww62*controller_mainline_data[13].agg_occ;
 				 if(local_occupancy>occ_threshold_6){ 
 				   suggested_speed[i]= mind( weighted_occ_gain6/maxd(local_weighted_occupancy,5), 65); 
