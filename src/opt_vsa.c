@@ -176,6 +176,9 @@ int main(int argc, char *argv[])
 	 //double up_last_speed = 0;
 	 double local_speed = 0.0;
 	 double local_occupancy = 0.0;
+	 double local_speed_loop = 0.0;
+	 double local_speed_radar = 0.0;
+     double local_speed_fused = 0.0;
 	 // VSA control parameters
 	 double last_occ_threshold = 12; // occupancy threshold in last VDS (suggested 10 to 12.5)
 	 double occ_threshold_1 = 12;
@@ -1630,153 +1633,167 @@ int main(int argc, char *argv[])
 		 // suppose the max steady state flow is 1800 vehicles per hour per lane
 		 for (i=1; i<=NUM_SIGNS; i++){
 			if(i==1){
-				local_speed = db_locinfo[0].weighted_speed_average;
+				local_speed_loop = controller_mainline_data[5].agg_speed;
+                local_speed_radar = db_locinfo[0].weighted_speed_average;
+                local_speed_fused = 0.5*local_speed_loop+0.5*local_speed_radar; // fused speed 
 				local_occupancy = controller_mainline_data[5].agg_occ;
 				if(weighted_average_occupancy_gain){
                 s11 = controller_mainline_data[7].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				s12 = controller_mainline_data[9].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				s13 = controller_mainline_data[10].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				}
-				local_weighted_occupancy = 0.5*controller_mainline_data[5].agg_occ + 0.5*(s11*controller_mainline_data[7].agg_occ +s12* controller_mainline_data[9].agg_occ+ s13*controller_mainline_data[10].agg_occ);
+				local_weighted_occupancy = 0.4*controller_mainline_data[5].agg_occ + 0.6*(s11*controller_mainline_data[7].agg_occ +s12* controller_mainline_data[9].agg_occ+ s13*controller_mainline_data[10].agg_occ);
 				if(local_occupancy>occ_threshold_1){
 			        	suggested_speed[i]= mind( weighted_occ_gain1/maxd(local_weighted_occupancy,5), 65); 
 					// check local speed of VSA
 		    // if local speed is less than 20 mph (very low speed), then use local speed.
-					if(local_speed<20){
-						suggested_speed[i]= maxd(local_speed-5,5);
+					if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
+						suggested_speed[i]= maxd(local_speed_fused-5,5);
 					}
 				}else{
-					if(local_occupancy<2 && local_speed<2 ){
+					if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[7].agg_speed+controller_mainline_data[9].agg_speed+controller_mainline_data[10].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
-			            suggested_speed[i] = local_speed;
+			            suggested_speed[i] = local_speed_fused;
 					}
 			    }
 			 } 
 			 if(i==2){
-				 local_speed = db_locinfo[1].weighted_speed_average;
+				 local_speed_loop = controller_mainline_data[7].agg_speed;
+                 local_speed_radar = db_locinfo[1].weighted_speed_average;
+                 local_speed_fused = 0.5*local_speed_loop+0.5*local_speed_radar; // fused speed 
 				 local_occupancy = controller_mainline_data[7].agg_occ;
 				 if(weighted_average_occupancy_gain){
 				 s21 = controller_mainline_data[9].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 s22 = controller_mainline_data[10].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 s23 = controller_mainline_data[11].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 }
-				 local_weighted_occupancy = 0.5*controller_mainline_data[7].agg_occ + 0.5*(s21*controller_mainline_data[9].agg_occ + s22*controller_mainline_data[10].agg_occ+s23*controller_mainline_data[11].agg_occ);
+				 local_weighted_occupancy = 0.4*controller_mainline_data[7].agg_occ + 0.6*(s21*controller_mainline_data[9].agg_occ + s22*controller_mainline_data[10].agg_occ+s23*controller_mainline_data[11].agg_occ);
 		 if(local_occupancy>occ_threshold_2){
 				 suggested_speed[i]= mind( weighted_occ_gain2/maxd(local_weighted_occupancy,5), 65); 
-			            if(local_speed<20){
-			               suggested_speed[i]=  maxd(local_speed-5,5);
+			            if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
+			               suggested_speed[i]=  maxd(local_speed_fused-5,5);
 			             }
 				 }else{
-					if(local_occupancy<2 && local_speed<2 ){
+					if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[5].agg_speed+controller_mainline_data[9].agg_speed+controller_mainline_data[10].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
-			            suggested_speed[i] = local_speed;
+			            suggested_speed[i] = local_speed_fused;
 					}
 				 }
 			 }
 			 if(i==3){
-				 local_speed = db_locinfo[2].weighted_speed_average;
+				 local_speed_loop = controller_mainline_data[9].agg_speed;
+                 local_speed_radar = db_locinfo[2].weighted_speed_average;
+                 local_speed_fused = 0.5*local_speed_loop+0.5*local_speed_radar; // fused speed
 				 local_occupancy = controller_mainline_data[9].agg_occ;
 				 if(weighted_average_occupancy_gain){
 				 s31 = controller_mainline_data[10].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 s32 = controller_mainline_data[11].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 s33 = controller_mainline_data[12].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 }
-				 local_weighted_occupancy = 0.5*controller_mainline_data[9].agg_occ + 0.5*(s31*controller_mainline_data[10].agg_occ + s32*controller_mainline_data[11].agg_occ+s33*controller_mainline_data[12].agg_occ);
+				 local_weighted_occupancy = 0.4*controller_mainline_data[9].agg_occ + 0.6*(s31*controller_mainline_data[10].agg_occ + s32*controller_mainline_data[11].agg_occ+s33*controller_mainline_data[12].agg_occ);
 
 				 if(local_occupancy>occ_threshold_3){
 				    suggested_speed[i]= mind( weighted_occ_gain3/maxd(local_weighted_occupancy,5), 65); 
-						 if(local_speed<20){
-			               suggested_speed[i]= maxd(local_speed-5,5);
+						 if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
+			               suggested_speed[i]= maxd(local_speed_fused-5,5);
 			             }
 				 }else{
-				    if(local_occupancy<2 && local_speed<2 ){
+				    if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[7].agg_speed+controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
-			            suggested_speed[i] = local_speed;
+			            suggested_speed[i] = local_speed_fused;
 					} 
 				 }
 			 }
 			 if(i==4){
-				 local_speed = db_locinfo[3].weighted_speed_average;
+				 local_speed_loop = controller_mainline_data[10].agg_speed;
+                 local_speed_radar = db_locinfo[3].weighted_speed_average;
+                 local_speed_fused = 0.5*local_speed_loop+0.5*local_speed_radar; // fused speed 
 				 local_occupancy = controller_mainline_data[10].agg_occ;
 				 if(weighted_average_occupancy_gain){
 				 s41 = controller_mainline_data[11].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s42 =controller_mainline_data[12].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s43 = controller_mainline_data[12].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 }
-				 local_weighted_occupancy = 0.5*controller_mainline_data[10].agg_occ + 0.5*(s41*controller_mainline_data[11].agg_occ + s42*controller_mainline_data[12].agg_occ+s43*controller_mainline_data[13].agg_occ);
+				 local_weighted_occupancy = 0.4*controller_mainline_data[10].agg_occ + 0.6*(s41*controller_mainline_data[11].agg_occ + s42*controller_mainline_data[12].agg_occ+s43*controller_mainline_data[13].agg_occ);
 
 		 if(local_occupancy>occ_threshold_4){
 				   suggested_speed[i]= mind( weighted_occ_gain4/maxd(local_weighted_occupancy,5), 65); 
-				   		 if(local_speed<20){
-			               suggested_speed[i]= maxd(local_speed-5,5);
+				   		 if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
+			               suggested_speed[i]= maxd(local_speed_fused-5,5);
 			             }
 				 }else{
-				   if(local_occupancy<2 && local_speed<2 ){
+				   if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[9].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[12].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
-			            suggested_speed[i] = local_speed;
+			            suggested_speed[i] = local_speed_fused;
 					}    
 				 }
 			 }
 			 if(i==5){
-				 local_speed = db_locinfo[4].weighted_speed_average;
+				 local_speed_loop = controller_mainline_data[11].agg_speed;
+                 local_speed_radar = db_locinfo[4].weighted_speed_average;
+                 local_speed_fused = 0.5*local_speed_loop+0.5*local_speed_radar; // fused speed 
 				 local_occupancy = controller_mainline_data[11].agg_occ;
 				 if(weighted_average_occupancy_gain){
 				 s51 = controller_mainline_data[12].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s52 = controller_mainline_data[13].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 }
-				 local_weighted_occupancy = 0.5*controller_mainline_data[11].agg_occ + 0.5*(s51*controller_mainline_data[12].agg_occ + s52*controller_mainline_data[13].agg_occ);
+				 local_weighted_occupancy = 0.4*controller_mainline_data[11].agg_occ + 0.6*(s51*controller_mainline_data[12].agg_occ + s52*controller_mainline_data[13].agg_occ);
 		 if(local_occupancy>occ_threshold_5){ 
 				  suggested_speed[i]= mind( weighted_occ_gain5/maxd(local_weighted_occupancy,5), 65); 
-				  		if(local_speed<20){
-			               suggested_speed[i]= maxd(local_speed-5,5);
+				  		if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
+			               suggested_speed[i]= maxd(local_speed_fused-5,5);
 			             }
 				 }else{
-				  if(local_occupancy<2 && local_speed<2 ){
+				  if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[12].agg_speed+controller_mainline_data[13].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
-			            suggested_speed[i] = local_speed;
+			            suggested_speed[i] = local_speed_fused;
 					}     
 				 }
 			 }
 			 if(i==6){
-				 local_speed = db_locinfo[5].weighted_speed_average;
+				 local_speed_loop = controller_mainline_data[12].agg_speed;
+                 local_speed_radar = db_locinfo[5].weighted_speed_average;
+                 local_speed_fused = 0.5*local_speed_loop+0.5*local_speed_radar; // fused speed 
 				 local_occupancy = controller_mainline_data[12].agg_occ;
 				 if(weighted_average_occupancy_gain){
                  s61 = controller_mainline_data[12].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s62 = controller_mainline_data[13].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 }
-				 local_weighted_occupancy = s61*controller_mainline_data[12].agg_occ + s62*controller_mainline_data[13].agg_occ;
+				 local_weighted_occupancy = 0.4*controller_mainline_data[12].agg_occ + 0.6*controller_mainline_data[13].agg_occ;
 				 if(local_occupancy>occ_threshold_6){ 
 				   suggested_speed[i]= mind( weighted_occ_gain6/maxd(local_weighted_occupancy,5), 65); 
-				   		if(local_speed<20){
-			               suggested_speed[i]= maxd(local_speed-5,5);
+				   		if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
+			               suggested_speed[i]= maxd(local_speed_fused-5,5);
 			            }
 				 }else{
-		              if(local_occupancy<2 && local_speed<2 ){
+		              if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[13].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
-			            suggested_speed[i] = local_speed;
+			            suggested_speed[i] = local_speed_fused;
 					}
 				 }
 		     }
 			 if(i==7){
-				 local_speed = db_locinfo[6].weighted_speed_average;
+				 local_speed_loop = controller_mainline_data[13].agg_speed;
+                 local_speed_radar = db_locinfo[6].weighted_speed_average;
+                 local_speed_fused = 0.5*local_speed_loop+0.5*local_speed_radar; // fused speed
 				 local_occupancy = controller_mainline_data[13].agg_occ;
 				 local_weighted_occupancy = controller_mainline_data[13].agg_occ;
 				 if(local_occupancy>occ_threshold_7){
-				 suggested_speed[i]= mind( weighted_occ_gain7/maxd(local_weighted_occupancy,5), 65); 
-				 		 if(local_speed<20){
-			               suggested_speed[i]= maxd(local_speed-5,5);
+				 suggested_speed[i]= mind(weighted_occ_gain7/maxd(local_weighted_occupancy,5), 65); 
+				 		 if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
+			               suggested_speed[i]= maxd(local_speed_fused-5,5);
 			             }
 				 }else{
-				   if(local_occupancy<2 && local_speed<2 ){
+				   if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[12].agg_speed);  // this is the case if sensor don't receive correct data
 					}else{
-			            suggested_speed[i] = local_speed;
+			            suggested_speed[i] = local_speed_fused;
 					}
 				 }
 			 }  
