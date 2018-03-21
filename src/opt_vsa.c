@@ -162,7 +162,9 @@ int main(int argc, char *argv[])
 	//int FR_occ_zero_counter[NumOnRamp] = {0};
 
 	 double suggested_speed[8]= {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // the first entry is the suggested speed of FMS, so seven VSA puls one FMS is eight units in total.
-	int suggested_speed_int = 0;
+	 double prev_suggested_speed[8]= {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // suggested speed at k-1 step (previous time step)
+     double prev_prev_suggested_speed[8]= {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // suggested speed at k-2 step (previous previous time step)
+	 int suggested_speed_int = 0;
 	 double speed_linear_VSA = 0.0;
 	 suggested_speed[0]= 60; // first FMS1 is always 60 mph (free flow speed), where is the starting point of VSA test site 
 	 double slope = 0.0;
@@ -315,6 +317,9 @@ int main(int argc, char *argv[])
 	 double weighted_speed_gain5 = 1.0;
 	 double weighted_speed_gain6 = 1.0;
 	 double weighted_speed_gain7 = 1.0;
+
+	 // activate VSA limitation 
+	 int old_vsa_variation_limitation = 0;
 
 	 // controller options is here. 0 is deactivate and 1 is activate. 
 	 int speed_based_VSA_use_loop_detector = 1; //activate speed based VSA control with loop detector speed data
@@ -2066,8 +2071,15 @@ int main(int argc, char *argv[])
 		 }
 	 }
 
-	// add speed variation limit conditions
-	for (i=1; i<NUM_SIGNS-1-1; i++){
+	 // save VSA values at previous time step and at 2 steps before
+     for (i=1; i<=NUM_SIGNS; i++){
+	   prev_suggested_speed[i] = suggested_speed[i];
+       prev_prev_suggested_speed[i] = prev_suggested_speed[i];                        
+	 }
+	
+	 // add speed variation limit conditions
+	if (old_vsa_variation_limitation){
+	for (i=1; i<=NUM_SIGNS; i++){
 		if(suggested_speed[i]-suggested_speed[i+1]>20){
 			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-10));
 		}else if(suggested_speed[i]-suggested_speed[i+1]>30){
@@ -2082,7 +2094,55 @@ int main(int argc, char *argv[])
 			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-0));
 		}
 	}
-	
+   }
+
+   // add new speed variation limit conditions
+	// (1) For each location, compared to previous time step
+   	for (i=1; i<=NUM_SIGNS; i++){
+		if(suggested_speed[i] > prev_suggested_speed[i]+20)
+		{
+			suggested_speed[i] = prev_suggested_speed[i]+20;
+		}
+		if(suggested_speed[i] < prev_suggested_speed[i]-20)
+		{
+			suggested_speed[i] = prev_suggested_speed[i]-20;
+		}
+	}
+	// (2) For each location, compared to its upstream location at the same time:
+   	for (i=2; i<=NUM_SIGNS; i++){
+		if(suggested_speed[i] > suggested_speed[i-1]+20)
+		{
+			suggested_speed[i] = suggested_speed[i-1]+20;
+		}
+		if(suggested_speed[i] < suggested_speed[i-1]-20)
+		{
+			suggested_speed[i] = suggested_speed[i-1]-20;
+		}
+	}
+	// (3) For each location, compared to its upstream location at previous time step
+   	for (i=2; i<=NUM_SIGNS; i++){
+		if(suggested_speed[i] > prev_suggested_speed[i-1]+20)
+		{
+			suggested_speed[i] = prev_suggested_speed[i-1]+20;
+		}
+		if(suggested_speed[i] < prev_suggested_speed[i-1]-20)
+		{
+			suggested_speed[i] = prev_suggested_speed[i-1]-20;
+		}
+	}
+	// (4) For each location, compared to its upstream location at 2 time step before
+   	for (i=2; i<=NUM_SIGNS; i++){
+		if(suggested_speed[i] > prev_prev_suggested_speed[i-1]+30)
+		{
+			suggested_speed[i] = prev_prev_suggested_speed[i-1]+30;
+		}
+		if(suggested_speed[i] < prev_prev_suggested_speed[i-1]-30)
+		{
+			suggested_speed[i] = prev_prev_suggested_speed[i-1]-30;
+		}
+	}
+
+
 	// check downstream occupancy. if all downstream occupancy is low, then activate different speed value by occupancy level  
 	// check VSA 1
 	if(controller_mainline_data[5].agg_occ<0.2 && 
@@ -2217,10 +2277,15 @@ int main(int argc, char *argv[])
 	}else{
 	}
 
-	// for construction area Twin Oaks (VSA 5) and Barham Pkwy (VSA 6), set VSA max speed as 55 mph
-    suggested_speed[5] = mind(suggested_speed[5],55);
-    suggested_speed[6] = mind(suggested_speed[6],55);
-
+	// for construction region near Twin Oaks (VSA 5) and Barham Pkwy (VSA 6), set those VSA max speed as 55 mph
+    suggested_speed[5] = mind(55, maxd(5, suggested_speed[5])); 
+    suggested_speed[6] = mind(55, maxd(5, suggested_speed[6])); 
+    // restrict the rest of VSA speed between 5 mph and 65 mph
+	suggested_speed[1] = mind(65, maxd(5, suggested_speed[1])); 
+	suggested_speed[2] = mind(65, maxd(5, suggested_speed[2]));
+    suggested_speed[3] = mind(65, maxd(5, suggested_speed[3]));
+    suggested_speed[4] = mind(65, maxd(5, suggested_speed[4]));
+    suggested_speed[7] = mind(65, maxd(5, suggested_speed[7]));
 
 		webdatafp = fopen("/var/www/html/VSA/scripts/VSA_performance_plot.txt", "w");
 		fprintf(webdatafp, "Intersection Name,speed(mph),volume(VPH/100),occupancy(%%),VSA(mph),radar speed(mph)");
