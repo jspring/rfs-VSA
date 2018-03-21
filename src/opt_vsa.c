@@ -2097,28 +2097,6 @@ int main(int argc, char *argv[])
    }
 
    // add new speed variation limit conditions
-	// (1) For each location, compared to previous time step
-   	for (i=1; i<=NUM_SIGNS; i++){
-		if(suggested_speed[i] > prev_suggested_speed[i]+20)
-		{
-			suggested_speed[i] = prev_suggested_speed[i]+20;
-		}
-		if(suggested_speed[i] < prev_suggested_speed[i]-20)
-		{
-			suggested_speed[i] = prev_suggested_speed[i]-20;
-		}
-	}
-	// (2) For each location, compared to its upstream location at the same time
-   	for (i=2; i<=NUM_SIGNS; i++){
-		if(suggested_speed[i] > suggested_speed[i-1]+20)
-		{
-			suggested_speed[i] = suggested_speed[i-1]+20;
-		}
-		if(suggested_speed[i] < suggested_speed[i-1]-20)
-		{
-			suggested_speed[i] = suggested_speed[i-1]-20;
-		}
-	}
 	// (3) For each location, compared to its upstream location at previous time step
    	for (i=2; i<=NUM_SIGNS; i++){
 		if(suggested_speed[i] > prev_suggested_speed[i-1]+20)
@@ -2130,6 +2108,7 @@ int main(int argc, char *argv[])
 			suggested_speed[i] = prev_suggested_speed[i-1]-20;
 		}
 	}
+
 	// (4) For each location, compared to its upstream location at 2 time step before
    	for (i=2; i<=NUM_SIGNS; i++){
 		if(suggested_speed[i] > prev_prev_suggested_speed[i-1]+30)
@@ -2139,6 +2118,30 @@ int main(int argc, char *argv[])
 		if(suggested_speed[i] < prev_prev_suggested_speed[i-1]-30)
 		{
 			suggested_speed[i] = prev_prev_suggested_speed[i-1]-30;
+		}
+	}
+
+	// (1) For each location, compared to previous time step
+   	for (i=1; i<=NUM_SIGNS; i++){
+		if(suggested_speed[i] > prev_suggested_speed[i]+20)
+		{
+			suggested_speed[i] = prev_suggested_speed[i]+20;
+		}
+		if(suggested_speed[i] < prev_suggested_speed[i]-20)
+		{
+			suggested_speed[i] = prev_suggested_speed[i]-20;
+		}
+	}
+
+	// (2) For each location, compared to its upstream location at the same time
+   	for (i=2; i<=NUM_SIGNS; i++){
+		if(suggested_speed[i] > suggested_speed[i-1]+20)
+		{
+			suggested_speed[i] = suggested_speed[i-1]+20;
+		}
+		if(suggested_speed[i] < suggested_speed[i-1]-20)
+		{
+			suggested_speed[i] = suggested_speed[i-1]-20;
 		}
 	}
 
