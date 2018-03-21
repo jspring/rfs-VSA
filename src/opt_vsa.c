@@ -2108,7 +2108,7 @@ int main(int argc, char *argv[])
 			suggested_speed[i] = prev_suggested_speed[i]-20;
 		}
 	}
-	// (2) For each location, compared to its upstream location at the same time:
+	// (2) For each location, compared to its upstream location at the same time
    	for (i=2; i<=NUM_SIGNS; i++){
 		if(suggested_speed[i] > suggested_speed[i-1]+20)
 		{
