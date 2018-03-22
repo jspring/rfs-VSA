@@ -197,6 +197,13 @@ int main(int argc, char *argv[])
 	 double occ_gain5 = 0.6;
 	 double local_weighted_occupancy = 1.0;
 	 double local_weighted_speed = 5.0;
+	 double local_speed_fused_1 = 0.0;
+	 double local_speed_fused_2 = 0.0;
+	 double local_speed_fused_3 = 0.0;
+	 double local_speed_fused_4 = 0.0;
+	 double local_speed_fused_5 = 0.0;
+	 double local_speed_fused_6 = 0.0;
+	 double local_speed_fused_7 = 0.0;
 
 	 //double gamma = 0.0; 
 	 //double Q_b = 1200;
@@ -317,9 +324,6 @@ int main(int argc, char *argv[])
 	 double weighted_speed_gain5 = 1.0;
 	 double weighted_speed_gain6 = 1.0;
 	 double weighted_speed_gain7 = 1.0;
-
-	 // activate VSA limitation 
-	 int old_vsa_variation_limitation = 0;
 
 	 // controller options is here. 0 is deactivate and 1 is activate. 
 	 int speed_based_VSA_use_loop_detector = 1; //activate speed based VSA control with loop detector speed data
@@ -1647,14 +1651,10 @@ int main(int argc, char *argv[])
 				s12 = controller_mainline_data[9].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				s13 = controller_mainline_data[10].agg_occ/(controller_mainline_data[7].agg_occ+controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ);
 				}
-				local_weighted_occupancy = 0.4*controller_mainline_data[5].agg_occ + 0.6*(s11*controller_mainline_data[7].agg_occ +s12* controller_mainline_data[9].agg_occ+ s13*controller_mainline_data[10].agg_occ);
+				//local_weighted_occupancy = 0.4*controller_mainline_data[5].agg_occ + 0.6*(s11*controller_mainline_data[7].agg_occ +s12* controller_mainline_data[9].agg_occ+ s13*controller_mainline_data[10].agg_occ);
+				local_weighted_occupancy = 0.4*controller_mainline_data[5].agg_occ + 0.6*maxd(maxd(controller_mainline_data[7].agg_occ,controller_mainline_data[9].agg_occ),controller_mainline_data[10].agg_occ);
 				if(local_occupancy>occ_threshold_1){
-			        	suggested_speed[i]= mind( weighted_occ_gain1/maxd(local_weighted_occupancy,5), 65); 
-					// check local speed of VSA
-		    // if local speed is less than 20 mph (very low speed), then use local speed.
-					if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
-						suggested_speed[i]= maxd(local_speed_fused-5,5);
-					}
+			        	suggested_speed[i]= mind( weighted_occ_gain1/maxd(local_weighted_occupancy,5), 65);  // calculated VSA 1
 				}else{
 					if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[7].agg_speed+controller_mainline_data[9].agg_speed+controller_mainline_data[10].agg_speed);  // this is the case if sensor don't receive correct data
@@ -1673,12 +1673,10 @@ int main(int argc, char *argv[])
 				 s22 = controller_mainline_data[10].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 s23 = controller_mainline_data[11].agg_occ/(controller_mainline_data[9].agg_occ+controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ);
 				 }
-				 local_weighted_occupancy = 0.4*controller_mainline_data[7].agg_occ + 0.6*(s21*controller_mainline_data[9].agg_occ + s22*controller_mainline_data[10].agg_occ+s23*controller_mainline_data[11].agg_occ);
+				 //local_weighted_occupancy = 0.4*controller_mainline_data[7].agg_occ + 0.6*(s21*controller_mainline_data[9].agg_occ + s22*controller_mainline_data[10].agg_occ+s23*controller_mainline_data[11].agg_occ);
+				 local_weighted_occupancy = 0.4*controller_mainline_data[7].agg_occ + 0.6*maxd(maxd(controller_mainline_data[9].agg_occ,controller_mainline_data[10].agg_occ),controller_mainline_data[11].agg_occ);
 		 if(local_occupancy>occ_threshold_2){
-				 suggested_speed[i]= mind( weighted_occ_gain2/maxd(local_weighted_occupancy,5), 65); 
-			            if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
-			               suggested_speed[i]=  maxd(local_speed_fused-5,5);
-			             }
+				 suggested_speed[i]= mind( weighted_occ_gain2/maxd(local_weighted_occupancy,5), 65);   // calculated VSA 2
 				 }else{
 					if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[5].agg_speed+controller_mainline_data[9].agg_speed+controller_mainline_data[10].agg_speed);  // this is the case if sensor don't receive correct data
@@ -1697,13 +1695,12 @@ int main(int argc, char *argv[])
 				 s32 = controller_mainline_data[11].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 s33 = controller_mainline_data[12].agg_occ/(controller_mainline_data[10].agg_occ+controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ);
 				 }
-				 local_weighted_occupancy = 0.4*controller_mainline_data[9].agg_occ + 0.6*(s31*controller_mainline_data[10].agg_occ + s32*controller_mainline_data[11].agg_occ+s33*controller_mainline_data[12].agg_occ);
+				 //local_weighted_occupancy = 0.4*controller_mainline_data[9].agg_occ + 0.6*(s31*controller_mainline_data[10].agg_occ + s32*controller_mainline_data[11].agg_occ+s33*controller_mainline_data[12].agg_occ);
+				 local_weighted_occupancy = 0.4*controller_mainline_data[9].agg_occ + 0.6*(0.5*maxd(maxd(controller_mainline_data[10].agg_occ,controller_mainline_data[11].agg_occ),controller_mainline_data[12].agg_occ)
+			     +0.5*(0.34*controller_mainline_data[10].agg_occ+0.33*controller_mainline_data[11].agg_occ+0.33*controller_mainline_data[12].agg_occ));
 
 				 if(local_occupancy>occ_threshold_3){
-				    suggested_speed[i]= mind( weighted_occ_gain3/maxd(local_weighted_occupancy,5), 65); 
-						 if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
-			               suggested_speed[i]= maxd(local_speed_fused-5,5);
-			             }
+				    suggested_speed[i]= mind( weighted_occ_gain3/maxd(local_weighted_occupancy,5), 65); // calculated VSA 3
 				 }else{
 				    if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[7].agg_speed+controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed);  // this is the case if sensor don't receive correct data
@@ -1722,13 +1719,10 @@ int main(int argc, char *argv[])
 				 s42 =controller_mainline_data[12].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s43 = controller_mainline_data[12].agg_occ/(controller_mainline_data[11].agg_occ+controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 }
-				 local_weighted_occupancy = 0.4*controller_mainline_data[10].agg_occ + 0.6*(s41*controller_mainline_data[11].agg_occ + s42*controller_mainline_data[12].agg_occ+s43*controller_mainline_data[13].agg_occ);
+				 local_weighted_occupancy = 0.4*controller_mainline_data[10].agg_occ + 0.6*(0.34*controller_mainline_data[11].agg_occ + 0.33*controller_mainline_data[12].agg_occ+0.33*controller_mainline_data[13].agg_occ);
 
 		 if(local_occupancy>occ_threshold_4){
-				   suggested_speed[i]= mind( weighted_occ_gain4/maxd(local_weighted_occupancy,5), 65); 
-				   		 if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
-			               suggested_speed[i]= maxd(local_speed_fused-5,5);
-			             }
+				   suggested_speed[i]= mind( weighted_occ_gain4/maxd(local_weighted_occupancy,5), 65);  // calculated VSA 4
 				 }else{
 				   if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[9].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[12].agg_speed);  // this is the case if sensor don't receive correct data
@@ -1746,12 +1740,9 @@ int main(int argc, char *argv[])
 				 s51 = controller_mainline_data[12].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 s52 = controller_mainline_data[13].agg_occ/(controller_mainline_data[12].agg_occ+controller_mainline_data[13].agg_occ);
 				 }
-				 local_weighted_occupancy = 0.4*controller_mainline_data[11].agg_occ + 0.6*(s51*controller_mainline_data[12].agg_occ + s52*controller_mainline_data[13].agg_occ);
+				 local_weighted_occupancy = 0.4*controller_mainline_data[11].agg_occ + 0.6*(0.5*controller_mainline_data[12].agg_occ + 0.5*controller_mainline_data[13].agg_occ);
 		 if(local_occupancy>occ_threshold_5){ 
-				  suggested_speed[i]= mind( weighted_occ_gain5/maxd(local_weighted_occupancy,5), 65); 
-				  		if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
-			               suggested_speed[i]= maxd(local_speed_fused-5,5);
-			             }
+				  suggested_speed[i]= mind( weighted_occ_gain5/maxd(local_weighted_occupancy,5), 65);  // calculated VSA 5
 				 }else{
 				  if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[12].agg_speed+controller_mainline_data[13].agg_speed);  // this is the case if sensor don't receive correct data
@@ -1771,10 +1762,7 @@ int main(int argc, char *argv[])
 				 }
 				 local_weighted_occupancy = 0.4*controller_mainline_data[12].agg_occ + 0.6*controller_mainline_data[13].agg_occ;
 				 if(local_occupancy>occ_threshold_6){ 
-				   suggested_speed[i]= mind( weighted_occ_gain6/maxd(local_weighted_occupancy,5), 65); 
-				   		if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
-			               suggested_speed[i]= maxd(local_speed_fused-5,5);
-			            }
+				   suggested_speed[i]= mind( weighted_occ_gain6/maxd(local_weighted_occupancy,5), 65);  // calculated VSA 6
 				 }else{
 		              if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[13].agg_speed);  // this is the case if sensor don't receive correct data
@@ -1790,10 +1778,7 @@ int main(int argc, char *argv[])
 				 local_occupancy = controller_mainline_data[13].agg_occ;
 				 local_weighted_occupancy = controller_mainline_data[13].agg_occ;
 				 if(local_occupancy>occ_threshold_7){
-				 suggested_speed[i]= mind(weighted_occ_gain7/maxd(local_weighted_occupancy,5), 65); 
-				 		 if(local_speed_loop<local_speed_fused || local_speed_radar<local_speed_fused){
-			               suggested_speed[i]= maxd(local_speed_fused-5,5);
-			             }
+				 suggested_speed[i]= mind(weighted_occ_gain7/maxd(local_weighted_occupancy,5), 65);  // calculated VSA 7
 				 }else{
 				   if(local_occupancy<2 && local_speed_loop<2 ){
                         suggested_speed[i] = 0.33*(controller_mainline_data[10].agg_speed+controller_mainline_data[11].agg_speed+controller_mainline_data[12].agg_speed);  // this is the case if sensor don't receive correct data
@@ -2071,41 +2056,39 @@ int main(int argc, char *argv[])
 		 }
 	 }
 
-	 // save VSA values at previous time step and at 2 steps before
-     for (i=1; i<=NUM_SIGNS; i++){
-	   prev_suggested_speed[i] = suggested_speed[i];
-       prev_prev_suggested_speed[i] = prev_suggested_speed[i];                        
-	 }
-	
-	 // add speed variation limit conditions
-	if (old_vsa_variation_limitation){
-	for (i=1; i<=NUM_SIGNS; i++){
-		if(suggested_speed[i]-suggested_speed[i+1]>20){
-			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-10));
-		}else if(suggested_speed[i]-suggested_speed[i+1]>30){
-			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-20));
-		}else if(suggested_speed[i]-suggested_speed[i+1]>40){
-			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-30));
-		}else if(suggested_speed[i]-suggested_speed[i+1]>50){
-			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-40));
-		}else if(suggested_speed[i]-suggested_speed[i+1]>60){
-			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-50));
-		}else{
-			suggested_speed[i] = mind(65, maxd(5,suggested_speed[i]-0));
+    // this one is only for the first upstream VSA
+	local_speed_fused_1 = 0.5*controller_mainline_data[5].agg_speed+0.5*db_locinfo[0].weighted_speed_average;
+    local_speed_fused_2 = 0.5*controller_mainline_data[7].agg_speed+0.5*db_locinfo[1].weighted_speed_average;
+	local_speed_fused_3 = 0.5*controller_mainline_data[9].agg_speed+0.5*db_locinfo[2].weighted_speed_average;
+	local_speed_fused_4 = 0.5*controller_mainline_data[10].agg_speed+0.5*db_locinfo[3].weighted_speed_average;
+    local_speed_fused_5 = 0.5*controller_mainline_data[11].agg_speed+0.5*db_locinfo[4].weighted_speed_average;
+	local_speed_fused_6 = 0.5*controller_mainline_data[12].agg_speed+0.5*db_locinfo[5].weighted_speed_average;
+	local_speed_fused_7 = 0.5*controller_mainline_data[13].agg_speed+0.5*db_locinfo[6].weighted_speed_average;
+
+	suggested_speed[1] = mind(local_speed_fused_1,suggested_speed[1]);
+
+	// add new speed variation limit conditions
+	// (1) For each location, compared to previous time step
+   	for (i=1; i<=NUM_SIGNS; i++){
+		if(suggested_speed[i] > prev_suggested_speed[i]+20)
+		{
+			suggested_speed[i] = prev_suggested_speed[i]+20;
+		}
+		if(suggested_speed[i] < prev_suggested_speed[i]-30)
+		{
+			suggested_speed[i] = prev_suggested_speed[i]-30;
 		}
 	}
-   }
 
-   // add new speed variation limit conditions
 	// (3) For each location, compared to its upstream location at previous time step
    	for (i=2; i<=NUM_SIGNS; i++){
 		if(suggested_speed[i] > prev_suggested_speed[i-1]+20)
 		{
 			suggested_speed[i] = prev_suggested_speed[i-1]+20;
 		}
-		if(suggested_speed[i] < prev_suggested_speed[i-1]-20)
+		if(suggested_speed[i] < prev_suggested_speed[i-1]-30)
 		{
-			suggested_speed[i] = prev_suggested_speed[i-1]-20;
+			suggested_speed[i] = prev_suggested_speed[i-1]-30;
 		}
 	}
 
@@ -2115,21 +2098,9 @@ int main(int argc, char *argv[])
 		{
 			suggested_speed[i] = prev_prev_suggested_speed[i-1]+30;
 		}
-		if(suggested_speed[i] < prev_prev_suggested_speed[i-1]-30)
+		if(suggested_speed[i] < prev_prev_suggested_speed[i-1]-50)
 		{
-			suggested_speed[i] = prev_prev_suggested_speed[i-1]-30;
-		}
-	}
-
-	// (1) For each location, compared to previous time step
-   	for (i=1; i<=NUM_SIGNS; i++){
-		if(suggested_speed[i] > prev_suggested_speed[i]+20)
-		{
-			suggested_speed[i] = prev_suggested_speed[i]+20;
-		}
-		if(suggested_speed[i] < prev_suggested_speed[i]-20)
-		{
-			suggested_speed[i] = prev_suggested_speed[i]-20;
+			suggested_speed[i] = prev_prev_suggested_speed[i-1]-50;
 		}
 	}
 
@@ -2139,23 +2110,23 @@ int main(int argc, char *argv[])
 		{
 			suggested_speed[i] = suggested_speed[i-1]+20;
 		}
-		if(suggested_speed[i] < suggested_speed[i-1]-20)
+		if(suggested_speed[i] < suggested_speed[i-1]-35)
 		{
-			suggested_speed[i] = suggested_speed[i-1]-20;
+			suggested_speed[i] = suggested_speed[i-1]-35;
 		}
 	}
 
 
 	// check downstream occupancy. if all downstream occupancy is low, then activate different speed value by occupancy level  
 	// check VSA 1
-	if(controller_mainline_data[5].agg_occ<0.2 && 
-		controller_mainline_data[7].agg_occ<0.2 && 
-		controller_mainline_data[9].agg_occ<0.2 && 
-		controller_mainline_data[10].agg_occ<0.2 && 
-		controller_mainline_data[11].agg_occ<0.2 && 
-		controller_mainline_data[12].agg_occ<0.2 && 
-		controller_mainline_data[13].agg_occ<0.2){
-		suggested_speed[1] = 45;
+	if(controller_mainline_data[5].agg_occ<0.12 &&
+		controller_mainline_data[7].agg_occ<0.12 && 
+		controller_mainline_data[9].agg_occ<0.12 && 
+		controller_mainline_data[10].agg_occ<0.12 && 
+		controller_mainline_data[11].agg_occ<0.12 && 
+		controller_mainline_data[12].agg_occ<0.12 && 
+		controller_mainline_data[13].agg_occ<0.12){
+		suggested_speed[1] = 65;
 	}else if (controller_mainline_data[5].agg_occ<0.15 &&
 		controller_mainline_data[7].agg_occ<0.15 && 
 		controller_mainline_data[9].agg_occ<0.15 && 
@@ -2164,25 +2135,25 @@ int main(int argc, char *argv[])
 		controller_mainline_data[12].agg_occ<0.15 && 
 		controller_mainline_data[13].agg_occ<0.15){
 		suggested_speed[1] = 55;
-	}else if (controller_mainline_data[5].agg_occ<0.12 &&
-		controller_mainline_data[7].agg_occ<0.12 && 
-		controller_mainline_data[9].agg_occ<0.12 && 
-		controller_mainline_data[10].agg_occ<0.12 && 
-		controller_mainline_data[11].agg_occ<0.12 && 
-		controller_mainline_data[12].agg_occ<0.12 && 
-		controller_mainline_data[13].agg_occ<0.12){
-		suggested_speed[1] = 65;
-	}else{
-	}
-
-    // check VSA 2
-	if(controller_mainline_data[7].agg_occ<0.2 && 
+	}else if (controller_mainline_data[5].agg_occ<0.2 && 
+		controller_mainline_data[7].agg_occ<0.2 && 
 		controller_mainline_data[9].agg_occ<0.2 && 
 		controller_mainline_data[10].agg_occ<0.2 && 
 		controller_mainline_data[11].agg_occ<0.2 && 
 		controller_mainline_data[12].agg_occ<0.2 && 
 		controller_mainline_data[13].agg_occ<0.2){
-		suggested_speed[2] = 45;
+		suggested_speed[1] = 45; 
+	}else{
+	}
+
+    // check VSA 2
+	if(controller_mainline_data[7].agg_occ<0.12 && 
+		controller_mainline_data[9].agg_occ<0.12 && 
+		controller_mainline_data[10].agg_occ<0.12 && 
+		controller_mainline_data[11].agg_occ<0.12 && 
+		controller_mainline_data[12].agg_occ<0.12 && 
+		controller_mainline_data[13].agg_occ<0.12){
+		suggested_speed[2] = 65;
 	}else if (controller_mainline_data[7].agg_occ<0.15 && 
 		controller_mainline_data[9].agg_occ<0.15 && 
 		controller_mainline_data[10].agg_occ<0.15 && 
@@ -2190,94 +2161,124 @@ int main(int argc, char *argv[])
 		controller_mainline_data[12].agg_occ<0.15 && 
 		controller_mainline_data[13].agg_occ<0.15){
 		suggested_speed[2] = 55;
-	}else if (controller_mainline_data[7].agg_occ<0.12 && 
-		controller_mainline_data[9].agg_occ<0.12 && 
-		controller_mainline_data[10].agg_occ<0.12 && 
-		controller_mainline_data[11].agg_occ<0.12 && 
-		controller_mainline_data[12].agg_occ<0.12 && 
-		controller_mainline_data[13].agg_occ<0.12){
-		suggested_speed[2] = 65;
-	}else{
-	}
-    
-	// check VSA 3 
-	if(controller_mainline_data[9].agg_occ<0.2 &&
+	}else if (controller_mainline_data[7].agg_occ<0.2 && 
+		controller_mainline_data[9].agg_occ<0.2 && 
 		controller_mainline_data[10].agg_occ<0.2 && 
 		controller_mainline_data[11].agg_occ<0.2 && 
 		controller_mainline_data[12].agg_occ<0.2 && 
 		controller_mainline_data[13].agg_occ<0.2){
-		suggested_speed[3] = 45;
+		suggested_speed[2] = 45;
+	}else{
+	}
+    
+	// check VSA 3 
+	if(controller_mainline_data[9].agg_occ<0.12 &&
+		controller_mainline_data[10].agg_occ<0.12 && 
+		controller_mainline_data[11].agg_occ<0.12 && 
+		controller_mainline_data[12].agg_occ<0.12 && 
+		controller_mainline_data[13].agg_occ<0.12){
+		suggested_speed[3] = 65;
 	}else if (controller_mainline_data[9].agg_occ<0.15 &&
 		controller_mainline_data[10].agg_occ<0.15 && 
 		controller_mainline_data[11].agg_occ<0.15 && 
 		controller_mainline_data[12].agg_occ<0.15 && 
 		controller_mainline_data[13].agg_occ<0.15){
 		suggested_speed[3] = 55;
-	}else if (controller_mainline_data[9].agg_occ<0.12 &&
-		controller_mainline_data[10].agg_occ<0.12 && 
-		controller_mainline_data[11].agg_occ<0.12 && 
-		controller_mainline_data[12].agg_occ<0.12 && 
-		controller_mainline_data[13].agg_occ<0.12){
-		suggested_speed[3] = 65;
+	}else if (controller_mainline_data[9].agg_occ<0.2 &&
+		controller_mainline_data[10].agg_occ<0.2 && 
+		controller_mainline_data[11].agg_occ<0.2 && 
+		controller_mainline_data[12].agg_occ<0.2 && 
+		controller_mainline_data[13].agg_occ<0.2){
+		suggested_speed[3] = 45;
 	}else{
 	}
 
 	// check VSA 4
-	if(controller_mainline_data[10].agg_occ<0.2 &&
-		controller_mainline_data[11].agg_occ<0.2 && 
-		controller_mainline_data[12].agg_occ<0.2 && 
-		controller_mainline_data[13].agg_occ<0.2){
-		suggested_speed[4] = 45;
+	if(controller_mainline_data[10].agg_occ<0.12 &&
+		controller_mainline_data[11].agg_occ<0.12 && 
+		controller_mainline_data[12].agg_occ<0.12 && 
+		controller_mainline_data[13].agg_occ<0.12){
+		suggested_speed[4] = 65;
 	}else if (controller_mainline_data[10].agg_occ<0.15 &&
 		controller_mainline_data[11].agg_occ<0.15 && 
 		controller_mainline_data[12].agg_occ<0.15 && 
 		controller_mainline_data[13].agg_occ<0.15){
 		suggested_speed[4] = 55;
-	}else if (controller_mainline_data[10].agg_occ<0.12 &&
-		controller_mainline_data[11].agg_occ<0.12 && 
-		controller_mainline_data[12].agg_occ<0.12 && 
-		controller_mainline_data[13].agg_occ<0.12){
-		suggested_speed[4] = 65;
+	}else if (controller_mainline_data[10].agg_occ<0.2 &&
+		controller_mainline_data[11].agg_occ<0.2 && 
+		controller_mainline_data[12].agg_occ<0.2 && 
+		controller_mainline_data[13].agg_occ<0.2){
+		suggested_speed[4] = 45;
 	}else{
 	}
 
 	// check VSA 5
-	if(controller_mainline_data[11].agg_occ<0.2 &&
-		controller_mainline_data[12].agg_occ<0.2 && 
-		controller_mainline_data[13].agg_occ<0.2){
-		suggested_speed[5] = 45;
+	if(controller_mainline_data[11].agg_occ<0.12 &&
+		controller_mainline_data[12].agg_occ<0.12 && 
+		controller_mainline_data[13].agg_occ<0.12){
+		suggested_speed[5] = 65;
 	}else if (controller_mainline_data[11].agg_occ<0.15 &&
 		controller_mainline_data[12].agg_occ<0.15 && 
 		controller_mainline_data[13].agg_occ<0.15){
 		suggested_speed[5] = 55;
-	}else if (controller_mainline_data[11].agg_occ<0.12 &&
-		controller_mainline_data[12].agg_occ<0.12 && 
-		controller_mainline_data[13].agg_occ<0.12){
-		suggested_speed[5] = 65;
+	}else if (controller_mainline_data[11].agg_occ<0.2 &&
+		controller_mainline_data[12].agg_occ<0.2 && 
+		controller_mainline_data[13].agg_occ<0.2){
+		suggested_speed[5] = 45;
 	}else{
 	}
 
 	// check VSA 6
-    if(controller_mainline_data[12].agg_occ<0.2 && 
-		controller_mainline_data[13].agg_occ<0.2){
-		suggested_speed[6] = 45;
+    if(controller_mainline_data[12].agg_occ<0.12 && 
+		controller_mainline_data[13].agg_occ<0.12){
+		suggested_speed[6] = 65;
 	}else if (controller_mainline_data[12].agg_occ<0.15 && 
 		controller_mainline_data[13].agg_occ<0.15){
 		suggested_speed[6] = 55;
-	}else if (controller_mainline_data[12].agg_occ<0.12 && 
-		controller_mainline_data[13].agg_occ<0.12){
-		suggested_speed[6] = 65;
+	}else if (controller_mainline_data[12].agg_occ<0.2 && 
+		controller_mainline_data[13].agg_occ<0.2){
+		suggested_speed[6] = 45;
 	}else{
 	}
     
 	// check VSA 7
-    if(controller_mainline_data[13].agg_occ<0.2){
-		suggested_speed[7] = 45;
+    if(controller_mainline_data[13].agg_occ<0.12){
+		suggested_speed[7] = 65;
 	}else if (controller_mainline_data[13].agg_occ<0.15){
 		suggested_speed[7] = 55;
-	}else if (controller_mainline_data[13].agg_occ<0.12){
-		suggested_speed[7] = 65;
+	}else if (controller_mainline_data[13].agg_occ<0.2){
+		suggested_speed[7] = 45;
 	}else{
+	}
+
+	// you can add more limitation here if you understand traffic and driver behavior
+	// limit VSA not greater than measured speed
+    if (suggested_speed[1] > local_speed_fused_1+5){
+	     suggested_speed[1] = local_speed_fused_1+5;
+	}
+    
+	if (suggested_speed[2] > local_speed_fused_2+5){
+	     suggested_speed[2] = local_speed_fused_2+5;
+	}
+
+	if (suggested_speed[3] > local_speed_fused_3+5){
+	     suggested_speed[3] = local_speed_fused_3+5;
+	}
+
+	if (suggested_speed[4] > local_speed_fused_4+5){
+	     suggested_speed[4] = local_speed_fused_4+5;
+	}
+    
+	if (suggested_speed[5] > local_speed_fused_5+5){
+	     suggested_speed[5] = local_speed_fused_5+5;
+	}
+
+	if (suggested_speed[6] > local_speed_fused_6+5){
+	     suggested_speed[6] = local_speed_fused_6+5;
+	}
+    
+	if (suggested_speed[7] > local_speed_fused_7+5){
+	     suggested_speed[7] = local_speed_fused_7+5;
 	}
 
 	// for construction region near Twin Oaks (VSA 5) and Barham Pkwy (VSA 6), set those VSA max speed as 55 mph
@@ -2289,6 +2290,12 @@ int main(int argc, char *argv[])
     suggested_speed[3] = mind(65, maxd(5, suggested_speed[3]));
     suggested_speed[4] = mind(65, maxd(5, suggested_speed[4]));
     suggested_speed[7] = mind(65, maxd(5, suggested_speed[7]));
+
+	// save VSA values at previous time step and at 2 steps before
+     for (i=1; i<=NUM_SIGNS; i++){
+       prev_prev_suggested_speed[i] = prev_suggested_speed[i];
+	   prev_suggested_speed[i] = suggested_speed[i];
+	 }
 
 		webdatafp = fopen("/var/www/html/VSA/scripts/VSA_performance_plot.txt", "w");
 		fprintf(webdatafp, "Intersection Name,speed(mph),volume(VPH/100),occupancy(%%),VSA(mph),radar speed(mph)");
