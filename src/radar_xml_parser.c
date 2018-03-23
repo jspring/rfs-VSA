@@ -218,6 +218,7 @@ int main(int argc, char *argv[]) {
 		total_targets,
 		speed_count
 	);
+	db_locinfo.weighted_speed_average *= 0.621371;
 	if( (db_locinfo.name < 8) && (db_locinfo.name > 0) )
 		db_clt_write(pclt, db_vsa_sign_ids[db_locinfo.name - 1].id, sizeof(db_locinfo_t), &db_locinfo);
 	}

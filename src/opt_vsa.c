@@ -2329,7 +2329,7 @@ int main(int argc, char *argv[])
 				controller_mainline_data[5].agg_vol/100.0,
 				controller_mainline_data[5].agg_occ,
 				suggested_speed_int,
-				db_locinfo[j].weighted_speed_average * 0.6214
+				db_locinfo[j].weighted_speed_average
 			);
 
 			if(j == 1)
@@ -2339,7 +2339,7 @@ int main(int argc, char *argv[])
 				controller_mainline_data[7].agg_vol/100.0,
 				controller_mainline_data[7].agg_occ,
 				suggested_speed_int,
-				db_locinfo[j].weighted_speed_average * 0.6214
+				db_locinfo[j].weighted_speed_average
 			);
 
 			if(j == 2)
@@ -2349,7 +2349,7 @@ int main(int argc, char *argv[])
 				controller_mainline_data[9].agg_vol/100.0,
 				controller_mainline_data[9].agg_occ,
 				suggested_speed_int,
-				db_locinfo[j].weighted_speed_average * 0.6214
+				db_locinfo[j].weighted_speed_average
 			);
 
 			if(j == 3)
@@ -2359,7 +2359,7 @@ int main(int argc, char *argv[])
 				controller_mainline_data[10].agg_vol/100.0,
 				controller_mainline_data[10].agg_occ,
 				suggested_speed_int,
-				db_locinfo[j].weighted_speed_average * 0.6214
+				db_locinfo[j].weighted_speed_average
 			);
 
 			if(j == 4)
@@ -2369,7 +2369,7 @@ int main(int argc, char *argv[])
 				controller_mainline_data[11].agg_vol/100.0,
 				controller_mainline_data[11].agg_occ,
 				suggested_speed_int,
-				db_locinfo[j].weighted_speed_average * 0.6214
+				db_locinfo[j].weighted_speed_average
 			);
 
 			if(j == 5)
@@ -2379,7 +2379,7 @@ int main(int argc, char *argv[])
 				controller_mainline_data[12].agg_vol/100.0,
 				controller_mainline_data[12].agg_occ,
 				suggested_speed_int,
-				db_locinfo[j].weighted_speed_average * 0.6214
+				db_locinfo[j].weighted_speed_average
 			);
 
 			if(j == 6)
@@ -2389,7 +2389,7 @@ int main(int argc, char *argv[])
 				controller_mainline_data[13].agg_vol/100.0,
 				controller_mainline_data[13].agg_occ,
 				suggested_speed_int,
-				db_locinfo[j].weighted_speed_average * 0.6214
+				db_locinfo[j].weighted_speed_average
 			);
 	    	} 
 		fclose(webdatafp);
