@@ -28,7 +28,7 @@ typedef struct {
 
 
 typedef struct {
-	char datetime[100];
+	char datetime[30];
 	unsigned char count;
 	unsigned char speed;
 } raw_record_t;
@@ -43,12 +43,13 @@ typedef struct {
 }locinfo_t;
 
 typedef struct {
+	char datetime[30];
 	char name;
 	stats_t stats;
 	float weighted_speed_average;
 	int total_targets;
 	int speed_count;
-}db_locinfo_t;
+}IS_PACKED db_locinfo_t;
 
 extern db_id_t db_vsa_sign_ids[NUM_SIGNS];
 

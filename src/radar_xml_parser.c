@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
 //			db_clt_write(pclt, DB_LDS_BASE_VAR + (i * VAR_INC), sizeof(loop_data_t)*NUM_LOOPNAMES, &lds[i][0]);
 	
 
-	i = 0;
+	i = -1;
 
         node2 = mxmlFindElement(node, node, "raw_records", NULL, NULL, MXML_DESCEND);
         for (node3 = mxmlFindElement(node2, node2, "record", NULL, NULL,
@@ -167,13 +167,14 @@ int main(int argc, char *argv[]) {
                                     MXML_DESCEND))
         {
 
+		i++;
 		textvalue= mxmlElementGetAttr(node3, "datetime");
 		if(textvalue == NULL)
 			strcpy(locinfo.raw_record[i][0].datetime, "none");
 		else
 			strcpy(locinfo.raw_record[i][0].datetime, textvalue);
 
-		j = 0;
+		j = -1;
 	total_targets = 0;
 	speed_count = 0;
 		for( node4 = mxmlFindElement(node3, node3, "counter", NULL, NULL, MXML_DESCEND);
@@ -181,6 +182,7 @@ int main(int argc, char *argv[]) {
 			node4 = mxmlFindElement(node4, node3, "counter", NULL, NULL,
                                     MXML_DESCEND))
 		{
+			j++;
 			textvalue = (char *)mxmlGetText(node4, &whitespacevalue);
 			locinfo.raw_record[i][j].count = (textvalue == NULL) ? 0 : atoi(textvalue);
 			textvalue= mxmlElementGetAttr(node4, "speed");
@@ -194,9 +196,7 @@ int main(int argc, char *argv[]) {
 				locinfo.raw_record[i][j].speed,
 				locinfo.raw_record[i][0].datetime
 			);
-			j++;
 		}
-		i++;
 	}
 	locinfo.weighted_speed_average = total_targets > 0 ? (float)(speed_count)/total_targets : 0;
 	db_locinfo.stats.max_speed = locinfo.stats.max_speed;
@@ -210,13 +210,15 @@ int main(int argc, char *argv[]) {
 	db_locinfo.speed_count = speed_count;
 	db_locinfo.name = atoi(locinfo.location.name);
 	db_locinfo.weighted_speed_average = locinfo.weighted_speed_average;
+	strncpy(db_locinfo.datetime, locinfo.raw_record[i][0].datetime, 30 );
 
-	printf("Location %d Weighted speed average %.2f kph %.2f mph total_targets %d speed_count %d\n", 
+	printf("Location %d Weighted speed average %.2f kph %.2f mph total_targets %d speed_count %d final datetime %s\n", 
 		db_locinfo.name,
 		db_locinfo.weighted_speed_average,
 		db_locinfo.weighted_speed_average * 0.621371,
 		total_targets,
-		speed_count
+		speed_count,
+		db_locinfo.datetime
 	);
 	db_locinfo.weighted_speed_average *= 0.621371;
 	if( (db_locinfo.name < 8) && (db_locinfo.name > 0) )
