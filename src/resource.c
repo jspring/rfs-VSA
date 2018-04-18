@@ -543,13 +543,13 @@ float hm_speed_aggregation_mainline(loop_data_t lds[], float hm_speed_prev, stru
 	var_speed = var_array(speed_temp, confidence->num_good_vals);
 	
 	// this loop replace data with large variance
-	for(i=0 ; i < NUM_LANES ; i++) {
+	for(i=0 ; i < confidence->num_good_vals; i++) {
 	    if (abs(speed_temp[i]-mean_speed)>5*sqrt(abs(var_speed)))
 	    speed_temp[i] = mean_speed;
 	}
 
 	// compute harmonic mean
-	for(i=0 ; i < NUM_LANES ; i++) {
+	for(i=0 ; i < confidence->num_good_vals; i++) {
 		if((flow[i] < 10 && occupancy[i] < 1 )) // check flow and occupancy
 		    speed_temp[i]= maxd(hm_speed_prev,5);
 			
