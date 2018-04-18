@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 		if( (strcmp(textvalue, LdsId_onramp2[i][0]) ) == 0) {
 			mainline_counter = mainline_speed = mainline_occupancy = mainline_volume = 0;
 
-//			printf("%s: LdsID %s\n", LdsId_onramp2[i][1], textvalue);
+			printf("%s: LdsID %s\n", LdsId_onramp2[i][1], textvalue);
 		        for (node3 = mxmlFindElement(node, node, "LoopDiags", NULL, NULL,
                                     MXML_DESCEND);
              		node3 != NULL;
@@ -121,6 +121,7 @@ int main(int argc, char *argv[]) {
 						break;
 					}		
 				}		
+				strncpy(textvalue, lds[i][j].loopname, 5);
         			node3 = mxmlFindElement(node3, node, "RawSpeed", NULL, NULL, MXML_DESCEND);
         			textvalue = (char *)mxmlGetText(node3, &whitespacevalue);
 				lds[i][j].rawspeed = atoi(textvalue);
@@ -148,14 +149,19 @@ int main(int argc, char *argv[]) {
         			node3 = mxmlFindElement(node3, node, "RawOccupancyCount", NULL, NULL, MXML_DESCEND);
         			textvalue = (char *)mxmlGetText(node3, &whitespacevalue);
 
-//				printf("LoopName %s RawloopErrorStatus %d rawLoopErrorStatus %s RawSpeed %d RawVolume %d RawOccupancy %.2f\n",
-//					lds[i][j].loopname,
-//					lds[i][j].rawlooperrorstatus,
-//					rawlooperrorstatus,
-//					lds[i][j].rawspeed,
-//					lds[i][j].rawvolume,
-//					lds[i][j].rawoccupancy/10.0
-//				);
+				if(lds[i][j].rawlooperrorstatus == 0) {
+					lds[i][j].rawspeed = -1;
+					lds[i][j].rawvolume = -1;
+					lds[i][j].rawoccupancy = 0;
+				}
+				printf("LoopName %s RawloopErrorStatus %d rawLoopErrorStatus %s RawSpeed %d RawVolume %d RawOccupancy %.2f\n",
+					lds[i][j].loopname,
+					lds[i][j].rawlooperrorstatus,
+					rawlooperrorstatus,
+					lds[i][j].rawspeed,
+					lds[i][j].rawvolume,
+					lds[i][j].rawoccupancy/10.0
+				);
 
         		}
 //			printf("\n");
